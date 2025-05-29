@@ -1,0 +1,171 @@
+{
+  "recipes": [
+    {
+      "id": 1,
+      "title": "Spaghetti Bolognese",
+      "description": "A classic Italian meat sauce served over al dente spaghetti.",
+      "imageUrl": "/images/spaghetti-bolognese.jpg",
+      "servings": 4,
+      "prepTimeMinutes": 15,
+      "cookTimeMinutes": 60,
+      "ingredients": [
+        { "name": "spaghetti", "quantity": 400, "unit": "g" },
+        { "name": "ground beef", "quantity": 500, "unit": "g" },
+        { "name": "tomato sauce", "quantity": 800, "unit": "g" },
+        { "name": "onion", "quantity": 1, "unit": "pc" },
+        { "name": "garlic", "quantity": 2, "unit": "cloves" },
+        { "name": "olive oil", "quantity": 2, "unit": "tbsp" },
+        { "name": "fresh basil", "quantity": 5, "unit": "leaves" },
+        { "name": "salt", "quantity": 1, "unit": "tsp" },
+        { "name": "black pepper", "quantity": 0.5, "unit": "tsp" }
+      ],
+      "steps": [
+        "Chop onion and garlic.",
+        "Heat oil in a pan, sauté onion until translucent.",
+        "Add garlic and ground beef, cook until browned.",
+        "Stir in tomato sauce, basil, salt, and pepper. Simmer 45 minutes.",
+        "Cook spaghetti according to package instructions.",
+        "Serve sauce over spaghetti and garnish with extra basil."
+      ],
+      "tags": ["Italian", "Pasta", "Dinner"]
+    },
+    {
+      "id": 2,
+      "title": "Chicken Tikka Masala",
+      "description": "Tender chicken pieces in a creamy, spiced tomato curry sauce.",
+      "imageUrl": "/images/chicken-tikka-masala.jpg",
+      "servings": 4,
+      "prepTimeMinutes": 20,
+      "cookTimeMinutes": 40,
+      "ingredients": [
+        { "name": "chicken breast", "quantity": 500, "unit": "g" },
+        { "name": "plain yogurt", "quantity": 100, "unit": "g" },
+        { "name": "tikka masala paste", "quantity": 2, "unit": "tbsp" },
+        { "name": "tomato puree", "quantity": 200, "unit": "g" },
+        { "name": "heavy cream", "quantity": 100, "unit": "ml" },
+        { "name": "onion", "quantity": 1, "unit": "pc" },
+        { "name": "garlic", "quantity": 2, "unit": "cloves" },
+        { "name": "ginger", "quantity": 1, "unit": "inch" },
+        { "name": "vegetable oil", "quantity": 1, "unit": "tbsp" },
+        { "name": "salt", "quantity": 1, "unit": "tsp" }
+      ],
+      "steps": [
+        "Marinate chicken in yogurt and tikka paste for 30 minutes.",
+        "Sauté chopped onion, garlic, and ginger in oil until soft.",
+        "Add tomato puree, cook 5 minutes.",
+        "Stir in cream and marinated chicken. Simmer 25–30 minutes until chicken is cooked.",
+        "Adjust seasoning and serve with rice or naan."
+      ],
+      "tags": ["Indian", "Curry", "Spicy"]
+    },
+    {
+      "id": 3,
+      "title": "Vegan Buddha Bowl",
+      "description": "A colorful bowl of quinoa, roasted chickpeas, and fresh veggies.",
+      "imageUrl": "/images/vegan-buddha-bowl.jpg",
+      "servings": 2,
+      "prepTimeMinutes": 20,
+      "cookTimeMinutes": 15,
+      "ingredients": [
+        { "name": "quinoa", "quantity": 200, "unit": "g" },
+        { "name": "canned chickpeas", "quantity": 400, "unit": "g" },
+        { "name": "avocado", "quantity": 1, "unit": "pc" },
+        { "name": "baby spinach", "quantity": 100, "unit": "g" },
+        { "name": "carrot", "quantity": 1, "unit": "pc" },
+        { "name": "olive oil", "quantity": 2, "unit": "tbsp" },
+        { "name": "lemon juice", "quantity": 1, "unit": "tbsp" },
+        { "name": "salt", "quantity": 0.5, "unit": "tsp" },
+        { "name": "pepper", "quantity": 0.25, "unit": "tsp" }
+      ],
+      "steps": [
+        "Cook quinoa according to package directions.",
+        "Toss chickpeas with 1 tbsp oil, salt, and pepper; roast 15 minutes at 200°C.",
+        "Slice avocado and carrot into ribbons.",
+        "Assemble bowls with quinoa, chickpeas, spinach, avocado, and carrot.",
+        "Drizzle with remaining oil and lemon juice before serving."
+      ],
+      "tags": ["Vegan", "Healthy", "Gluten-Free"]
+    },
+    {
+      "id": 4,
+      "title": "Chocolate Chip Cookies",
+      "description": "Soft-baked cookies loaded with melty chocolate chips.",
+      "imageUrl": "/images/chocolate-chip-cookies.jpg",
+      "servings": 24,
+      "prepTimeMinutes": 15,
+      "cookTimeMinutes": 10,
+      "ingredients": [
+        { "name": "all-purpose flour", "quantity": 300, "unit": "g" },
+        { "name": "granulated sugar", "quantity": 150, "unit": "g" },
+        { "name": "brown sugar", "quantity": 150, "unit": "g" },
+        { "name": "unsalted butter", "quantity": 200, "unit": "g" },
+        { "name": "egg", "quantity": 1, "unit": "pc" },
+        { "name": "vanilla extract", "quantity": 1, "unit": "tsp" },
+        { "name": "chocolate chips", "quantity": 200, "unit": "g" },
+        { "name": "baking powder", "quantity": 1, "unit": "tsp" },
+        { "name": "salt", "quantity": 0.5, "unit": "tsp" }
+      ],
+      "steps": [
+        "Cream butter and sugars until light and fluffy.",
+        "Beat in egg and vanilla.",
+        "Whisk flour, baking powder, and salt; gradually add to butter mixture.",
+        "Fold in chocolate chips.",
+        "Drop by tablespoonfuls onto a baking sheet and bake 10 minutes at 180°C."
+      ],
+      "tags": ["Dessert", "Baking", "Snack"]
+    },
+    {
+      "id": 5,
+      "title": "Greek Salad",
+      "description": "A fresh, no-cook salad with cucumbers, tomatoes, feta, and olives.",
+      "imageUrl": "/images/greek-salad.jpg",
+      "servings": 4,
+      "prepTimeMinutes": 15,
+      "cookTimeMinutes": 0,
+      "ingredients": [
+        { "name": "cucumber", "quantity": 1, "unit": "pc" },
+        { "name": "tomatoes", "quantity": 2, "unit": "pc" },
+        { "name": "red onion", "quantity": 0.5, "unit": "pc" },
+        { "name": "feta cheese", "quantity": 150, "unit": "g" },
+        { "name": "kalamata olives", "quantity": 100, "unit": "g" },
+        { "name": "olive oil", "quantity": 3, "unit": "tbsp" },
+        { "name": "lemon juice", "quantity": 1, "unit": "tbsp" },
+        { "name": "dried oregano", "quantity": 1, "unit": "tsp" },
+        { "name": "salt", "quantity": 0.5, "unit": "tsp" }
+      ],
+      "steps": [
+        "Chop cucumber, tomatoes, and onion; place in a bowl.",
+        "Crumble feta over the veggies and scatter olives.",
+        "Whisk oil, lemon juice, oregano, and salt, then toss with salad.",
+        "Serve immediately or chill 10 minutes to meld flavors."
+      ],
+      "tags": ["Salad", "Vegetarian", "Gluten-Free"]
+    },
+    {
+      "id": 6,
+      "title": "Fluffy Pancakes",
+      "description": "Golden, fluffy pancakes perfect for a weekend breakfast.",
+      "imageUrl": "/images/fluffy-pancakes.jpg",
+      "servings": 4,
+      "prepTimeMinutes": 10,
+      "cookTimeMinutes": 20,
+      "ingredients": [
+        { "name": "all-purpose flour", "quantity": 200, "unit": "g" },
+        { "name": "milk", "quantity": 300, "unit": "ml" },
+        { "name": "egg", "quantity": 1, "unit": "pc" },
+        { "name": "baking powder", "quantity": 1, "unit": "tsp" },
+        { "name": "granulated sugar", "quantity": 1, "unit": "tbsp" },
+        { "name": "salt", "quantity": 0.25, "unit": "tsp" },
+        { "name": "butter", "quantity": 1, "unit": "tbsp" }
+      ],
+      "steps": [
+        "Whisk flour, baking powder, sugar, and salt in a bowl.",
+        "In another bowl, beat egg and milk together.",
+        "Pour wet into dry ingredients; stir until just combined.",
+        "Melt butter in a skillet, then pour ¼-cup batter for each pancake.",
+        "Cook 2–3 minutes per side until golden."
+      ],
+      "tags": ["Breakfast", "Sweet", "Vegetarian"]
+    }
+  ]
+}

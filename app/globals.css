@@ -80,8 +80,8 @@
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+    --background: #fafafa;
+    --foreground: #000000;
   }
 }
 
@@ -131,5 +131,23 @@ body {
   }
   body {
     @apply bg-background text-foreground;
+  }
+}
+
+@layer components {
+  .wrapper {
+    @apply max-w-[1280px] mx-auto px-4 sm:px-6 lg:px-8;
+  }
+
+  .wrapper-md {
+    @apply max-w-3xl w-full mx-auto px-4 sm:px-6 lg:px-8;
+  }
+
+  .wrapper-lg {
+    @apply max-w-4xl w-full mx-auto px-4 sm:px-6 lg:px-8;
+  }
+
+  .page {
+    @apply flex flex-col min-h-screen pt-12.5 pb-20 gap-9;
   }
 }

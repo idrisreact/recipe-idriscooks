@@ -1,12 +1,9 @@
-"use client"
+"use client";
 
-interface ContainerProps{
-    children:React.ReactNode
+interface ContainerProps {
+  children: React.ReactNode;
 }
 
-export const Container =({children}:ContainerProps)=>{
-
-
-
-    return <div className="m-auto w-full px-16">{children}</div>
-}
+export const Container = ({ children }: ContainerProps) => {
+  return <div className="mx-auto w-full px-4 max-w-screen-lg">{children}</div>;
+};
