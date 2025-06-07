@@ -13,7 +13,7 @@ export function BouncingText() {
 
   return (
     <h1 className="text-4xl flex sm:w-full bouncing-text text-center md:text-5xl">
-      Taste Perfection: Premium Recipes Curated by Idris
+      Cook Like Idris: Bold, Premium, Unforgettable
     </h1>
   );
 }
