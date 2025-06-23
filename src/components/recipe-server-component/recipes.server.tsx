@@ -1,45 +1,25 @@
 "use client";
-import { authClient } from "@/src/utils/auth-client";
 import { Text } from "@/src/components/ui/Text";
 import { Session } from "@/src/types";
 import { Heading } from "../heading/heading";
 import { CategoryTitle } from "../catergory/catergory-title";
 import { VerticalSpace } from "../ui/VerticalSpace";
 import { useRouter } from "next/navigation";
+import { useAuth } from "@/src/hooks/use-auth";
+import { useMemo } from "react";
 
-import recipesData from "../../../data/recipe.json";
-import { ByTagIndex, RecipesData } from "@/src/types/recipes.types";
-
-export function groupRecipesByTag(data: RecipesData): ByTagIndex {
-  const byTag: ByTagIndex = {};
-
-  for (const recipe of data.recipes) {
-    for (const tag of recipe.tags) {
-      if (!byTag[tag]) {
-        byTag[tag] = [];
-      }
-      byTag[tag].push({ id: recipe.id, title: recipe.title });
-    }
-  }
-
-  return byTag;
-}
 interface Props {
   session: Session | null;
+  tags: string[];
 }
 
-export const Recipes = ({ session }: Props) => {
-  const signIn = async () => {
-    await authClient.signIn.social({
-      provider: "google",
-    });
-  };
+const MAX_TAG_CATEGORIES = 5;
 
+export const Recipes = ({ session, tags }: Props) => {
+  const { signIn } = useAuth();
   const router = useRouter();
 
-  const tags = groupRecipesByTag(recipesData);
-
-  console.log(tags);
+  const slugs = useMemo(() => tags.slice(0, MAX_TAG_CATEGORIES), [tags]);
 
   return (
     <div>
@@ -52,7 +32,7 @@ export const Recipes = ({ session }: Props) => {
           </Text>
           <button
             type="button"
-            aria-label="sign in with google"
+            aria-label="Sign in with google"
             onClick={signIn}
             className="self-baseline bg-white p-2 text-black rounded-3xl border-2 text-sm cursor-pointer"
           >
@@ -61,11 +41,17 @@ export const Recipes = ({ session }: Props) => {
         </div>
       )}
       <VerticalSpace space="16" />
-      <CategoryTitle
-        title="Featured"
-        onClick={() => router.push("/featured")}
-      />
-      {JSON.stringify({ tags }, null, 2)}
+
+      <div>
+        {slugs &&
+          slugs.map((val) => (
+            <CategoryTitle
+              title={val}
+              key={val}
+              onClick={() => router.push(`/recipes/category/${val}`)}
+            />
+          ))}
+      </div>
     </div>
   );
 };
