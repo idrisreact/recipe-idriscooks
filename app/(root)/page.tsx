@@ -1,6 +1,5 @@
 import { AboutSection } from "@/src/components/about-section/about-section";
 import { BouncingText } from "@/src/components/hero-animation-text/hero-animation-text";
-import { Container } from "@/src/components/ui/Container";
 import { ScrollIndicator } from "@/src/components/ui/scroll-component";
 import { VerticalSpace } from "@/src/components/ui/VerticalSpace";
 import { authClient } from "@/src/utils/auth-client";

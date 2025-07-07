@@ -4,7 +4,7 @@
       "id": 1,
       "title": "Spaghetti Bolognese",
       "description": "A classic Italian meat sauce served over al dente spaghetti.",
-      "imageUrl": "/images/spaghetti-bolognese.jpg",
+      "imageUrl": "https://images.pexels.com/photos/725990/pexels-photo-725990.jpeg",
       "servings": 4,
       "prepTimeMinutes": 15,
       "cookTimeMinutes": 60,
