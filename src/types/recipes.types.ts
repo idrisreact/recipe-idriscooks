@@ -30,3 +30,10 @@ export interface Ingredient {
       title: string;
     }[]
   >;
+
+
+ export type RecipeResponse = {
+    data: Recipe[];
+    count: number;
+    search: string;
+  };

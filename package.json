@@ -9,7 +9,7 @@
     "lint": "next lint",
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build",
-    "drizzle-studio":"npx drizzle-kit studio"
+    "drizzle-studio": "npx drizzle-kit studio"
   },
   "dependencies": {
     "@heroicons/react": "^2.2.0",
@@ -17,6 +17,7 @@
     "@radix-ui/react-icons": "^1.3.2",
     "@radix-ui/react-label": "^2.1.7",
     "@radix-ui/react-slot": "^1.2.3",
+    "@tanstack/react-query": "^5.81.5",
     "better-auth": "^1.2.7",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",

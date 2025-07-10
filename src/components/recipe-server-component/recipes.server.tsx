@@ -2,11 +2,10 @@
 import { Text } from "@/src/components/ui/Text";
 import { Session } from "@/src/types";
 import { Heading } from "../heading/heading";
-import { CategoryTitle } from "../catergory/catergory-title";
 import { VerticalSpace } from "../ui/VerticalSpace";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/src/hooks/use-auth";
-import { ChangeEvent, useEffect, useMemo, useState } from "react";
+import { useMemo } from "react";
 import { Input } from "@/components/ui/input";
 import { z } from "zod";
 import { useForm } from "react-hook-form";
@@ -19,29 +18,27 @@ import {
   FormLabel,
 } from "@/components/ui/form";
 import { Button } from "@/components/ui/button";
-import recipes from "@/data/recipe.json";
 import { useDebounce } from "@/src/hooks/use-debounce";
 import { Card } from "../card/card";
+import { useQuery, keepPreviousData } from "@tanstack/react-query";
+import { RecipeResponse } from "@/src/types/recipes.types";
 
 interface Props {
   session: Session | null;
-  tags: string[];
 }
 
-const MAX_TAG_CATEGORIES = 5;
+type FormValues = {
+  search: string;
+};
+const formSchema = z.object({
+  search: z.string().min(3, "must be more than 3 letters long"),
+});
 
-export const Recipes = ({ session, tags }: Props) => {
+export const Recipes = ({ session }: Props) => {
   const { signIn } = useAuth();
   const router = useRouter();
 
-  const slugs = useMemo(() => tags.slice(0, MAX_TAG_CATEGORIES), [tags]);
-  const [searchedRecipe, setSearchRecipe] = useState("");
-
-  const formSchema = z.object({
-    search: z.string().min(3, "must be more than 3 letters long"),
-  });
-
-  const form = useForm<z.infer<typeof formSchema>>({
+  const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       search: "",
@@ -50,23 +47,34 @@ export const Recipes = ({ session, tags }: Props) => {
 
   const raw = form.watch("search");
 
-  const debounceValue = useDebounce(raw, 500);
-  const [results, setResults] = useState<string | null>("");
-  useEffect(() => {
-    if (debounceValue.length > 3) {
-      const match = recipes.recipes.find((recipe) =>
-        recipe.title
-          .toLocaleLowerCase()
-          .includes(debounceValue.toLocaleLowerCase())
-      );
-      setResults(match?.title ?? "no results found");
-    } else {
-      setResults(null);
-    }
-  }, [debounceValue]);
+  const debounced = useDebounce(raw, 500);
+
+  const {
+    data: recipes = { data: [], count: 0, search: "" },
+    isLoading,
+    isError,
+  } = useQuery<RecipeResponse>({
+    queryKey: ["recipes", debounced],
+    queryFn: async () => {
+      const url = new URL("/api/recipes", window.location.origin);
+      if (debounced.length >= 3) {
+        url.searchParams.set("search", debounced);
+      }
+      const res = await fetch(url.toString());
+      if (!res.ok) {
+        throw new Error(`Error ${res.status}`);
+      }
+      return res.json() as Promise<RecipeResponse>;
+    },
+    enabled: debounced.length === 0 || debounced.length >= 3,
+    placeholderData: keepPreviousData,
+  });
+
+  if (isLoading) return <div>Loading…</div>;
+  if (isError) return <div>Failed to load recipes</div>;
 
   return (
-    <div>
+    <div className="mx-auto lg:w-4xl">
       {session ? (
         <Heading title="Welcome" subTitle={session.user.name} />
       ) : (
@@ -107,22 +115,22 @@ export const Recipes = ({ session, tags }: Props) => {
           </form>
         </Form>
         <VerticalSpace space="8" />
-        {results && (
-          <div className="flex gap-5">
-            <Card
-              backgroundImage={recipes.recipes[0].imageUrl}
-              heading={recipes.recipes[0].title}
-              lead={recipes.recipes[0].description.slice(0, 10)}
-              secondaryLead={recipes.recipes[0].tags[0]}
-            />
-            <Card
-              backgroundImage={recipes.recipes[0].imageUrl}
-              heading={recipes.recipes[0].title}
-              lead={recipes.recipes[0].description.slice(0, 10)}
-              secondaryLead={recipes.recipes[0].tags[0]}
-            />
-          </div>
-        )}
+        <div className=" flex gap-5 flex-wrap">
+          {recipes.data.length === 0 ? (
+            <Text as="h1">No recipes found for {debounced}</Text>
+          ) : (
+            recipes.data.map((recipe) => (
+              <Card
+                key={recipe.id}
+                backgroundImage={recipe.imageUrl}
+                heading={recipe.title}
+                lead={recipe.description.slice(0, 10)}
+                secondaryLead={recipe.tags[0]}
+                onClick={() => router.push(`/recipes/category/${recipe.title}`)}
+              />
+            ))
+          )}
+        </div>
       </div>
     </div>
   );

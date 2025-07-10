@@ -6,7 +6,7 @@ type CardProps = {
   avatar?: string;
   lead: string;
   secondaryLead: string;
-  onCLick?: () => void;
+  onClick?: () => void;
 };
 
 export const Card = ({
@@ -15,13 +15,14 @@ export const Card = ({
   avatar,
   lead,
   secondaryLead,
-  onCLick,
+  onClick,
 }: CardProps) => {
   return (
     <article
       className="relative w-64 h-80 rounded-lg overflow-hidden bg-center bg-cover"
       style={{ backgroundImage: `url(${backgroundImage})` }}
       aria-label={heading}
+      onClick={onClick}
     >
       <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent" />
 
