@@ -58,6 +58,11 @@ export const LayoutHeader = ({ children }: LayoutHeaderProps) => {
             <li className="mr-2">
               <Link href={"/recipes"}>Recipes</Link>
             </li>
+            {session && (
+              <li className="mr-2">
+                <Link href={"/favorites"}>Favorites</Link>
+              </li>
+            )}
             <li className="mr-2">
               <Link href={"/about"}>About</Link>
             </li>

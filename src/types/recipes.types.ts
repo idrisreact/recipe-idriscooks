@@ -11,8 +11,8 @@ export interface Ingredient {
     description: string;
     imageUrl: string;
     servings: number;
-    prepTimeMinutes: number;
-    cookTimeMinutes: number;
+    prepTime: number;
+    cookTime: number;
     ingredients: Ingredient[];
     steps: string[];
     tags: string[];
