@@ -14,6 +14,7 @@ import { RecipeFilters } from "./recipe-filters";
 import { RecipeCard } from "./recipe-card";
 import { RecipeLoadingSkeleton } from "./recipe-loading-skeleton";
 import { RecipeEmptyState } from "./recipe-empty-state";
+import { PDFGenerator } from "./pdf-generator";
 
 interface Props {
   session: Session | null;
@@ -105,6 +106,13 @@ export const Recipes = ({ session }: Props) => {
         onToggleFilters={() => setShowFilters(!showFilters)}
         resultsCount={recipes.length}
       />
+
+      {/* PDF Download Section */}
+      {recipes.length > 0 && (
+        <div className="mb-6 flex justify-end">
+          <PDFGenerator recipes={recipes} title="All Recipes" />
+        </div>
+      )}
 
       {/* Recipes Grid/List */}
       {isLoading ? (

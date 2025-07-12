@@ -9,6 +9,7 @@ import { useRouter } from "next/navigation";
 import { Heart, Clock, Users, Share2, Eye } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { RecipePreviewModal } from "@/src/components/recipe-server-component/recipe-preview-modal";
+import { PDFGenerator } from "@/src/components/recipe-server-component/pdf-generator";
 import { useState } from "react";
 import { Recipe } from "@/src/types/recipes.types";
 
@@ -90,11 +91,15 @@ export default function FavoritesPage() {
         </div>
       ) : (
         <>
-          <div className="mb-4">
+          <div className="mb-6 flex justify-between items-center">
             <Text className="text-gray-600">
               {favorites.length} favorite recipe
               {favorites.length !== 1 ? "s" : ""}
             </Text>
+            <PDFGenerator
+              recipes={favorites.map((f) => f.recipe)}
+              title="My Favorite Recipes"
+            />
           </div>
 
           <div className="flex gap-5 flex-wrap">
