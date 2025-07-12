@@ -2,7 +2,6 @@
 import { Recipe } from "@/src/types/recipes.types";
 import { Session } from "@/src/types";
 import { useRouter } from "next/navigation";
-import { useAuth } from "@/src/hooks/use-auth";
 import { Button } from "@/components/ui/button";
 import { Text } from "@/src/components/ui/Text";
 import { useFavorites } from "@/src/hooks/use-favorites";

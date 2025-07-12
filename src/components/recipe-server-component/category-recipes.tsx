@@ -1,11 +1,10 @@
 "use client";
-import { Text } from "@/src/components/ui/Text";
+
 import { Session } from "@/src/types";
 import { useRouter } from "next/navigation";
-import { useAuth } from "@/src/hooks/use-auth";
 import { Button } from "@/components/ui/button";
 import { Recipe } from "@/src/types/recipes.types";
-import { useState, useMemo } from "react";
+import { useState } from "react";
 import { RecipePreviewModal } from "./recipe-preview-modal";
 import { useFavorites } from "@/src/hooks/use-favorites";
 import { RecipeCard } from "./recipe-card";
@@ -17,12 +16,7 @@ interface CategoryRecipesProps {
   category: string;
 }
 
-export function CategoryRecipes({
-  session,
-  recipes,
-  category,
-}: CategoryRecipesProps) {
-  const { signIn } = useAuth();
+export function CategoryRecipes({ recipes, category }: CategoryRecipesProps) {
   const router = useRouter();
   const [previewRecipe, setPreviewRecipe] = useState<Recipe | null>(null);
   const [isPreviewOpen, setIsPreviewOpen] = useState(false);

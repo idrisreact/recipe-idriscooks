@@ -1,8 +1,7 @@
 "use client";
 import { Recipe } from "@/src/types/recipes.types";
 import { Button } from "@/components/ui/button";
-import { Text } from "@/src/components/ui/Text";
-import { Download, FileText } from "lucide-react";
+import { Download } from "lucide-react";
 import { useState } from "react";
 import jsPDF from "jspdf";
 import html2canvas from "html2canvas";
@@ -18,7 +17,6 @@ interface PDFGeneratorProps {
 export function PDFGenerator({
   recipes,
   isGenerating = false,
-  onGenerate,
   title = "My Favorite Recipes",
 }: PDFGeneratorProps) {
   const [isLoading, setIsLoading] = useState(false);
@@ -115,7 +113,7 @@ export function PDFGenerator({
         <!-- Recipes -->
         ${recipes
           .map(
-            (recipe, index) => `
+            (recipe) => `
           <div style="margin-bottom: 40px; page-break-inside: avoid;">
             <!-- Recipe Header -->
             <div style="background: linear-gradient(135deg, #3b82f6, #1d4ed8); color: #ffffff; padding: 20px; border-radius: 8px; margin-bottom: 20px;">
