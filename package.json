@@ -10,7 +10,8 @@
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build",
     "drizzle-studio": "npx drizzle-kit studio",
-    "db:seed": "tsx scripts/seed-recipes.ts"
+    "db:seed": "tsx scripts/seed-recipes.ts",
+    "db:migrate": "node migrate.js"
   },
   "dependencies": {
     "@heroicons/react": "^2.2.0",
