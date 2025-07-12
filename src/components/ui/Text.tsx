@@ -1,4 +1,4 @@
-import { HtmlHTMLAttributes, ReactNode } from "react";
+import { ReactNode } from "react";
 
 type ElementTag = "p" | "h1" | "h2" | "h3" | "span" | "div";
 
@@ -21,7 +21,7 @@ export const Text = <T extends ElementTag = "p">({
   return (
     <Component
       className={[opacityClass, className].filter(Boolean).join(" ")}
-      {...(props as any)}
+      {...(props as React.ComponentPropsWithoutRef<T>)}
     >
       {children}
     </Component>

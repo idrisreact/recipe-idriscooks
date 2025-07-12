@@ -1,11 +1,5 @@
 import { cn } from "@/lib/utils";
-import {
-  ChangeEvent,
-  FC,
-  HTMLAttributes,
-  KeyboardEvent,
-  MouseEvent,
-} from "react";
+import { ChangeEvent, FC, HTMLAttributes, KeyboardEvent } from "react";
 import { VerticalSpace } from "../ui/VerticalSpace";
 
 interface TagInputProps
@@ -52,7 +46,7 @@ export const TagInput: FC<TagInputProps> = ({
     }
   };
 
-  const handleDelete = (index: number) => (e: MouseEvent<HTMLDivElement>) => {
+  const handleDelete = (index: number) => () => {
     onDelete(index);
   };
   return (

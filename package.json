@@ -9,7 +9,8 @@
     "lint": "next lint",
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build",
-    "drizzle-studio": "npx drizzle-kit studio"
+    "drizzle-studio": "npx drizzle-kit studio",
+    "db:seed": "tsx scripts/seed-recipes.ts"
   },
   "dependencies": {
     "@heroicons/react": "^2.2.0",

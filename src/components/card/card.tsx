@@ -1,4 +1,5 @@
 "use client";
+import Image from "next/image";
 
 type CardProps = {
   backgroundImage: string;
@@ -31,9 +32,11 @@ export const Card = ({
 
         <div className="mt-2 flex items-center space-x-2">
           {avatar && (
-            <img
+            <Image
               src={avatar}
               alt={lead}
+              width={40}
+              height={40}
               className="w-10 h-10 rounded-full border-2 border-white object-cover"
             />
           )}

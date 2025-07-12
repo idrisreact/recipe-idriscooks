@@ -1,6 +1,6 @@
 import { useState, useMemo } from "react";
 import { useQuery, keepPreviousData } from "@tanstack/react-query";
-import { RecipeResponse, Recipe } from "@/src/types/recipes.types";
+import { RecipeResponse } from "@/src/types/recipes.types";
 import { useDebounce } from "./use-debounce";
 
 type SortOption = "newest" | "oldest" | "title" | "cookTime" | "servings";

@@ -26,8 +26,31 @@ export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
     const search = searchParams.get('search')?.trim().toLowerCase();
+    const tag = searchParams.get('tag')?.trim().toLowerCase();
+    const title = searchParams.get('title')?.trim();
 
-    if (!search) {
+    // If title is provided, fetch a single recipe
+    if (title) {
+      const recipe = await db
+        .select()
+        .from(recipes)
+        .where(sql`LOWER(${recipes.title}) = ${title.toLowerCase()}`)
+        .limit(1);
+
+      if (recipe.length === 0) {
+        return NextResponse.json(
+          { error: 'Recipe not found' },
+          { status: 404 }
+        );
+      }
+
+      return NextResponse.json({ 
+        data: recipe[0],
+        count: 1
+      });
+    }
+
+    if (!search && !tag) {
       const allRecipes = await db.select().from(recipes);
       return NextResponse.json({ 
         data: allRecipes, 
@@ -35,15 +58,32 @@ export async function GET(request: NextRequest) {
       });
     }
 
-    const results = await db
-      .select()
-      .from(recipes)
-      .where(sql`LOWER(${recipes.title}) LIKE ${`%${search}%`}`);
+    let results;
+
+    if (search && tag) {
+      results = await db
+        .select()
+        .from(recipes)
+        .where(sql`LOWER(${recipes.title}) LIKE ${`%${search}%`} AND ${recipes.tags} @> ${JSON.stringify([tag])}`);
+    } else if (search) {
+      results = await db
+        .select()
+        .from(recipes)
+        .where(sql`LOWER(${recipes.title}) LIKE ${`%${search}%`}`);
+    } else if (tag) {
+      results = await db
+        .select()
+        .from(recipes)
+        .where(sql`${recipes.tags} @> ${JSON.stringify([tag])}`);
+    } else {
+      results = await db.select().from(recipes);
+    }
 
     return NextResponse.json({ 
       data: results, 
       count: results.length,
-      search: search 
+      search: search || undefined,
+      tag: tag || undefined
     });
 
   } catch (error) {

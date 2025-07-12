@@ -2,11 +2,9 @@ import { AboutSection } from "@/src/components/about-section/about-section";
 import { BouncingText } from "@/src/components/hero-animation-text/hero-animation-text";
 import { ScrollIndicator } from "@/src/components/ui/scroll-component";
 import { VerticalSpace } from "@/src/components/ui/VerticalSpace";
-import { authClient } from "@/src/utils/auth-client";
 import Image from "next/image";
 
 export default function Home() {
-  authClient.getSession;
   return (
     <div className="page wrapper">
       <div className="h-[80vh] mt-16 flex items-center flex-col md:flex-row">

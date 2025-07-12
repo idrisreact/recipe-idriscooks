@@ -16,7 +16,7 @@ export const SubMenu: React.FC<SubMenuProps> = ({
   onSignUpClick,
   onSignOutClick,
 }) => {
-  const { data: session, isPending } = authClient.useSession();
+  const { data: session } = authClient.useSession();
 
   return (
     <ul className="flex flex-col">

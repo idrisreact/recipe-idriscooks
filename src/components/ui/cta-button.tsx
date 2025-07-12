@@ -5,7 +5,7 @@ interface ButtonProps extends HTMLAttributes<HTMLButtonElement> {
   isPrimary?: boolean;
 }
 
-export const CtaButton = ({ children, isPrimary, ...props }: ButtonProps) => {
+export const CtaButton = ({ children, ...props }: ButtonProps) => {
   return (
     <button
       className="rounded-2xl border-2 border-indigo-600 bg-black"

@@ -9,8 +9,6 @@ import { HamburgerMenuIcon } from "@radix-ui/react-icons";
 import { SubMenu } from "../sub-menu/sub-menu";
 import { SignInModal } from "../sign-in-modal/SignInModal";
 import { Text } from "../ui/Text";
-import { link } from "fs";
-import { title } from "process";
 
 interface LayoutHeaderProps {
   children: React.ReactNode;
@@ -23,7 +21,7 @@ const links = [
 ];
 
 export const LayoutHeader = ({ children }: LayoutHeaderProps) => {
-  const { data: session, isPending } = authClient.useSession();
+  const { data: session } = authClient.useSession();
   const [showModalMenu, setShowModalMenu] = useState(false);
   const [showSubMenu, setShowSubMenu] = useState(false);
   const router = useRouter();

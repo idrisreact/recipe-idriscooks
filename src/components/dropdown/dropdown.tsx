@@ -9,7 +9,6 @@ type DropDownProps<D> = {
 
 export const DropDown = <D,>({
   data,
-  value,
   label,
   selectId,
   ...props
