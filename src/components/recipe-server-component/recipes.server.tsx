@@ -87,7 +87,7 @@ export const Recipes = ({ session }: Props) => {
   }
 
   return (
-    <div className="mx-auto lg:w-4xl">
+    <div className="w-full px-2 sm:px-4 md:mx-auto md:max-w-4xl">
       {/* Header Section */}
       <RecipeWelcomeHeader session={session} onSignIn={signIn} />
 
@@ -126,20 +126,28 @@ export const Recipes = ({ session }: Props) => {
           }`}
         >
           {recipes.map((recipe) => (
-            <RecipeCard
+            <div
               key={recipe.id}
-              recipe={recipe}
-              isFavorited={isFavorited(recipe.id)}
-              onToggleFavorite={toggleFavorite}
-              onShare={shareRecipe}
-              onPreview={(recipe) => {
-                setPreviewRecipe(recipe);
-                setIsPreviewOpen(true);
-              }}
-              onNavigate={(recipe) =>
-                router.push(`/recipes/category/${recipe.title}`)
-              }
-            />
+              className={`w-full ${
+                viewMode === "list"
+                  ? ""
+                  : "md:w-[calc(50%-10px)] lg:w-[calc(33.333%-13.33px)]"
+              }`}
+            >
+              <RecipeCard
+                recipe={recipe}
+                isFavorited={isFavorited(recipe.id)}
+                onToggleFavorite={toggleFavorite}
+                onShare={shareRecipe}
+                onPreview={(recipe) => {
+                  setPreviewRecipe(recipe);
+                  setIsPreviewOpen(true);
+                }}
+                onNavigate={(recipe) =>
+                  router.push(`/recipes/category/${recipe.title}`)
+                }
+              />
+            </div>
           ))}
         </div>
       )}

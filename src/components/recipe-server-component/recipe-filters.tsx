@@ -72,8 +72,9 @@ export function RecipeFilters({
 
   return (
     <div className="mx-auto lg:w-4xl">
-      {/* Search and View Mode */}
-      <div className="flex items-center justify-between mb-6">
+      {/* Search, View Mode, and Filters all in one row */}
+      <div className="flex flex-col gap-4 md:flex-row md:items-center md:gap-4 mb-6">
+        {/* Search Input */}
         <Form {...form}>
           <form
             action=""
@@ -135,57 +136,60 @@ export function RecipeFilters({
             <List className="w-4 h-4" />
           </Button>
         </div>
+
+        {/* Filters Button */}
+        <div className="flex-shrink-0">
+          <Button
+            variant="outline"
+            onClick={onToggleFilters}
+            className="w-full md:w-auto"
+          >
+            <Filter className="w-4 h-4 mr-2" />
+            Filters
+          </Button>
+        </div>
       </div>
 
       {/* Filters Section */}
-      <div className="mb-6">
-        <Button variant="outline" onClick={onToggleFilters} className="mb-4">
-          <Filter className="w-4 h-4 mr-2" />
-          Filters
-        </Button>
+      {showFilters && (
+        <div className="bg-gray-50 p-4 rounded-lg mb-4">
+          {/* Sort Options */}
+          <div className="mb-4">
+            <Text className="font-medium mb-2">Sort by:</Text>
+            <div className="flex gap-2 flex-wrap">
+              {sortOptions.map((option) => (
+                <Button
+                  key={option.value}
+                  variant={sortBy === option.value ? "default" : "outline"}
+                  size="sm"
+                  onClick={() => onSortChange(option.value as SortOption)}
+                >
+                  {option.label}
+                </Button>
+              ))}
+            </div>
+          </div>
 
-        {showFilters && (
-          <div className="bg-gray-50 p-4 rounded-lg mb-4">
-            {/* Sort Options */}
-            <div className="mb-4">
-              <Text className="font-medium mb-2">Sort by:</Text>
+          {/* Tag Filters */}
+          {allTags.length > 0 && (
+            <div>
+              <Text className="font-medium mb-2">Filter by tags:</Text>
               <div className="flex gap-2 flex-wrap">
-                {sortOptions.map((option) => (
+                {allTags.map((tag) => (
                   <Button
-                    key={option.value}
-                    variant={sortBy === option.value ? "default" : "outline"}
+                    key={tag}
+                    variant={selectedTags.includes(tag) ? "default" : "outline"}
                     size="sm"
-                    onClick={() => onSortChange(option.value as SortOption)}
+                    onClick={() => onTagToggle(tag)}
                   >
-                    {option.label}
+                    {tag}
                   </Button>
                 ))}
               </div>
             </div>
-
-            {/* Tag Filters */}
-            {allTags.length > 0 && (
-              <div>
-                <Text className="font-medium mb-2">Filter by tags:</Text>
-                <div className="flex gap-2 flex-wrap">
-                  {allTags.map((tag) => (
-                    <Button
-                      key={tag}
-                      variant={
-                        selectedTags.includes(tag) ? "default" : "outline"
-                      }
-                      size="sm"
-                      onClick={() => onTagToggle(tag)}
-                    >
-                      {tag}
-                    </Button>
-                  ))}
-                </div>
-              </div>
-            )}
-          </div>
-        )}
-      </div>
+          )}
+        </div>
+      )}
 
       {/* Results Count */}
       <div className="mb-4">

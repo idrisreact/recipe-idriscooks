@@ -1,101 +1,139 @@
 "use client";
 import Link from "next/link";
 import Image from "next/image";
-import React, { useState } from "react";
+import { useState } from "react";
 import { authClient } from "@/src/utils/auth-client";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { HamburgerMenuIcon } from "@radix-ui/react-icons";
-import { SubMenu } from "../sub-menu/sub-menu";
-import { SignInModal } from "../sign-in-modal/SignInModal";
 import { Text } from "../ui/Text";
+import { SignInModal } from "../sign-in-modal/SignInModal";
 
 interface LayoutHeaderProps {
   children: React.ReactNode;
 }
 
-const links = [
-  { link: "/log-in", title: "Log in" },
-  // { link: "/sign-up", title: "Sign up" },
-  { link: "/sign-out", title: "Sign out" },
+const primaryLinks = [
+  { href: "/", label: "Home" },
+  { href: "/recipes", label: "Recipes" },
+  { href: "/favorites", label: "Favorites", auth: true },
+  { href: "/about", label: "About" },
+  { href: "/contact", label: "Contact" },
 ];
 
-export const LayoutHeader = ({ children }: LayoutHeaderProps) => {
+export function LayoutHeader({ children }: LayoutHeaderProps) {
   const { data: session } = authClient.useSession();
-  const [showModalMenu, setShowModalMenu] = useState(false);
-  const [showSubMenu, setShowSubMenu] = useState(false);
+  const [showMenu, setShowMenu] = useState(false);
+  const [showSignInModal, setShowSignInModal] = useState(false);
   const router = useRouter();
 
   const signOut = async () => {
     await authClient.signOut({
-      fetchOptions: {
-        onSuccess: () => {
-          router.push("/recipes");
-        },
-      },
+      fetchOptions: { onSuccess: () => router.push("/recipes") },
     });
+    setShowMenu(false);
   };
 
   return (
     <>
-      <div className="wrapper">
-        <header className="flex justify-between items-center py-2 md:py-8">
-          <Image
-            src="/images/idriscooks-logo.png"
-            alt="Logo"
-            width={50}
-            height={50}
-            priority
-            loading="eager"
-          />
+      <header className="wrapper flex items-center justify-between py-4 md:py-8 relative">
+        {/* Logo */}
+        <Image
+          src="/images/idriscooks-logo.png"
+          alt="Idris Cooks"
+          width={50}
+          height={50}
+        />
 
-          <ul className="hidden md:block md:flex">
-            <li className="mr-2">
-              <Link href={"/"}>Home</Link>
-            </li>
-            <li className="mr-2">
-              <Link href={"/recipes"}>Recipes</Link>
-            </li>
-            {session && (
-              <li className="mr-2">
-                <Link href={"/favorites"}>Favorites</Link>
-              </li>
-            )}
-            <li className="mr-2">
-              <Link href={"/about"}>About</Link>
-            </li>
-            <li className="mr-2">
-              <Link href={"/contact"}>Contact</Link>
-            </li>
-          </ul>
-          <div className="relative group flex items-center">
-            <div className="flex gap-2 items-center">
-              {session && <Text as="p">Welcome Back, {session.user.name}</Text>}
-              <Button
-                className="cursor-pointer"
-                variant={"outline"}
-                size={"icon"}
-                onClick={() => setShowSubMenu((prev) => !prev)}
-              >
-                <HamburgerMenuIcon />
-              </Button>
-            </div>
-            {showSubMenu && (
-              <div className="absolute right-0 top-full mt-1 w-40 bg-white shadow-lg rounded-md z-10 ">
-                <SubMenu
-                  links={links}
-                  onSignInClick={() => setShowModalMenu(true)}
-                  onSignOutClick={signOut}
-                  onSignUpClick={() => router.push("sign-up")}
-                />
-              </div>
-            )}
+        {/* Desktop nav */}
+        <nav className="hidden md:flex space-x-6">
+          {primaryLinks.map(({ href, label, auth }) =>
+            auth && !session ? null : (
+              <Link key={href} href={href}>
+                {label}
+              </Link>
+            )
+          )}
+        </nav>
+
+        {/* Greeting + Hamburger */}
+        <div className="flex items-center gap-2">
+          {session && (
+            <Text as="p" className="hidden sm:block">
+              Welcome Back, {session.user.name}
+            </Text>
+          )}
+          <Button
+            variant="outline"
+            size="icon"
+            onClick={() => setShowMenu((v) => !v)}
+            aria-label="Toggle menu"
+          >
+            <HamburgerMenuIcon />
+          </Button>
+        </div>
+
+        {/* Mobile dropdown */}
+        {showMenu && (
+          <div
+            className="absolute top-full inset-x-0 bg-white shadow-lg z-50 md:hidden"
+            onClick={() => setShowMenu(false)}
+          >
+            <nav className="flex flex-col space-y-3 p-4">
+              {/* Primary links */}
+              {primaryLinks.map(({ href, label, auth }) =>
+                auth && !session ? null : (
+                  <Link
+                    key={href}
+                    href={href}
+                    className="block text-lg"
+                    onClick={() => setShowMenu(false)}
+                  >
+                    {label}
+                  </Link>
+                )
+              )}
+
+              <hr className="my-2" />
+
+              {/* Auth controls */}
+              {!session ? (
+                <>
+                  <button
+                    onClick={() => {
+                      setShowSignInModal(true);
+                      setShowMenu(false);
+                    }}
+                    className="w-full text-left text-lg"
+                  >
+                    Sign In
+                  </button>
+                  <button
+                    onClick={() => {
+                      router.push("/sign-up");
+                      setShowMenu(false);
+                    }}
+                    className="w-full text-left text-lg"
+                  >
+                    Sign Up
+                  </button>
+                </>
+              ) : (
+                <button onClick={signOut} className="w-full text-left text-lg">
+                  Sign Out
+                </button>
+              )}
+            </nav>
           </div>
-        </header>
-      </div>
+        )}
+      </header>
 
       <main>{children}</main>
-      {showModalMenu && <SignInModal onClose={() => setShowModalMenu(false)} />}
+
+      {/* Keep your SignInModal for Google OAuth */}
+      {showSignInModal && (
+        <SignInModal onClose={() => setShowSignInModal(false)} />
+      )}
     </>
   );
-};
+}
