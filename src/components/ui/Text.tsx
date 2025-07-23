@@ -1,4 +1,4 @@
-import { ReactNode } from "react";
+import React, { ReactNode } from "react";
 
 type ElementTag = "p" | "h1" | "h2" | "h3" | "span" | "div";
 

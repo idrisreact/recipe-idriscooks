@@ -1,0 +1,59 @@
+[
+  {
+    "id": "1",
+    "name": "iPhone 14 Pro",
+    "price": 1099,
+    "inStock": true,
+    "image": "https://images.unsplash.com/photo-1591337676887-a217a6970a8a?q=80&w=1160&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+  },
+  {
+    "id": "2",
+    "name": "Samsung Galaxy S23",
+    "price": 999,
+    "inStock": false,
+    "image": "https://images.unsplash.com/photo-1610945415295-d9bbf067e59c?q=80&w=1742&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+  },
+  {
+    "id": "3",
+    "name": "Google Pixel 7",
+    "price": 799,
+    "inStock": true,
+    "image": "https://images.unsplash.com/photo-1724341039339-036842055cae?q=80&w=1740&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+  },
+  {
+    "id": "4",
+    "name": "OnePlus 11",
+    "price": 729,
+    "inStock": true,
+    "image": "https://images.unsplash.com/photo-1616332012084-9ac36f0a7b3a?q=80&w=774&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+  },
+  {
+    "id": "5",
+    "name": "Xiaomi Mi 13",
+    "price": 649,
+    "inStock": false,
+    "image": "https://images.unsplash.com/photo-1706669923923-e8ff18cd3310?q=80&w=1674&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+  },
+
+  {
+    "id": "7",
+    "name": "Motorola Edge+",
+    "price": 799,
+    "inStock": false,
+    "image": "https://images.unsplash.com/photo-1599497986334-a17a0d25b76b?q=80&w=1837&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+  },
+  {
+    "id": "8",
+    "name": "Nokia X30",
+    "price": 599,
+    "inStock": true,
+    "image": "https://images.unsplash.com/photo-1567637825290-4bb6ad22fee3?q=80&w=928&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+  },
+  {
+    "id": "9",
+    "name": "ASUS ROG Phone 7",
+    "price": 999,
+    "inStock": true,
+    "image": "https://images.unsplash.com/photo-1732020883998-24e6c14fd00d?q=80&w=1738&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+  }
+]
