@@ -1,17 +1,32 @@
+type DropDownOption = {
+  key: string;
+  value: string;
+};
+
 type DropDownProps = {
-  data: { key: string; value: string }[];
+  data: DropDownOption[];
+  id?: string;
   label: string;
   value: string;
   onChange: (value: string) => void;
 };
 
-export const DropDown = ({ data, label, onChange, value }: DropDownProps) => {
+export const DropDown = ({
+  data,
+  label,
+  onChange,
+  value,
+  id,
+}: DropDownProps) => {
+  const selectId = id || `dropdown-${label.replace(/\s+/g, "-").toLowerCase()}`;
+
   return (
     <div>
-      <label htmlFor={label}>{label}</label>
+      <label htmlFor={selectId}>{label}</label>
       <select
-        name={label}
-        id={label}
+        name={selectId}
+        id={selectId}
+        value={value}
         onChange={(e) => onChange(e.target.value)}
       >
         {data.map(({ key, value }) => (
