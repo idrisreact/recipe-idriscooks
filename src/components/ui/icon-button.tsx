@@ -19,7 +19,7 @@ export const IconButton: React.FC<IconButtonProps> = ({
       {...buttonProps}
       className={clsx(
         // base styles
-        "flex items-center justify-center space-x-2 py-2 px-4 border-2 rounded-md transition",
+        "flex items-center justify-center space-x-2 py-2 px-4 border-2 rounded-md transition cursor-pointer",
         // you can add any variant classes here, or pass via `className`
         className
       )}

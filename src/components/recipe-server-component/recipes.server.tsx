@@ -1,6 +1,5 @@
 "use client";
 import { Text } from "@/src/components/ui/Text";
-import { Session } from "@/src/types";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/src/hooks/use-auth";
 import { Button } from "@/components/ui/button";
@@ -15,6 +14,7 @@ import { RecipeCard } from "./recipe-card";
 import { RecipeLoadingSkeleton } from "./recipe-loading-skeleton";
 import { RecipeEmptyState } from "./recipe-empty-state";
 import { PDFGenerator } from "./pdf-generator";
+import { Session } from "@/src/types";
 
 interface Props {
   session: Session | null;
@@ -86,6 +86,9 @@ export const Recipes = ({ session }: Props) => {
     );
   }
 
+  // Only show first 3 recipes for unauthenticated users
+  const visibleRecipes = session ? recipes : recipes.slice(0, 3);
+
   return (
     <div className="w-full px-2 sm:px-4 md:mx-auto md:max-w-4xl">
       {/* Header Section */}
@@ -117,7 +120,7 @@ export const Recipes = ({ session }: Props) => {
       {/* Recipes Grid/List */}
       {isLoading ? (
         <RecipeLoadingSkeleton />
-      ) : recipes.length === 0 ? (
+      ) : visibleRecipes.length === 0 ? (
         <RecipeEmptyState searchTerm={search} />
       ) : (
         <div
@@ -125,7 +128,7 @@ export const Recipes = ({ session }: Props) => {
             viewMode === "list" ? "flex-col" : "flex-wrap"
           }`}
         >
-          {recipes.map((recipe) => (
+          {visibleRecipes.map((recipe) => (
             <div
               key={recipe.id}
               className={`w-full ${
@@ -149,6 +152,21 @@ export const Recipes = ({ session }: Props) => {
               />
             </div>
           ))}
+        </div>
+      )}
+
+      {/* Show login prompt if not logged in and more than 3 recipes exist */}
+      {!session && recipes.length > 3 && (
+        <div className="mt-8 text-center">
+          <Text className="text-gray-700 mb-2 block">
+            Sign in to view all {recipes.length} recipes!
+          </Text>
+          <Button
+            onClick={signIn}
+            className="bg-blue-600 hover:bg-blue-700 text-white"
+          >
+            Sign In
+          </Button>
         </div>
       )}
 

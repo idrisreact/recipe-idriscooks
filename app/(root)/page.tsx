@@ -1,6 +1,7 @@
 import Image from "next/image";
 import { BouncingText } from "@/src/components/hero-animation-text/hero-animation-text";
-import { AboutSection } from "@/src/components/about-section/about-section";
+import HeroButtons from "@/src/components/ui/HeroButtons";
+import FeaturesSection from "@/src/components/features-section";
 
 export default function Home() {
   return (
@@ -24,16 +25,11 @@ export default function Home() {
               Elevate Your Kitchen: Where Every Meal Becomes a Masterpiece
             </span>
           </BouncingText>
+          <HeroButtons />
         </div>
       </div>
 
-      {/* Main Content Section */}
-      <div className="page wrapper">
-        <AboutSection
-          title="About"
-          lead="Hello there! My name is Idris, and I’ve been making TikTok videos since the start of the pandemic. I love sharing my food recipes and exploring different cultures’ cuisines. I’ve created this website to provide a step-by-step guide on how to recreate my recipes. So, you can enjoy these delicious dishes right from the comfort of your own home!"
-        />
-      </div>
+      <FeaturesSection />
     </>
   );
 }

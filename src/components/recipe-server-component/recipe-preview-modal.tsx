@@ -4,6 +4,8 @@ import { X, Clock, Users, Heart, Share2, BookOpen } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Text } from "@/src/components/ui/Text";
 import { useState } from "react";
+import { authClient } from "@/src/utils/auth-client";
+import { SignInOverlay } from "./sign-in-overlay";
 
 interface RecipePreviewModalProps {
   recipe: Recipe | null;
@@ -25,6 +27,7 @@ export const RecipePreviewModal = ({
   const [activeTab, setActiveTab] = useState<"ingredients" | "steps">(
     "ingredients"
   );
+  const { data: session } = authClient.useSession();
 
   if (!isOpen || !recipe) return null;
 
@@ -44,7 +47,8 @@ export const RecipePreviewModal = ({
 
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-lg max-w-2xl w-full max-h-[90vh] overflow-hidden">
+      <div className="bg-white rounded-lg max-w-2xl w-full max-h-[90vh] overflow-hidden relative">
+        {!session && <SignInOverlay />}
         {/* Header */}
         <div
           className="relative h-48 bg-cover bg-center"
