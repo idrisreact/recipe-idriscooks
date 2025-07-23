@@ -1,5 +1,3 @@
-import { CtaButton } from "../ui/cta-button";
-
 interface AboutSectionProps {
   title: string;
   lead: string;
