@@ -63,7 +63,39 @@ export function LayoutHeader({ children }: LayoutHeaderProps) {
               Welcome Back, {session.user.name}
             </Text>
           )}
+          {/* Desktop Auth Controls */}
+          {session ? (
+            <Button
+              className="hidden md:block"
+              variant="outline"
+              size="sm"
+              onClick={signOut}
+            >
+              Sign Out
+            </Button>
+          ) : (
+            <>
+              <Button
+                className="hidden md:block"
+                variant="outline"
+                size="sm"
+                onClick={() => setShowSignInModal(true)}
+              >
+                Sign In
+              </Button>
+              <Button
+                className="hidden md:block"
+                variant="outline"
+                size="sm"
+                onClick={() => router.push("/sign-up")}
+              >
+                Sign Up
+              </Button>
+            </>
+          )}
+          {/* Hamburger for mobile */}
           <Button
+            className="md:hidden"
             variant="outline"
             size="icon"
             onClick={() => setShowMenu((v) => !v)}

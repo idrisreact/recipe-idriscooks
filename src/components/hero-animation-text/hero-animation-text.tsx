@@ -1,8 +1,8 @@
 "use client";
-import { useEffect } from "react";
+import { useEffect, ReactNode } from "react";
 import gsap from "gsap";
 
-export function BouncingText() {
+export function BouncingText({ children }: { children?: ReactNode }) {
   useEffect(() => {
     gsap.fromTo(
       ".bouncing-text",
@@ -12,8 +12,8 @@ export function BouncingText() {
   }, []);
 
   return (
-    <h1 className="text-4xl flex sm:w-full bouncing-text text-center md:text-5xl">
-      Cook Like Idris: Bold, Premium, Unforgettable
+    <h1 className="text-4xl flex text-brand-orange sm:w-full bouncing-text text-center md:text-5xl">
+      {children || "Cook Like Idris: Bold, Premium, Unforgettable"}
     </h1>
   );
 }
