@@ -37,6 +37,7 @@ export const Card = ({
               alt={lead}
               width={40}
               height={40}
+              quality={50}
               className="w-10 h-10 rounded-full border-2 border-white object-cover"
             />
           )}

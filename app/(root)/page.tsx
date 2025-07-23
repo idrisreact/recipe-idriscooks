@@ -19,6 +19,7 @@ export default function Home() {
             width={220}
             height={220}
             className="z-10"
+            quality={50}
           />
           <BouncingText>
             <span className="text-white w-full md:max-w-xl block text-center">

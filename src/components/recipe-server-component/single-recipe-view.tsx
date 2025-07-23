@@ -53,7 +53,7 @@ export function SingleRecipeView({ session, recipe }: SingleRecipeViewProps) {
       <div className="mb-6">
         <Button
           variant="outline"
-          onClick={() => router.back()}
+          onClick={() => router.push("/recipes")}
           className="flex items-center gap-2"
         >
           <ArrowLeft className="w-4 h-4" />
