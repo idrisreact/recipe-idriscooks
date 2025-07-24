@@ -15,9 +15,14 @@ import { SignInOverlay } from "./sign-in-overlay";
 interface SingleRecipeViewProps {
   session: Session | null;
   recipe: Recipe;
+  canView: boolean;
 }
 
-export function SingleRecipeView({ session, recipe }: SingleRecipeViewProps) {
+export function SingleRecipeView({
+  session,
+  recipe,
+  canView,
+}: SingleRecipeViewProps) {
   const router = useRouter();
 
   // Use the custom hooks
@@ -76,20 +81,17 @@ export function SingleRecipeView({ session, recipe }: SingleRecipeViewProps) {
         </Text>
       </div>
 
-      {/* Recipe Content - Blurred for non-logged in users */}
+      {/* Recipe Content - Only for logged in users */}
       <div className="relative">
-        <div
-          className={`transition-all duration-300 ${
-            !session ? "blur-sm opacity-60" : ""
-          }`}
-        >
-          <RecipeContent recipe={recipe} />
-          <RecipeTags recipe={recipe} />
-          <RecipeActions />
-        </div>
-
-        {/* Sign In Overlay for non-logged in users */}
-        {!session && <SignInOverlay position="top" />}
+        {canView ? (
+          <>
+            <RecipeContent recipe={recipe} />
+            <RecipeTags recipe={recipe} />
+            <RecipeActions />
+          </>
+        ) : (
+          <SignInOverlay position="top" />
+        )}
       </div>
     </div>
   );

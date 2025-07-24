@@ -55,11 +55,29 @@ export default async function RecipePage({ params }: PageProps) {
     notFound();
   }
 
+  // Only allow full view if logged in
+  const canView = !!session;
+  let recipeData;
+  if (canView) {
+    recipeData = recipe;
+  } else {
+    // Only send minimal info for unauthenticated users
+    recipeData = {
+      title: recipe.title,
+      description: recipe.description,
+      id: recipe.id,
+      imageUrl: recipe.imageUrl,
+      cookTime: recipe.cookTime,
+      servings: recipe.servings,
+    };
+  }
+
   return (
     <div className="wrapper page">
       <SingleRecipeView
         session={session}
-        recipe={recipe as unknown as Recipe}
+        recipe={recipeData as unknown as Recipe}
+        canView={canView}
       />
     </div>
   );
