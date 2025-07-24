@@ -7,11 +7,13 @@ import { useRouter } from "next/navigation";
 interface SignInOverlayProps {
   noBackground?: boolean;
   onClose?: () => void;
+  position?: "center" | "top";
 }
 
 export function SignInOverlay({
   noBackground = false,
   onClose,
+  position = "center",
 }: SignInOverlayProps) {
   const { signIn } = useAuth();
   const router = useRouter();
@@ -61,7 +63,14 @@ export function SignInOverlay({
   }
 
   return (
-    <div className="absolute inset-0 top-0 left-0 right-0 bottom-0 flex items-center justify-center bg-white/80 backdrop-blur-sm rounded-lg">
+    <div
+      className={`absolute inset-0 top-0 left-0 right-0 bottom-0 flex ${
+        {
+          center: "items-center",
+          top: "items-start mt-12 md:mt-24",
+        }[position]
+      } justify-center bg-white/80 backdrop-blur-sm rounded-lg`}
+    >
       {content}
     </div>
   );

@@ -89,7 +89,7 @@ export function SingleRecipeView({ session, recipe }: SingleRecipeViewProps) {
         </div>
 
         {/* Sign In Overlay for non-logged in users */}
-        {!session && <SignInOverlay />}
+        {!session && <SignInOverlay position="top" />}
       </div>
     </div>
   );
