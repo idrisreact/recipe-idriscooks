@@ -6,6 +6,8 @@ import { useState } from "react";
 import jsPDF from "jspdf";
 import html2canvas from "html2canvas";
 import toast from "react-hot-toast";
+import { authClient } from "@/src/utils/auth-client";
+import { SignInOverlay } from "./sign-in-overlay";
 
 interface PDFGeneratorProps {
   recipes: Recipe[];
@@ -20,10 +22,11 @@ export function PDFGenerator({
   title = "My Favorite Recipes",
 }: PDFGeneratorProps) {
   const [isLoading, setIsLoading] = useState(false);
+  const [showLoginModal, setShowLoginModal] = useState(false);
+  const { data: session } = authClient.useSession();
 
   const generatePDF = async () => {
     if (recipes.length === 0) return;
-
     setIsLoading(true);
     const loadingToast = toast.loading("Generating PDF...");
 
@@ -96,6 +99,14 @@ export function PDFGenerator({
         document.body.removeChild(container);
       }
     }
+  };
+
+  const handlePDFClick = () => {
+    if (!session) {
+      setShowLoginModal(true);
+      return;
+    }
+    generatePDF();
   };
 
   const generatePDFHTML = (recipes: Recipe[]): string => {
@@ -204,22 +215,42 @@ export function PDFGenerator({
   };
 
   return (
-    <Button
-      onClick={generatePDF}
-      disabled={isLoading || isGenerating || recipes.length === 0}
-      className="flex items-center gap-2 bg-green-600 hover:bg-green-700"
-    >
-      {isLoading || isGenerating ? (
-        <>
-          <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-          Generating PDF...
-        </>
-      ) : (
-        <>
-          <Download className="w-4 h-4" />
-          Download PDF ({recipes.length} recipes)
-        </>
+    <>
+      <Button
+        onClick={handlePDFClick}
+        disabled={isLoading || isGenerating || recipes.length === 0}
+        className="flex items-center gap-2 bg-green-600 hover:bg-green-700"
+      >
+        {isLoading || isGenerating ? (
+          <>
+            <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+            Generating PDF...
+          </>
+        ) : (
+          <>
+            <Download className="w-4 h-4" />
+            Download PDF ({recipes.length} recipes)
+          </>
+        )}
+      </Button>
+      {showLoginModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
+          <div className="relative">
+            <SignInOverlay
+              noBackground
+              onClose={() => setShowLoginModal(false)}
+            />
+            <button
+              className="absolute top-2 right-2 text-gray-500 hover:text-gray-700 text-2xl"
+              onClick={() => setShowLoginModal(false)}
+              aria-label="Close login modal"
+              style={{ zIndex: 10 }}
+            >
+              ×
+            </button>
+          </div>
+        </div>
       )}
-    </Button>
+    </>
   );
 }
