@@ -6,11 +6,18 @@ import FeatureInfoCard from "./card/feature-info-card";
 import { FaMedal, FaVideo, FaUtensils } from "react-icons/fa";
 import { useEffect, useState } from "react";
 import { Card } from "./card/card";
-import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
 
 function MostPopularRecipes() {
-  const [recipes, setRecipes] = useState<any[]>([]);
+  interface PopularRecipe {
+    id: number;
+    title: string;
+    description: string;
+    image_url: string;
+    tags?: string[];
+    favoriteCount: number;
+  }
+  const [recipes, setRecipes] = useState<PopularRecipe[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const router = useRouter();
@@ -23,8 +30,12 @@ function MostPopularRecipes() {
         const res = await fetch("/api/recipes/popular");
         const data = await res.json();
         setRecipes(data.data || []);
-      } catch (err) {
-        setError("Failed to load popular recipes");
+      } catch (error: unknown) {
+        if (error instanceof Error) {
+          setError(error.message || "Failed to load popular recipes");
+        } else {
+          setError("Failed to load popular recipes");
+        }
       } finally {
         setLoading(false);
       }

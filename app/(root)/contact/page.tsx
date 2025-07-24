@@ -31,8 +31,12 @@ export default function ContactPage() {
         throw new Error((await res.json()).error || "Failed to send message");
       setSuccess(true);
       reset();
-    } catch (err: any) {
-      setError(err.message || "Failed to send message");
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        setError(err.message || "Failed to send message");
+      } else {
+        setError("Failed to send message");
+      }
     }
   };
 
@@ -45,7 +49,7 @@ export default function ContactPage() {
         <h1 className="text-2xl font-bold mb-6 text-center">Contact Us</h1>
         {success && (
           <div className="mb-4 text-green-600">
-            Thank you for your message! We'll get back to you soon.
+            Thank you for your message! We&apos;ll get back to you soon.
           </div>
         )}
         {error && <div className="mb-4 text-red-600">{error}</div>}

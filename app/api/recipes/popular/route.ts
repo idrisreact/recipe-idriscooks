@@ -1,9 +1,9 @@
-import { NextRequest, NextResponse } from "next/server";
+import {  NextResponse } from "next/server";
 import { db } from "@/src/db";
 import { recipes, favoriteRecipes } from "@/src/db/schemas";
 import { sql } from "drizzle-orm";
 
-export async function GET(request: NextRequest) {
+export async function GET() {
   try {
     // Get top 4 recipes by favorite count
     const popular = await db.execute(

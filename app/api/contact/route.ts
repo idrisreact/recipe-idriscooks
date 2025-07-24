@@ -23,7 +23,10 @@ export async function POST(request: NextRequest) {
       html: `<p><b>Name:</b> ${name}</p><p><b>Email:</b> ${email}</p><p><b>Message:</b><br/>${message}</p>`,
     });
     return NextResponse.json({ success: true });
-  } catch (error: any) {
-    return NextResponse.json({ error: error.message || "Failed to send message." }, { status: 500 });
+  } catch (error: unknown) {
+    if (error instanceof Error) {
+      return NextResponse.json({ error: error.message || "Failed to send message." }, { status: 500 });
+    }
+    return NextResponse.json({ error: "Failed to send message." }, { status: 500 });
   }
 } 
