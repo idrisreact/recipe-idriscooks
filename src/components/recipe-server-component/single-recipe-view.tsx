@@ -18,11 +18,7 @@ interface SingleRecipeViewProps {
   canView: boolean;
 }
 
-export function SingleRecipeView({
-  session,
-  recipe,
-  canView,
-}: SingleRecipeViewProps) {
+export function SingleRecipeView({ recipe, canView }: SingleRecipeViewProps) {
   const router = useRouter();
 
   // Use the custom hooks
