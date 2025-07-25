@@ -3,11 +3,25 @@ import { Recipe } from "@/src/types/recipes.types";
 import { Button } from "@/components/ui/button";
 import { Download } from "lucide-react";
 import { useState } from "react";
-import jsPDF from "jspdf";
-import html2canvas from "html2canvas";
 import toast from "react-hot-toast";
 import { authClient } from "@/src/utils/auth-client";
 import { SignInOverlay } from "./sign-in-overlay";
+import {
+  Document,
+  Page,
+  Text,
+  View,
+  StyleSheet,
+  Image,
+} from "@react-pdf/renderer";
+
+import dynamic from "next/dynamic";
+const PDFDownloadLink = dynamic(
+  () => import("@react-pdf/renderer").then((mod) => mod.PDFDownloadLink),
+  {
+    ssr: false,
+  }
+);
 
 interface PDFGeneratorProps {
   recipes: Recipe[];
@@ -16,223 +30,245 @@ interface PDFGeneratorProps {
   title?: string;
 }
 
+const PRIMARY = "#22c55e";
+const TEXT = "#333";
+const BG = "#f9fafb";
+
+const styles = StyleSheet.create({
+  page: {
+    padding: 32, // More padding for standalone look
+    fontFamily: "Helvetica",
+    backgroundColor: BG,
+    color: TEXT,
+  },
+  // ─── Hero Banner ────────────────────────────────────────────
+  banner: {
+    width: "100%",
+    height: 120,
+    marginBottom: 24, // More space below banner
+  },
+  // ─── Header ────────────────────────────────────────────────
+  header: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: 24,
+    marginTop: 0, // Remove if you want header at the very top
+  },
+  headerTitle: {
+    fontSize: 32,
+    fontWeight: "bold",
+    color: PRIMARY,
+  },
+  headerMeta: {
+    fontSize: 10,
+    color: "#666",
+  },
+  // ─── Recipe Card ──────────────────────────────────────────
+  recipeCard: {
+    backgroundColor: "#fff",
+    padding: 16,
+    borderRadius: 8,
+    marginBottom: 24,
+    border: `1px solid ${BG}`,
+    marginTop: 0, // Remove if you want content to start at the top
+  },
+  badges: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    marginBottom: 8,
+  },
+  badge: {
+    fontSize: 8,
+    paddingVertical: 2,
+    paddingHorizontal: 6,
+    borderRadius: 12,
+    backgroundColor: PRIMARY,
+    color: "#fff",
+    marginRight: 4,
+    marginBottom: 4,
+  },
+  recipeTitle: {
+    fontSize: 20,
+    fontWeight: "bold",
+    marginBottom: 6,
+  },
+  recipeMeta: {
+    fontSize: 10,
+    color: "#666",
+    marginBottom: 8,
+  },
+  contentRow: {
+    flexDirection: "row",
+    gap: 12,
+  },
+  textCol: {
+    flex: 1,
+  },
+  imgCol: {
+    width: 100,
+    height: 100,
+    borderRadius: 8,
+    overflow: "hidden",
+  },
+  recipeImage: {
+    width: "100%",
+    height: "100%",
+  },
+  sectionTitle: {
+    fontSize: 12,
+    fontWeight: "bold",
+    color: PRIMARY,
+    marginBottom: 4,
+    borderBottom: `1px solid ${BG}`,
+    paddingBottom: 2,
+  },
+  ingredient: {
+    fontSize: 10,
+    marginBottom: 2,
+  },
+  step: {
+    fontSize: 10,
+    marginBottom: 2,
+    color: "#444",
+  },
+  footer: {
+    textAlign: "center",
+    marginTop: 32,
+    fontSize: 8,
+    color: "#666",
+  },
+});
+
+const MyDocument = ({
+  recipes,
+  title,
+}: {
+  recipes: Recipe[];
+  title: string;
+}) => (
+  <Document>
+    {/* Menu (Table of Contents) Page */}
+    <Page size="A4" style={styles.page}>
+      <Image src="/images/food background.png" style={styles.banner} />
+      <Text style={styles.headerTitle}>{title}</Text>
+      <Text style={{ marginBottom: 24, color: "#666", fontSize: 12 }}>
+        Table of Contents
+      </Text>
+      {recipes.map((r, idx) => (
+        <View
+          key={r.id}
+          style={{
+            flexDirection: "row",
+            justifyContent: "space-between",
+            marginBottom: 12,
+          }}
+        >
+          <Text style={{ fontSize: 14 }}>
+            {idx + 1}. {r.title}
+          </Text>
+          <Text style={{ fontSize: 12, color: "#888" }}>Page {idx + 2}</Text>
+        </View>
+      ))}
+    </Page>
+    {/* Each recipe on its own page (no banner) */}
+    {recipes.map((r, idx) => (
+      <Page key={r.id} size="A4" style={styles.page}>
+        <View style={styles.header}>
+          <Text style={styles.headerTitle}>{r.title}</Text>
+          <Text style={styles.headerMeta}>
+            {r.cookTime}m 2 {r.servings} servings
+          </Text>
+        </View>
+        <View style={styles.badges}>
+          {r.tags?.map((t) => (
+            <Text key={t} style={styles.badge}>
+              {t}
+            </Text>
+          ))}
+        </View>
+        <View style={styles.contentRow}>
+          <View style={styles.textCol}>
+            <Text style={styles.sectionTitle}>Ingredients</Text>
+            {Array.isArray(r.ingredients) && r.ingredients.length > 0 ? (
+              r.ingredients.map((ing, i) => (
+                <Text key={i} style={styles.ingredient}>
+                  7 {ing.quantity} {ing.unit} {ing.name}
+                </Text>
+              ))
+            ) : (
+              <Text style={styles.ingredient}>No ingredients listed</Text>
+            )}
+            <Text style={[styles.sectionTitle, { marginTop: 8 }]}>
+              Instructions
+            </Text>
+            {Array.isArray(r.steps) && r.steps.length > 0 ? (
+              r.steps.map((step, i) => (
+                <Text key={i} style={styles.step}>
+                  {i + 1}. {step}
+                </Text>
+              ))
+            ) : (
+              <Text style={styles.step}>No steps listed</Text>
+            )}
+          </View>
+          {r.imageUrl && (
+            <View style={styles.imgCol}>
+              <Image src={r.imageUrl} style={styles.recipeImage} />
+            </View>
+          )}
+        </View>
+        <Text style={styles.footer}>
+          Generated by Idris Cooks App 2013 Happy cooking! 1f469 200d 1f373
+        </Text>
+      </Page>
+    ))}
+  </Document>
+);
+
 export function PDFGenerator({
   recipes,
   isGenerating = false,
   title = "My Favorite Recipes",
 }: PDFGeneratorProps) {
-  const [isLoading, setIsLoading] = useState(false);
   const [showLoginModal, setShowLoginModal] = useState(false);
   const { data: session } = authClient.useSession();
 
-  const generatePDF = async () => {
-    if (recipes.length === 0) return;
-    setIsLoading(true);
-    const loadingToast = toast.loading("Generating PDF...");
-
-    // 1) prepare offscreen container
-    const container = document.createElement("div");
-    container.style.position = "absolute";
-    container.style.left = "-9999px";
-    document.body.appendChild(container);
-
-    // inject global CSS rules for children
-    const styleTag = document.createElement("style");
-    styleTag.textContent = `* { box-sizing: border-box; }`;
-    container.appendChild(styleTag);
-
-    // render your markup (JSX or string)
-    container.innerHTML = generatePDFHTML(recipes);
-
-    try {
-      // 2) html2canvas
-      const canvas = await html2canvas(container, {
-        scale: 2,
-        backgroundColor: "#ffffff",
-        useCORS: true,
-        onclone: (clonedDoc) => {
-          // 1️⃣ remove every stylesheet
-          clonedDoc
-            .querySelectorAll('link[rel="stylesheet"], style')
-            .forEach((el) => el.remove());
-
-          // 2️⃣ inject a minimal reset + your own styles
-          const reset = clonedDoc.createElement("style");
-          reset.textContent = `
-            /* basic reset */
-            *, *::before, *::after { box-sizing: border-box !important; margin:0; padding:0; }
-            html, body { background: #ffffff !important; color: #333333 !important;
-                         font-family: Arial, Helvetica, sans-serif !important; }
-          `;
-          clonedDoc.head.appendChild(reset);
-        },
-      });
-
-      // 3) remove container immediately so offscreen DOM is clean
-      document.body.removeChild(container);
-
-      // 4) build PDF
-      const pdf = new jsPDF("p", "mm", "a4");
-      const imgData = canvas.toDataURL("image/png");
-      const pageW = pdf.internal.pageSize.getWidth();
-      const pageH = pdf.internal.pageSize.getHeight();
-      const imgH = (canvas.height * pageW) / canvas.width;
-
-      let y = 0;
-      pdf.addImage(imgData, "PNG", 0, y, pageW, imgH);
-      while (imgH - y > pageH) {
-        y += pageH;
-        pdf.addPage();
-        pdf.addImage(imgData, "PNG", 0, -y, pageW, imgH);
-      }
-
-      // 5) download
-      pdf.save(/* filename */);
-      toast.success("PDF downloaded!", { id: loadingToast });
-    } catch (err) {
-      console.error(err);
-      toast.error("Failed to generate PDF.", { id: loadingToast });
-    } finally {
-      setIsLoading(false);
-      // ensure container is gone even on error
-      if (document.body.contains(container)) {
-        document.body.removeChild(container);
-      }
-    }
-  };
-
-  const handlePDFClick = () => {
+  const handlePDFClick = (e: React.MouseEvent) => {
     if (!session) {
+      e.preventDefault();
       setShowLoginModal(true);
       return;
     }
-    generatePDF();
-  };
-
-  const generatePDFHTML = (recipes: Recipe[]): string => {
-    return `
-      <div style="font-family: Arial, Helvetica, sans-serif; color: #333333; background-color: #ffffff;">
-        <!-- Header -->
-        <div style="text-align: center; margin-bottom: 40px; border-bottom: 3px solid #3b82f6; padding-bottom: 20px;">
-          <h1 style="color: #3b82f6; font-size: 32px; margin: 0 0 10px 0; font-weight: bold;">${title}</h1>
-          <p style="color: #666666; font-size: 16px; margin: 0;">Generated on ${new Date().toLocaleDateString()}</p>
-          <p style="color: #666666; font-size: 14px; margin: 10px 0 0 0;">${
-            recipes.length
-          } recipe${recipes.length !== 1 ? "s" : ""}</p>
-        </div>
-
-        <!-- Recipes -->
-        ${recipes
-          .map(
-            (recipe) => `
-          <div style="margin-bottom: 40px; page-break-inside: avoid;">
-            <!-- Recipe Header -->
-            <div style="background: linear-gradient(135deg, #3b82f6, #1d4ed8); color: #ffffff; padding: 20px; border-radius: 8px; margin-bottom: 20px;">
-              <h2 style="margin: 0 0 10px 0; font-size: 24px; font-weight: bold;">${
-                recipe.title
-              }</h2>
-              <div style="display: flex; gap: 20px; font-size: 14px;">
-                <span>⏱️ ${recipe.cookTime}m cook time</span>
-                <span>👥 ${recipe.servings} servings</span>
-              </div>
-            </div>
-
-            <!-- Description -->
-            <p style="color: #666666; font-size: 16px; line-height: 1.6; margin-bottom: 20px;">${
-              recipe.description
-            }</p>
-
-            <!-- Content Grid -->
-            <div style="display: flex; gap: 30px;">
-              <!-- Ingredients -->
-              <div style="flex: 1;">
-                <h3 style="color: #3b82f6; font-size: 18px; margin-bottom: 15px; border-bottom: 2px solid #e5e7eb; padding-bottom: 5px; font-weight: bold;">Ingredients</h3>
-                <ul style="list-style: none; padding: 0; margin: 0;">
-                  ${
-                    recipe.ingredients
-                      ?.map(
-                        (ingredient) => `
-                    <li style="display: flex; align-items: center; gap: 10px; padding: 8px 0; border-bottom: 1px solid #f3f4f6;">
-                      <div style="width: 8px; height: 8px; background-color: #3b82f6; border-radius: 50%; flex-shrink: 0;"></div>
-                      <span style="font-weight: 500; color: #333333;">${ingredient.quantity} ${ingredient.unit} ${ingredient.name}</span>
-                    </li>
-                  `
-                      )
-                      .join("") ||
-                    '<li style="color: #999999;">No ingredients listed</li>'
-                  }
-                </ul>
-              </div>
-
-              <!-- Instructions -->
-              <div style="flex: 1;">
-                <h3 style="color: #3b82f6; font-size: 18px; margin-bottom: 15px; border-bottom: 2px solid #e5e7eb; padding-bottom: 5px; font-weight: bold;">Instructions</h3>
-                <ol style="padding-left: 20px; margin: 0;">
-                  ${
-                    recipe.steps
-                      ?.map(
-                        (step) => `
-                    <li style="margin-bottom: 12px; line-height: 1.5; color: #374151;">${step}</li>
-                  `
-                      )
-                      .join("") ||
-                    '<li style="color: #999999;">No steps listed</li>'
-                  }
-                </ol>
-              </div>
-            </div>
-
-            <!-- Tags -->
-            ${
-              recipe.tags && recipe.tags.length > 0
-                ? `
-              <div style="margin-top: 20px; padding-top: 15px; border-top: 1px solid #e5e7eb;">
-                <div style="display: flex; gap: 8px; flex-wrap: wrap;">
-                  ${recipe.tags
-                    .map(
-                      (tag) => `
-                    <span style="background-color: #dbeafe; color: #1e40af; padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 500;">${tag}</span>
-                  `
-                    )
-                    .join("")}
-                </div>
-              </div>
-            `
-                : ""
-            }
-          </div>
-        `
-          )
-          .join("")}
-
-        <!-- Footer -->
-        <div style="text-align: center; margin-top: 40px; padding-top: 20px; border-top: 2px solid #e5e7eb; color: #666666; font-size: 12px;">
-          <p>Generated by Idris Cooks App</p>
-          <p>Happy cooking! 👨‍🍳</p>
-        </div>
-      </div>
-    `;
+    toast.success("PDF download started!");
   };
 
   return (
     <>
-      <Button
-        onClick={handlePDFClick}
-        disabled={isLoading || isGenerating || recipes.length === 0}
-        className="flex items-center gap-2 bg-green-600 hover:bg-green-700"
+      <PDFDownloadLink
+        document={<MyDocument recipes={recipes} title={title} />}
+        fileName="recipes.pdf"
       >
-        {isLoading || isGenerating ? (
-          <>
-            <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-            Generating PDF...
-          </>
-        ) : (
-          <>
-            <Download className="w-4 h-4" />
-            Download PDF ({recipes.length} recipes)
-          </>
+        {({ loading }) => (
+          <Button
+            onClick={handlePDFClick}
+            disabled={loading || isGenerating || recipes.length === 0}
+            className="flex items-center gap-2 bg-green-600 hover:bg-green-700"
+          >
+            {loading || isGenerating ? (
+              <>
+                <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                Generating PDF...
+              </>
+            ) : (
+              <>
+                <Download className="w-4 h-4" />
+                Download PDF ({recipes.length} recipes)
+              </>
+            )}
+          </Button>
         )}
-      </Button>
+      </PDFDownloadLink>
       {showLoginModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
           <div className="relative">

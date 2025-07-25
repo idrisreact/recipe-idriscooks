@@ -26,6 +26,7 @@ export default function FavoritesPage() {
     }
   };
 
+  console.log(favorites);
   const shareRecipe = (recipe: Recipe) => {
     if (navigator.share) {
       navigator.share({

@@ -1,7 +1,7 @@
 import { db } from '../db';
 import { favoriteRecipes, recipes } from '../db/schemas';
 import { eq, and } from 'drizzle-orm';
-import { FavoriteRecipe, FavoriteRecipeWithRecipe } from '../types';
+import { FavoriteRecipe, FavoriteRecipeWithRecipe, Ingredient } from '../types';
 
 export async function addToFavorites(userId: string, recipeId: number): Promise<FavoriteRecipe> {
   const [favorite] = await db
@@ -55,7 +55,7 @@ export async function getUserFavorites(userId: string): Promise<FavoriteRecipeWi
     ...favorite,
     recipe: {
       ...favorite.recipe,
-      ingredients: favorite.recipe.ingredients ? [favorite.recipe.ingredients] : [],
+      ingredients: favorite.recipe.ingredients as unknown as Ingredient[],
       steps: (favorite.recipe.steps as string[]) || [],
       tags: (favorite.recipe.tags as string[]) || [],
     },

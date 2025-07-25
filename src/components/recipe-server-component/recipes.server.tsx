@@ -46,6 +46,8 @@ export const Recipes = ({ session }: Props) => {
     toggleTag,
   } = useRecipes();
 
+  console.log(recipes);
+
   // Toggle favorite
   const toggleFavorite = async (recipeId: number) => {
     if (isFavorited(recipeId)) {
@@ -91,10 +93,8 @@ export const Recipes = ({ session }: Props) => {
 
   return (
     <div className="w-full px-2 sm:px-4 md:mx-auto md:max-w-4xl">
-      {/* Header Section */}
       <RecipeWelcomeHeader session={session} onSignIn={signIn} />
 
-      {/* Search and Filters Section */}
       <RecipeFilters
         search={search}
         onSearchChange={setSearch}
@@ -110,14 +110,12 @@ export const Recipes = ({ session }: Props) => {
         resultsCount={recipes.length}
       />
 
-      {/* PDF Download Section */}
       {recipes.length > 0 && (
         <div className="mb-6 flex justify-end">
           <PDFGenerator recipes={recipes} title="All Recipes" />
         </div>
       )}
 
-      {/* Recipes Grid/List */}
       {isLoading ? (
         <RecipeLoadingSkeleton />
       ) : visibleRecipes.length === 0 ? (
@@ -155,7 +153,6 @@ export const Recipes = ({ session }: Props) => {
         </div>
       )}
 
-      {/* Show login prompt if not logged in and more than 3 recipes exist */}
       {!session && recipes.length > 3 && (
         <div className="mt-8 text-center">
           <Text className="text-gray-700 mb-2 block">
@@ -170,7 +167,6 @@ export const Recipes = ({ session }: Props) => {
         </div>
       )}
 
-      {/* Recipe Preview Modal */}
       <RecipePreviewModal
         recipe={previewRecipe}
         isOpen={isPreviewOpen}

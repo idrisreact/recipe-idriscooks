@@ -21,7 +21,6 @@ export const SubMenu: React.FC<SubMenuProps> = ({
   return (
     <ul className="flex flex-col">
       {links.map(({ link, title }) => {
-        // If it’s “Sign in”, render a <button> that calls onSignInClick
         if (title === "Log in") {
           if (session) return;
           return (

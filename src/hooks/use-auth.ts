@@ -10,8 +10,12 @@ export const useAuth = ()=>{
         });
       };
 
+      const signOut = async () => {
+        await authClient.signOut();
+      };
 
       return {
-        signIn
+        signIn,
+        signOut
       }
 }
