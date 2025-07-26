@@ -3,7 +3,7 @@ import { Recipe } from "@/src/types/recipes.types";
 import { X, Clock, Users, Heart, Share2, BookOpen } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Text } from "@/src/components/ui/Text";
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { authClient } from "@/src/utils/auth-client";
 import { SignInOverlay } from "./sign-in-overlay";
 
@@ -28,6 +28,58 @@ export const RecipePreviewModal = ({
     "ingredients"
   );
   const { data: session } = authClient.useSession();
+  const modalRef = useRef<HTMLDivElement>(null);
+  const previousActiveElement = useRef<HTMLElement | null>(null);
+
+  useEffect(() => {
+    if (isOpen) {
+      // Save current focus and manage body scroll
+      previousActiveElement.current = document.activeElement as HTMLElement;
+      document.body.style.overflow = "hidden";
+
+      // Focus management
+      const focusableElements = modalRef.current?.querySelectorAll(
+        'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+      ) as NodeListOf<HTMLElement>;
+      
+      const firstElement = focusableElements?.[0];
+      const lastElement = focusableElements?.[focusableElements.length - 1];
+
+      const handleKeyDown = (e: KeyboardEvent) => {
+        if (e.key === 'Escape') {
+          onClose();
+          return;
+        }
+
+        if (e.key === 'Tab') {
+          if (focusableElements.length === 0) return;
+
+          if (e.shiftKey) {
+            // Shift + Tab
+            if (document.activeElement === firstElement) {
+              e.preventDefault();
+              lastElement?.focus();
+            }
+          } else {
+            // Tab
+            if (document.activeElement === lastElement) {
+              e.preventDefault();
+              firstElement?.focus();
+            }
+          }
+        }
+      };
+
+      document.addEventListener('keydown', handleKeyDown);
+      firstElement?.focus();
+
+      return () => {
+        document.body.style.overflow = "auto";
+        document.removeEventListener('keydown', handleKeyDown);
+        previousActiveElement.current?.focus();
+      };
+    }
+  }, [isOpen, onClose]);
 
   if (!isOpen || !recipe) return null;
 
@@ -47,7 +99,13 @@ export const RecipePreviewModal = ({
 
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-lg max-w-2xl w-full max-h-[90vh] overflow-hidden relative">
+      <div 
+        ref={modalRef}
+        className="bg-white rounded-lg max-w-2xl w-full max-h-[90vh] overflow-hidden relative"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="recipe-preview-title"
+      >
         {!session && <SignInOverlay onClose={onClose} />}
         {/* Header */}
         <div

@@ -15,9 +15,9 @@ export const RecipeMetadata = ({
 }: RecipeMetadataProps) => {
   const baseStyle = "flex items-center gap-1 text-sm";
   const variantStyles = {
-    overlay: "bg-black/50 px-2 py-1 rounded text-white",
-    inline: "text-gray-600",
-    badge: "bg-gray-100 px-3 py-1 rounded-full"
+    overlay: "bg-black/70 px-2 py-1 rounded text-white shadow-sm",
+    inline: "text-gray-700",
+    badge: "bg-gray-200 px-3 py-1 rounded-full text-gray-800"
   };
   
   return (

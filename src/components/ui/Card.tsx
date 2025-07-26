@@ -40,32 +40,51 @@ export const Card = (props: CardProps) => {
 
   if (variant === 'recipe') {
     const { backgroundImage, title, subtitle, avatar, metadata, actions } = props;
+    
+    const handleKeyDown = (e: React.KeyboardEvent) => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        onClick?.();
+      }
+    };
+
     return (
       <article
-        className={`relative w-64 h-80 rounded-lg overflow-hidden bg-center bg-cover cursor-pointer ${className}`}
+        className={`relative w-64 h-80 rounded-lg overflow-hidden bg-center bg-cover cursor-pointer group focus-within:ring-2 focus-within:ring-blue-500 focus-within:ring-offset-2 ${className}`}
         style={{ backgroundImage: `url(${backgroundImage})` }}
-        aria-label={title}
+        aria-labelledby={`recipe-title-${title.replace(/\s+/g, '-').toLowerCase()}`}
         onClick={onClick}
+        onKeyDown={handleKeyDown}
+        tabIndex={0}
+        role="button"
       >
-        <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/20 to-transparent" />
 
         {/* Actions overlay */}
         {actions && (
-          <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity">
+          <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 group-focus-within:opacity-100 transition-opacity">
             {actions}
           </div>
         )}
 
         {/* Metadata overlay */}
         {metadata && (
-          <div className="absolute top-2 left-2 opacity-0 group-hover:opacity-100 transition-opacity">
+          <div 
+            className="absolute top-2 left-2 opacity-0 group-hover:opacity-100 group-focus-within:opacity-100 transition-opacity"
+            aria-label="Recipe details"
+          >
             {metadata}
           </div>
         )}
 
         {/* Content */}
         <div className="absolute bottom-4 left-4 right-4 text-white">
-          <h2 className="text-lg font-semibold">{title}</h2>
+          <h2 
+            id={`recipe-title-${title.replace(/\s+/g, '-').toLowerCase()}`}
+            className="text-lg font-semibold"
+          >
+            {title}
+          </h2>
 
           {(subtitle || avatar) && (
             <div className="mt-2 flex items-center space-x-2">

@@ -28,6 +28,7 @@ export function RecipeCard({
         icon={Heart}
         isActive={isFavorited}
         activeColor="text-red-500"
+        ariaLabel={isFavorited ? `Remove ${recipe.title} from favorites` : `Add ${recipe.title} to favorites`}
         onClick={async (e) => {
           e.stopPropagation();
           await onToggleFavorite(recipe.id);
@@ -35,6 +36,7 @@ export function RecipeCard({
       />
       <ActionButton
         icon={Share2}
+        ariaLabel={`Share ${recipe.title}`}
         onClick={(e) => {
           e.stopPropagation();
           onShare(recipe);
@@ -42,6 +44,7 @@ export function RecipeCard({
       />
       <ActionButton
         icon={Eye}
+        ariaLabel={`Preview ${recipe.title}`}
         onClick={(e) => {
           e.stopPropagation();
           onPreview(recipe);

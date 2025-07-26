@@ -127,6 +127,7 @@ export default function FavoritesPage() {
                     icon={Heart}
                     isActive={true}
                     activeColor="text-red-500"
+                    ariaLabel={`Remove ${favorite.recipe.title} from favorites`}
                     onClick={async (e) => {
                       e.stopPropagation();
                       await toggleFavorite(favorite.recipe.id);
@@ -134,6 +135,7 @@ export default function FavoritesPage() {
                   />
                   <ActionButton
                     icon={Share2}
+                    ariaLabel={`Share ${favorite.recipe.title}`}
                     onClick={(e) => {
                       e.stopPropagation();
                       shareRecipe(favorite.recipe);
@@ -141,6 +143,7 @@ export default function FavoritesPage() {
                   />
                   <ActionButton
                     icon={Eye}
+                    ariaLabel={`Preview ${favorite.recipe.title}`}
                     onClick={(e) => {
                       e.stopPropagation();
                       setPreviewRecipe(favorite.recipe);

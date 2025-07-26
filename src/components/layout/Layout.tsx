@@ -38,18 +38,24 @@ export function LayoutHeader({ children }: LayoutHeaderProps) {
     <>
       <header className="wrapper flex items-center justify-between py-4 md:py-8 relative">
         {/* Logo */}
-        <Image
-          src="/images/idriscooks-logo.png"
-          alt="Idris Cooks"
-          width={50}
-          height={50}
-        />
+        <Link href="/" aria-label="Go to homepage">
+          <Image
+            src="/images/idriscooks-logo.png"
+            alt="Idris Cooks"
+            width={50}
+            height={50}
+          />
+        </Link>
 
         {/* Desktop nav */}
-        <nav className="hidden md:flex space-x-6">
+        <nav className="hidden md:flex space-x-6" role="navigation" aria-label="Main navigation">
           {primaryLinks.map(({ href, label, auth }) =>
             auth && !session ? null : (
-              <Link key={href} href={href}>
+              <Link 
+                key={href} 
+                href={href}
+                className="text-gray-700 hover:text-blue-600 focus:text-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 rounded-md px-2 py-1 transition-colors"
+              >
                 {label}
               </Link>
             )
@@ -99,7 +105,9 @@ export function LayoutHeader({ children }: LayoutHeaderProps) {
             variant="outline"
             size="icon"
             onClick={() => setShowMenu((v) => !v)}
-            aria-label="Toggle menu"
+            aria-label={showMenu ? "Close menu" : "Open menu"}
+            aria-expanded={showMenu}
+            aria-controls="mobile-menu"
           >
             <HamburgerMenuIcon />
           </Button>
@@ -108,10 +116,11 @@ export function LayoutHeader({ children }: LayoutHeaderProps) {
         {/* Mobile dropdown */}
         {showMenu && (
           <div
+            id="mobile-menu"
             className="absolute top-full inset-x-0 bg-white shadow-lg z-50 md:hidden"
             onClick={() => setShowMenu(false)}
           >
-            <nav className="flex flex-col space-y-3 p-4">
+            <nav className="flex flex-col space-y-3 p-4" role="navigation" aria-label="Mobile navigation">
               {/* Primary links */}
               {primaryLinks.map(({ href, label, auth }) =>
                 auth && !session ? null : (

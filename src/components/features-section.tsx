@@ -6,6 +6,7 @@ import { FaMedal, FaVideo, FaUtensils } from "react-icons/fa";
 import { useEffect, useState } from "react";
 import { Card } from "@/src/components/ui/Card";
 import { useRouter } from "next/navigation";
+import { useQuery } from "@tanstack/react-query";
 
 function MostPopularRecipes() {
   interface PopularRecipe {
@@ -16,37 +17,23 @@ function MostPopularRecipes() {
     tags?: string[];
     favoriteCount: number;
   }
-  const [recipes, setRecipes] = useState<PopularRecipe[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+
   const router = useRouter();
 
-  useEffect(() => {
-    async function fetchPopular() {
-      setLoading(true);
-      setError(null);
-      try {
-        const res = await fetch("/api/recipes/popular");
-        const data = await res.json();
-        setRecipes(data.data || []);
-      } catch (error: unknown) {
-        if (error instanceof Error) {
-          setError(error.message || "Failed to load popular recipes");
-        } else {
-          setError("Failed to load popular recipes");
-        }
-      } finally {
-        setLoading(false);
-      }
-    }
-    fetchPopular();
-  }, []);
+  const {
+    data: recipes,
+    isLoading,
+    error,
+  } = useQuery<PopularRecipe[]>({
+    queryKey: ["popular-recipes"],
+    queryFn: () => fetch("/api/recipes/popular").then((res) => res.json()),
+  });
 
-  if (loading)
+  if (isLoading)
     return <div className="my-8 text-center">Loading popular recipes...</div>;
   if (error)
-    return <div className="my-8 text-center text-red-500">{error}</div>;
-  if (!recipes.length) return null;
+    return <div className="my-8 text-center text-red-500">{error.message}</div>;
+  if (!recipes?.length) return null;
 
   return (
     <section className="wrapper my-16">
