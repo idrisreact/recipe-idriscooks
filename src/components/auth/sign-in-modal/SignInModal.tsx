@@ -1,7 +1,7 @@
 import { authClient } from "@/src/utils/auth-client";
 import Image from "next/image";
 import { FC, useEffect } from "react";
-import { IconButton } from "../ui/icon-button";
+import { Button } from "@/components/ui/button";
 
 export const SignInModal: FC<{ onClose: () => void }> = ({ onClose }) => {
   useEffect(() => {
@@ -40,21 +40,19 @@ export const SignInModal: FC<{ onClose: () => void }> = ({ onClose }) => {
 
           <h2 className="text-2xl font-semibold mb-4">Sign In</h2>
 
-          <IconButton
+          <Button
+            variant="icon"
             className="w-full cursor-pointer"
             onClick={handleGoogleSignIn}
-            icon={
-              <Image
-                src="/google-icon.svg"
-                height={20}
-                width={20}
-                alt="google logo"
-              />
-            }
           >
-            {" "}
+            <Image
+              src="/google-icon.svg"
+              height={20}
+              width={20}
+              alt="google logo"
+            />
             Continue with Google
-          </IconButton>
+          </Button>
 
           {/* 
             If you want to add a separate email/password form, you can add it here.

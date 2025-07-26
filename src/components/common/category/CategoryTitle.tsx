@@ -1,4 +1,4 @@
-import { Text } from "../ui/Text";
+import { Text } from "@/src/components/ui/Text";
 import { ChevronRightIcon } from "@radix-ui/react-icons";
 
 type CategoryTitleProps = {

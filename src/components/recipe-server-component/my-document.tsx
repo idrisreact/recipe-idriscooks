@@ -7,8 +7,16 @@ const TEXT = "#333";
 const BG = "#f9fafb";
 
 // Helper to dynamically import all @react-pdf/renderer components
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 function usePDFRenderer() {
-  const [pdf, setPdf] = useState<any>(null);
+  const [pdf, setPdf] = useState<{
+    Document: React.ComponentType<any>; // eslint-disable-line @typescript-eslint/no-explicit-any
+    Page: React.ComponentType<any>; // eslint-disable-line @typescript-eslint/no-explicit-any
+    Text: React.ComponentType<any>; // eslint-disable-line @typescript-eslint/no-explicit-any
+    View: React.ComponentType<any>; // eslint-disable-line @typescript-eslint/no-explicit-any
+    StyleSheet: { create: (styles: any) => any }; // eslint-disable-line @typescript-eslint/no-explicit-any
+    Image: React.ComponentType<any>; // eslint-disable-line @typescript-eslint/no-explicit-any
+  } | null>(null);
   useEffect(() => {
     let mounted = true;
     import("@react-pdf/renderer").then((mod) => {
@@ -149,7 +157,7 @@ export function MyDocument({
     <Document>
       {/* Menu (Table of Contents) Page */}
       <Page size="A4" style={styles.page}>
-        <Image src="/images/food background.png" style={styles.banner} />
+        <Image src="/images/food background.png" alt="Food background" style={styles.banner} />
         <Text style={styles.headerTitle}>{title}</Text>
         <Text style={{ marginBottom: 24, color: "#666", fontSize: 12 }}>
           Table of Contents
@@ -171,7 +179,7 @@ export function MyDocument({
         ))}
       </Page>
       {/* Each recipe on its own page (no banner) */}
-      {recipes.map((r, idx) => (
+      {recipes.map((r) => (
         <Page key={r.id} size="A4" style={styles.page}>
           <View style={styles.header}>
             <Text style={styles.headerTitle}>{r.title}</Text>
@@ -213,7 +221,7 @@ export function MyDocument({
             </View>
             {r.imageUrl && (
               <View style={styles.imgCol}>
-                <Image src={r.imageUrl} style={styles.recipeImage} />
+                <Image src={r.imageUrl} alt={r.title} style={styles.recipeImage} />
               </View>
             )}
           </View>

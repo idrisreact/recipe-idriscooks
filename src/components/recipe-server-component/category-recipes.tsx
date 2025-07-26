@@ -7,7 +7,7 @@ import { Recipe } from "@/src/types/recipes.types";
 import { useState } from "react";
 import { RecipePreviewModal } from "./recipe-preview-modal";
 import { useFavorites } from "@/src/hooks/use-favorites";
-import { RecipeCard } from "./recipe-card";
+import { RecipeCard } from "@/src/components/recipe/recipe-card";
 import { RecipeEmptyState } from "./recipe-empty-state";
 
 interface CategoryRecipesProps {

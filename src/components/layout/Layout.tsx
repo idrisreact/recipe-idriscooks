@@ -7,7 +7,7 @@ import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { HamburgerMenuIcon } from "@radix-ui/react-icons";
 import { Text } from "../ui/Text";
-import { SignInModal } from "../sign-in-modal/SignInModal";
+import { SignInModal } from "../auth/sign-in-modal/SignInModal";
 
 interface LayoutHeaderProps {
   children: React.ReactNode;

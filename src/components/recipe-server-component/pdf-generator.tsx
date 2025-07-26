@@ -9,10 +9,12 @@ import { SignInOverlay } from "./sign-in-overlay";
 import { MyDocument } from "./my-document";
 
 import dynamic from "next/dynamic";
+
 const PDFDownloadLink = dynamic(
-  () => import("@react-pdf/renderer").then((mod) => mod.PDFDownloadLink),
+  () => import("@react-pdf/renderer").then((mod) => ({ default: mod.PDFDownloadLink })),
   {
     ssr: false,
+    loading: () => <p>Loading PDF generator...</p>
   }
 );
 
@@ -23,9 +25,6 @@ interface PDFGeneratorProps {
   title?: string;
 }
 
-const PRIMARY = "#22c55e";
-const TEXT = "#333";
-const BG = "#f9fafb";
 
 export function PDFGenerator({
   recipes,

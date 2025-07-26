@@ -1,11 +1,10 @@
 "use client";
 
-import FeatureImageCard from "./card/feature-image-card";
 import FeatureQuoteCard from "./card/feature-quote-card";
 import FeatureInfoCard from "./card/feature-info-card";
 import { FaMedal, FaVideo, FaUtensils } from "react-icons/fa";
 import { useEffect, useState } from "react";
-import { Card } from "./card/card";
+import { Card } from "@/src/components/ui/Card";
 import { useRouter } from "next/navigation";
 
 function MostPopularRecipes() {
@@ -66,10 +65,10 @@ function MostPopularRecipes() {
             }
           >
             <Card
+              variant="recipe"
               backgroundImage={recipe.image_url}
-              heading={recipe.title}
-              lead={recipe.description?.slice(0, 50) + "..."}
-              secondaryLead={recipe.tags?.[0] || "No tags"}
+              title={recipe.title}
+              subtitle={recipe.description?.slice(0, 50) + "..."}
             />
           </div>
         ))}
@@ -91,7 +90,8 @@ export default function FeaturesSection() {
           We are a home to variety of recipes worldwide for you to learn.
         </p>
         <div className="flex flex-col md:flex-row gap-6 w-full justify-center items-center">
-          <FeatureImageCard
+          <Card
+            variant="feature"
             label="Easy to follow recipes"
             badge="Step #1"
             bgColor="bg-gray-200"
@@ -119,7 +119,8 @@ export default function FeaturesSection() {
               },
             ]}
           />
-          <FeatureImageCard
+          <Card
+            variant="feature"
             overlayText="Cook with Master Chefs"
             badge="LIVE"
             bgColor="bg-yellow-100"

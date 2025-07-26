@@ -1,5 +1,5 @@
 import { Text } from "@/src/components/ui/Text";
-import { Heading } from "@/src/components/heading/heading";
+import { Heading } from "@/src/components/common/heading/heading";
 import { VerticalSpace } from "@/src/components/ui/VerticalSpace";
 import { Session } from "@/src/types";
 

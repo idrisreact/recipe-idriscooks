@@ -10,10 +10,16 @@ import { useFavorites } from "@/src/hooks/use-favorites";
 import { useRecipes } from "@/src/hooks/use-recipes";
 import { RecipeWelcomeHeader } from "./recipe-welcome-header";
 import { RecipeFilters } from "./recipe-filters";
-import { RecipeCard } from "./recipe-card";
+import { RecipeCard } from "@/src/components/recipe/recipe-card";
 import { RecipeLoadingSkeleton } from "./recipe-loading-skeleton";
 import { RecipeEmptyState } from "./recipe-empty-state";
-import { PDFGenerator } from "./pdf-generator";
+// import dynamic from "next/dynamic";
+
+// Temporarily disabled PDF functionality due to build issues
+// const PDFGenerator = dynamic(() => import("./pdf-generator").then(mod => ({ default: mod.PDFGenerator })), {
+//   ssr: false,
+//   loading: () => <div>Loading PDF generator...</div>
+// });
 import { Session } from "@/src/types";
 
 interface Props {
@@ -112,7 +118,8 @@ export const Recipes = ({ session }: Props) => {
 
       {recipes.length > 0 && (
         <div className="mb-6 flex justify-end">
-          <PDFGenerator recipes={recipes} title="All Recipes" />
+          {/* Temporarily disabled PDF functionality due to build issues */}
+          {/* <PDFGenerator recipes={recipes} title="All Recipes" /> */}
         </div>
       )}
 

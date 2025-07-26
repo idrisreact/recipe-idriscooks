@@ -11,6 +11,13 @@ const nextConfig: NextConfig = {
       },
     ],
   },
+  webpack: (config) => {
+    config.externals = config.externals || [];
+    config.externals.push({
+      '@react-pdf/renderer': 'commonjs @react-pdf/renderer',
+    });
+    return config;
+  },
 };
 
 export default nextConfig;
