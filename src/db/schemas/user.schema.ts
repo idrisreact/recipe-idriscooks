@@ -48,5 +48,14 @@ export const verification = pgTable("verification", {
  updatedAt: timestamp('updated_at')
                 });
 
+                export const pricePlans = pgTable("price_plans", {
+                    id: text('id').primaryKey(),
+                    name: text('name').notNull().unique(),
+                    description: text('description'),
+                    price: text('price').notNull(),
+                    createdAt: timestamp('created_at').notNull(),
+                    updatedAt: timestamp('updated_at').notNull()
+                  });
+                  
 
-export const schema = {verification,user,account,session}
+export const schema = {verification,user,account,session,pricePlans}

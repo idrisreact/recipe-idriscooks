@@ -31,7 +31,7 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         <ReactQueryProvider>
-          <LayoutHeader>{children}</LayoutHeader>
+          {children}
           <Toaster
             position="top-right"
             toastOptions={{
