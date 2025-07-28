@@ -3,7 +3,7 @@
 import FeatureQuoteCard from "./card/feature-quote-card";
 import FeatureInfoCard from "./card/feature-info-card";
 import { FaMedal, FaVideo, FaUtensils } from "react-icons/fa";
-import { useEffect, useState } from "react";
+import React from "react";
 import { Card } from "@/src/components/ui/Card";
 import { useRouter } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";

@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { HamburgerMenuIcon } from "@radix-ui/react-icons";
 import { Text } from "../ui/Text";
 import { SignInModal } from "../auth/sign-in-modal/SignInModal";
+import SubscriptionBadge from "../subscription/subscription-badge";
 
 interface LayoutHeaderProps {
   children: React.ReactNode;
@@ -17,6 +18,7 @@ const primaryLinks = [
   { href: "/", label: "Home" },
   { href: "/recipes", label: "Recipes" },
   { href: "/favorites", label: "Favorites", auth: true },
+  { href: "/subscription", label: "Subscription", auth: true },
   { href: "/about", label: "About" },
   { href: "/contact", label: "Contact" },
 ];
@@ -62,13 +64,14 @@ export function LayoutHeader({ children }: LayoutHeaderProps) {
           )}
         </nav>
 
-        {/* Greeting + Hamburger */}
-        <div className="flex items-center gap-2">
+        {/* Greeting + Subscription + Hamburger */}
+        <div className="flex items-center gap-3">
           {session && (
             <Text as="p" className="hidden sm:block">
               Welcome Back, {session.user.name}
             </Text>
           )}
+          <SubscriptionBadge />
           {/* Desktop Auth Controls */}
           {session ? (
             <Button

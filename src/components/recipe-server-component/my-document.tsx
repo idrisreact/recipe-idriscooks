@@ -7,7 +7,6 @@ const TEXT = "#333";
 const BG = "#f9fafb";
 
 // Helper to dynamically import all @react-pdf/renderer components
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 function usePDFRenderer() {
   const [pdf, setPdf] = useState<{
     Document: React.ComponentType<any>; // eslint-disable-line @typescript-eslint/no-explicit-any
