@@ -1,4 +1,4 @@
-import { Text } from "../ui/Text";
+import { Text } from "@/src/components/ui/Text";
 
 type HeadingProps = {
   title: string;

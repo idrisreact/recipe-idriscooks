@@ -1,4 +1,4 @@
 export * from './auth'
 export * from './auth-client';
-export * from './catergory-tags'
+export * from './category-tags'
 export * from './favorite-recipes'

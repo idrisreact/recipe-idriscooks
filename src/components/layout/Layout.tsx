@@ -7,7 +7,8 @@ import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { HamburgerMenuIcon } from "@radix-ui/react-icons";
 import { Text } from "../ui/Text";
-import { SignInModal } from "../sign-in-modal/SignInModal";
+import { SignInModal } from "../auth/sign-in-modal/SignInModal";
+import SubscriptionBadge from "../subscription/subscription-badge";
 
 interface LayoutHeaderProps {
   children: React.ReactNode;
@@ -17,6 +18,7 @@ const primaryLinks = [
   { href: "/", label: "Home" },
   { href: "/recipes", label: "Recipes" },
   { href: "/favorites", label: "Favorites", auth: true },
+  { href: "/subscription", label: "Subscription", auth: true },
   { href: "/about", label: "About" },
   { href: "/contact", label: "Contact" },
 ];
@@ -38,31 +40,38 @@ export function LayoutHeader({ children }: LayoutHeaderProps) {
     <>
       <header className="wrapper flex items-center justify-between py-4 md:py-8 relative">
         {/* Logo */}
-        <Image
-          src="/images/idriscooks-logo.png"
-          alt="Idris Cooks"
-          width={50}
-          height={50}
-        />
+        <Link href="/" aria-label="Go to homepage">
+          <Image
+            src="/images/idriscooks-logo.png"
+            alt="Idris Cooks"
+            width={50}
+            height={50}
+          />
+        </Link>
 
         {/* Desktop nav */}
-        <nav className="hidden md:flex space-x-6">
+        <nav className="hidden md:flex space-x-6" role="navigation" aria-label="Main navigation">
           {primaryLinks.map(({ href, label, auth }) =>
             auth && !session ? null : (
-              <Link key={href} href={href}>
+              <Link 
+                key={href} 
+                href={href}
+                className="text-gray-700 hover:text-blue-600 focus:text-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 rounded-md px-2 py-1 transition-colors"
+              >
                 {label}
               </Link>
             )
           )}
         </nav>
 
-        {/* Greeting + Hamburger */}
-        <div className="flex items-center gap-2">
+        {/* Greeting + Subscription + Hamburger */}
+        <div className="flex items-center gap-3">
           {session && (
             <Text as="p" className="hidden sm:block">
               Welcome Back, {session.user.name}
             </Text>
           )}
+          <SubscriptionBadge />
           {/* Desktop Auth Controls */}
           {session ? (
             <Button
@@ -99,7 +108,9 @@ export function LayoutHeader({ children }: LayoutHeaderProps) {
             variant="outline"
             size="icon"
             onClick={() => setShowMenu((v) => !v)}
-            aria-label="Toggle menu"
+            aria-label={showMenu ? "Close menu" : "Open menu"}
+            aria-expanded={showMenu}
+            aria-controls="mobile-menu"
           >
             <HamburgerMenuIcon />
           </Button>
@@ -108,10 +119,11 @@ export function LayoutHeader({ children }: LayoutHeaderProps) {
         {/* Mobile dropdown */}
         {showMenu && (
           <div
+            id="mobile-menu"
             className="absolute top-full inset-x-0 bg-white shadow-lg z-50 md:hidden"
             onClick={() => setShowMenu(false)}
           >
-            <nav className="flex flex-col space-y-3 p-4">
+            <nav className="flex flex-col space-y-3 p-4" role="navigation" aria-label="Mobile navigation">
               {/* Primary links */}
               {primaryLinks.map(({ href, label, auth }) =>
                 auth && !session ? null : (

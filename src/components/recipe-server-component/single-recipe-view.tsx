@@ -6,10 +6,10 @@ import { Button } from "@/components/ui/button";
 import { Text } from "@/src/components/ui/Text";
 import { useFavorites } from "@/src/hooks/use-favorites";
 import { ArrowLeft } from "lucide-react";
-import { RecipeHeader } from "./recipe-header";
-import { RecipeContent } from "./recipe-content";
-import { RecipeTags } from "./recipe-tags";
-import { RecipeActions } from "./recipe-actions";
+import { RecipeHeader } from "@/src/components/recipe/recipe-header";
+import { RecipeContent } from "@/src/components/recipe/recipe-content";
+import { RecipeTags } from "@/src/components/recipe/recipe-tags";
+import { RecipeActions } from "@/src/components/recipe/recipe-actions";
 import { SignInOverlay } from "./sign-in-overlay";
 
 interface SingleRecipeViewProps {

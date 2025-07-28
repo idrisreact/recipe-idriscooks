@@ -1,12 +1,12 @@
 "use client";
 
-import FeatureImageCard from "./card/feature-image-card";
 import FeatureQuoteCard from "./card/feature-quote-card";
 import FeatureInfoCard from "./card/feature-info-card";
 import { FaMedal, FaVideo, FaUtensils } from "react-icons/fa";
-import { useEffect, useState } from "react";
-import { Card } from "./card/card";
+import React from "react";
+import { Card } from "@/src/components/ui/Card";
 import { useRouter } from "next/navigation";
+import { useQuery } from "@tanstack/react-query";
 
 function MostPopularRecipes() {
   interface PopularRecipe {
@@ -17,37 +17,23 @@ function MostPopularRecipes() {
     tags?: string[];
     favoriteCount: number;
   }
-  const [recipes, setRecipes] = useState<PopularRecipe[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+
   const router = useRouter();
 
-  useEffect(() => {
-    async function fetchPopular() {
-      setLoading(true);
-      setError(null);
-      try {
-        const res = await fetch("/api/recipes/popular");
-        const data = await res.json();
-        setRecipes(data.data || []);
-      } catch (error: unknown) {
-        if (error instanceof Error) {
-          setError(error.message || "Failed to load popular recipes");
-        } else {
-          setError("Failed to load popular recipes");
-        }
-      } finally {
-        setLoading(false);
-      }
-    }
-    fetchPopular();
-  }, []);
+  const {
+    data: recipes,
+    isLoading,
+    error,
+  } = useQuery<PopularRecipe[]>({
+    queryKey: ["popular-recipes"],
+    queryFn: () => fetch("/api/recipes/popular").then((res) => res.json()),
+  });
 
-  if (loading)
+  if (isLoading)
     return <div className="my-8 text-center">Loading popular recipes...</div>;
   if (error)
-    return <div className="my-8 text-center text-red-500">{error}</div>;
-  if (!recipes.length) return null;
+    return <div className="my-8 text-center text-red-500">{error.message}</div>;
+  if (!recipes?.length) return null;
 
   return (
     <section className="wrapper my-16">
@@ -66,10 +52,10 @@ function MostPopularRecipes() {
             }
           >
             <Card
+              variant="recipe"
               backgroundImage={recipe.image_url}
-              heading={recipe.title}
-              lead={recipe.description?.slice(0, 50) + "..."}
-              secondaryLead={recipe.tags?.[0] || "No tags"}
+              title={recipe.title}
+              subtitle={recipe.description?.slice(0, 50) + "..."}
             />
           </div>
         ))}
@@ -91,7 +77,8 @@ export default function FeaturesSection() {
           We are a home to variety of recipes worldwide for you to learn.
         </p>
         <div className="flex flex-col md:flex-row gap-6 w-full justify-center items-center">
-          <FeatureImageCard
+          <Card
+            variant="feature"
             label="Easy to follow recipes"
             badge="Step #1"
             bgColor="bg-gray-200"
@@ -119,7 +106,8 @@ export default function FeaturesSection() {
               },
             ]}
           />
-          <FeatureImageCard
+          <Card
+            variant="feature"
             overlayText="Cook with Master Chefs"
             badge="LIVE"
             bgColor="bg-yellow-100"
