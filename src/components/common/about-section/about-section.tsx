@@ -41,10 +41,10 @@ export const AboutSection = () => {
               variant="large" 
               className="text-muted-foreground leading-relaxed"
             >
-              Welcome to my kitchen! I'm passionate about making cooking fun,
-              accessible, and delicious for everyone. Whether you're a beginner or
-              a seasoned chef, you'll find inspiration, tips, and a world of
-              flavors here. Let's cook something amazing together!
+              Welcome to my kitchen! I&apos;m passionate about making cooking fun,
+              accessible, and delicious for everyone. Whether you&apos;re a beginner or
+              a seasoned chef, you&apos;ll find inspiration, tips, and a world of
+              flavors here. Let&apos;s cook something amazing together!
             </Text>
             
             {/* Stats */}

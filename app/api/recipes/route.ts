@@ -49,32 +49,89 @@ export async function GET(request: NextRequest) {
       return NextResponse.json(recipe[0]);
     }
 
-    // Build query
-    let query = db.select().from(recipes);
-
-    // Apply filters
-    if (search && tag) {
-      query = query.where(sql`LOWER(${recipes.title}) LIKE ${`%${search}%`} AND ${recipes.tags} @> ${JSON.stringify([tag])}`);
+    // Use a simpler approach with conditional query building
+    const baseQuery = db.select().from(recipes);
+    
+    // Execute different queries based on conditions
+    let results;
+    
+    if (search && tag && sort && limit) {
+      // All conditions
+      results = await db.select().from(recipes)
+        .where(sql`LOWER(${recipes.title}) LIKE ${`%${search}%`} AND ${recipes.tags} @> ${JSON.stringify([tag])}`)
+        .orderBy(sql`${recipes.id} DESC`)
+        .limit(limit);
+    } else if (search && tag && sort) {
+      // Search, tag, and sort
+      results = await db.select().from(recipes)
+        .where(sql`LOWER(${recipes.title}) LIKE ${`%${search}%`} AND ${recipes.tags} @> ${JSON.stringify([tag])}`)
+        .orderBy(sql`${recipes.id} DESC`);
+    } else if (search && tag && limit) {
+      // Search, tag, and limit
+      results = await db.select().from(recipes)
+        .where(sql`LOWER(${recipes.title}) LIKE ${`%${search}%`} AND ${recipes.tags} @> ${JSON.stringify([tag])}`)
+        .limit(limit);
+    } else if (search && sort && limit) {
+      // Search, sort, and limit
+      results = await db.select().from(recipes)
+        .where(sql`LOWER(${recipes.title}) LIKE ${`%${search}%`}`)
+        .orderBy(sql`${recipes.id} DESC`)
+        .limit(limit);
+    } else if (tag && sort && limit) {
+      // Tag, sort, and limit
+      results = await db.select().from(recipes)
+        .where(sql`${recipes.tags} @> ${JSON.stringify([tag])}`)
+        .orderBy(sql`${recipes.id} DESC`)
+        .limit(limit);
+    } else if (search && tag) {
+      // Search and tag
+      results = await db.select().from(recipes)
+        .where(sql`LOWER(${recipes.title}) LIKE ${`%${search}%`} AND ${recipes.tags} @> ${JSON.stringify([tag])}`);
+    } else if (search && sort) {
+      // Search and sort
+      results = await db.select().from(recipes)
+        .where(sql`LOWER(${recipes.title}) LIKE ${`%${search}%`}`)
+        .orderBy(sql`${recipes.id} DESC`);
+    } else if (search && limit) {
+      // Search and limit
+      results = await db.select().from(recipes)
+        .where(sql`LOWER(${recipes.title}) LIKE ${`%${search}%`}`)
+        .limit(limit);
+    } else if (tag && sort) {
+      // Tag and sort
+      results = await db.select().from(recipes)
+        .where(sql`${recipes.tags} @> ${JSON.stringify([tag])}`)
+        .orderBy(sql`${recipes.id} DESC`);
+    } else if (tag && limit) {
+      // Tag and limit
+      results = await db.select().from(recipes)
+        .where(sql`${recipes.tags} @> ${JSON.stringify([tag])}`)
+        .limit(limit);
+    } else if (sort && limit) {
+      // Sort and limit
+      results = await db.select().from(recipes)
+        .orderBy(sql`${recipes.id} DESC`)
+        .limit(limit);
     } else if (search) {
-      query = query.where(sql`LOWER(${recipes.title}) LIKE ${`%${search}%`}`);
+      // Search only
+      results = await db.select().from(recipes)
+        .where(sql`LOWER(${recipes.title}) LIKE ${`%${search}%`}`);
     } else if (tag) {
-      query = query.where(sql`${recipes.tags} @> ${JSON.stringify([tag])}`);
+      // Tag only
+      results = await db.select().from(recipes)
+        .where(sql`${recipes.tags} @> ${JSON.stringify([tag])}`);
+    } else if (sort) {
+      // Sort only
+      results = await db.select().from(recipes)
+        .orderBy(sql`${recipes.id} DESC`);
+    } else if (limit) {
+      // Limit only
+      results = await db.select().from(recipes)
+        .limit(limit);
+    } else {
+      // No conditions
+      results = await baseQuery;
     }
-
-    // Apply sorting
-    if (sort === 'recent') {
-      query = query.orderBy(sql`${recipes.id} DESC`);
-    } else if (sort === 'popular') {
-      // For popular, we could order by view count or favorites if those fields exist
-      query = query.orderBy(sql`${recipes.id} DESC`); // Fallback to recent if no popularity metric
-    }
-
-    // Apply limit
-    if (limit) {
-      query = query.limit(limit);
-    }
-
-    const results = await query;
 
     // Return just the array for direct consumption
     return NextResponse.json(results);
