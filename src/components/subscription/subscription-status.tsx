@@ -80,7 +80,7 @@ export default function SubscriptionStatus() {
       {!isPdfPlan && (
         <div className="bg-muted/50 rounded-lg p-4 mt-4">
           <Text className="text-muted-foreground text-sm">
-            You're currently on the free plan. Upgrade to get PDF exports 
+            You&apos;re currently on the free plan. Upgrade to get PDF exports 
             and offline access to all recipes.
           </Text>
         </div>
