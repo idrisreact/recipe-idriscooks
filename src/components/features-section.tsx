@@ -1,12 +1,11 @@
 "use client";
 
-import FeatureQuoteCard from "./card/feature-quote-card";
-import FeatureInfoCard from "./card/feature-info-card";
-import { FaMedal, FaVideo, FaUtensils } from "react-icons/fa";
 import React from "react";
 import { Card } from "@/src/components/ui/Card";
 import { useRouter } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
+import { Text } from "@/src/components/ui/Text";
+import RecentRecipesSection from "./recent-recipes-section";
 
 function MostPopularRecipes() {
   interface PopularRecipe {
@@ -30,21 +29,44 @@ function MostPopularRecipes() {
   });
 
   if (isLoading)
-    return <div className="my-8 text-center">Loading popular recipes...</div>;
+    return (
+      <section className="wrapper my-16">
+        <Text as="h2" variant="heading" className="text-center mb-6">
+          Most Popular Recipes
+        </Text>
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
+          {[...Array(4)].map((_, i) => (
+            <div key={i} className="murakamicity-card p-4 animate-pulse">
+              <div className="h-32 bg-muted rounded-sm mb-3"></div>
+              <div className="h-4 bg-muted rounded w-3/4 mb-2"></div>
+              <div className="h-3 bg-muted rounded w-1/2"></div>
+            </div>
+          ))}
+        </div>
+      </section>
+    );
+
   if (error)
-    return <div className="my-8 text-center text-red-500">{error.message}</div>;
+    return (
+      <section className="wrapper my-16">
+        <Text className="text-center text-destructive">
+          Failed to load popular recipes
+        </Text>
+      </section>
+    );
+
   if (!recipes?.length) return null;
 
   return (
     <section className="wrapper my-16">
-      <h2 className="text-2xl md:text-3xl font-bold mb-6 text-center">
+      <Text as="h2" variant="heading" className="text-center mb-6">
         Most Popular Recipes
-      </h2>
+      </Text>
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
         {recipes.map((recipe) => (
           <div
             key={recipe.id}
-            className="relative cursor-pointer"
+            className="relative cursor-pointer transition-transform duration-200 hover:scale-105"
             onClick={() =>
               router.push(
                 `/recipes/category/${encodeURIComponent(recipe.title)}`
@@ -68,52 +90,17 @@ export default function FeaturesSection() {
   return (
     <>
       <MostPopularRecipes />
-      <section className="wrapper my-16 flex flex-col items-center">
-        <h2 className="text-3xl md:text-4xl font-extrabold text-center mb-4">
-          Become a true <span className="text-yellow-500">chef</span> with our
-          recipes.
-        </h2>
-        <p className="text-gray-500 text-center mb-10 max-w-xl">
+      
+      <section className="wrapper my-20 flex flex-col items-center">
+        <Text as="h2" variant="heading" className="text-center mb-4">
+          Become a true <span className="text-primary">chef</span> with our recipes.
+        </Text>
+        <Text variant="large" className="text-muted-foreground text-center mb-16 max-w-2xl">
           We are a home to variety of recipes worldwide for you to learn.
-        </p>
-        <div className="flex flex-col md:flex-row gap-6 w-full justify-center items-center">
-          <Card
-            variant="feature"
-            label="Easy to follow recipes"
-            badge="Step #1"
-            bgColor="bg-gray-200"
-          />
-          <FeatureQuoteCard
-            quote="Cooking has never been this easy!"
-            author="Marsha Rianty"
-          />
-          <FeatureInfoCard
-            items={[
-              {
-                icon: <FaMedal />,
-                label: "Achievement",
-                value: "Cook 2 foods today",
-              },
-              {
-                icon: <FaVideo />,
-                label: "Live Now",
-                value: "Chef Idris Cooks",
-              },
-              {
-                icon: <FaUtensils />,
-                label: "Today's Recipe",
-                value: "Spaghetti Bolognese",
-              },
-            ]}
-          />
-          <Card
-            variant="feature"
-            overlayText="Cook with Master Chefs"
-            badge="LIVE"
-            bgColor="bg-yellow-100"
-          />
-        </div>
+        </Text>
       </section>
+
+      <RecentRecipesSection />
     </>
   );
 }
