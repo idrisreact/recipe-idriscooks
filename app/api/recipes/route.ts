@@ -28,6 +28,8 @@ export async function GET(request: NextRequest) {
     const search = searchParams.get('search')?.trim().toLowerCase();
     const tag = searchParams.get('tag')?.trim().toLowerCase();
     const title = searchParams.get('title')?.trim();
+    const limit = searchParams.get('limit') ? parseInt(searchParams.get('limit')!) : undefined;
+    const sort = searchParams.get('sort')?.trim().toLowerCase();
 
     // If title is provided, fetch a single recipe
     if (title) {
@@ -44,47 +46,38 @@ export async function GET(request: NextRequest) {
         );
       }
 
-      return NextResponse.json({ 
-        data: recipe[0],
-        count: 1
-      });
+      return NextResponse.json(recipe[0]);
     }
 
-    if (!search && !tag) {
-      const allRecipes = await db.select().from(recipes);
-      return NextResponse.json({ 
-        data: allRecipes, 
-        count: allRecipes.length 
-      });
-    }
+    // Build query
+    let query = db.select().from(recipes);
 
-    let results;
-
+    // Apply filters
     if (search && tag) {
-      results = await db
-        .select()
-        .from(recipes)
-        .where(sql`LOWER(${recipes.title}) LIKE ${`%${search}%`} AND ${recipes.tags} @> ${JSON.stringify([tag])}`);
+      query = query.where(sql`LOWER(${recipes.title}) LIKE ${`%${search}%`} AND ${recipes.tags} @> ${JSON.stringify([tag])}`);
     } else if (search) {
-      results = await db
-        .select()
-        .from(recipes)
-        .where(sql`LOWER(${recipes.title}) LIKE ${`%${search}%`}`);
+      query = query.where(sql`LOWER(${recipes.title}) LIKE ${`%${search}%`}`);
     } else if (tag) {
-      results = await db
-        .select()
-        .from(recipes)
-        .where(sql`${recipes.tags} @> ${JSON.stringify([tag])}`);
-    } else {
-      results = await db.select().from(recipes);
+      query = query.where(sql`${recipes.tags} @> ${JSON.stringify([tag])}`);
     }
 
-    return NextResponse.json({ 
-      data: results, 
-      count: results.length,
-      search: search || undefined,
-      tag: tag || undefined
-    });
+    // Apply sorting
+    if (sort === 'recent') {
+      query = query.orderBy(sql`${recipes.id} DESC`);
+    } else if (sort === 'popular') {
+      // For popular, we could order by view count or favorites if those fields exist
+      query = query.orderBy(sql`${recipes.id} DESC`); // Fallback to recent if no popularity metric
+    }
+
+    // Apply limit
+    if (limit) {
+      query = query.limit(limit);
+    }
+
+    const results = await query;
+
+    // Return just the array for direct consumption
+    return NextResponse.json(results);
 
   } catch (error) {
     console.error('Error fetching recipes:', error);

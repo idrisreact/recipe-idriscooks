@@ -1,6 +1,6 @@
 import { useState, useMemo } from "react";
 import { useQuery, keepPreviousData } from "@tanstack/react-query";
-import { RecipeResponse } from "@/src/types/recipes.types";
+import { Recipe } from "@/src/types/recipes.types";
 import { useDebounce } from "./use-debounce";
 
 type SortOption = "newest" | "oldest" | "title" | "cookTime" | "servings";
@@ -16,11 +16,11 @@ export function useRecipes() {
   const debouncedSearch = useDebounce(search, 500);
 
   const {
-    data: recipes = { data: [], count: 0, search: "" },
+    data: recipes = [],
     isLoading,
     isError,
     error,
-  } = useQuery<RecipeResponse>({
+  } = useQuery<Recipe[]>({
     queryKey: ["recipes", debouncedSearch],
     queryFn: async () => {
       const url = new URL("/api/recipes", window.location.origin);
@@ -31,7 +31,7 @@ export function useRecipes() {
       if (!res.ok) {
         throw new Error(`Error ${res.status}`);
       }
-      return res.json() as Promise<RecipeResponse>;
+      return res.json() as Promise<Recipe[]>;
     },
     enabled: debouncedSearch.length === 0 || debouncedSearch.length >= 3,
     placeholderData: keepPreviousData,
@@ -40,15 +40,15 @@ export function useRecipes() {
   // Extract unique tags from recipes
   const allTags = useMemo(() => {
     const tags = new Set<string>();
-    recipes.data.forEach((recipe) => {
+    recipes.forEach((recipe) => {
       recipe.tags?.forEach((tag) => tags.add(tag));
     });
     return Array.from(tags);
-  }, [recipes.data]);
+  }, [recipes]);
 
   // Filter and sort recipes
   const filteredAndSortedRecipes = useMemo(() => {
-    let filtered = recipes.data;
+    let filtered = recipes;
 
     // Filter by selected tags
     if (selectedTags.length > 0) {
@@ -74,7 +74,7 @@ export function useRecipes() {
           return 0;
       }
     });
-  }, [recipes.data, sortBy, selectedTags]);
+  }, [recipes, sortBy, selectedTags]);
 
   const toggleTag = (tag: string) => {
     setSelectedTags((prev) =>
