@@ -13,6 +13,8 @@ import { RecipeFilters } from "./recipe-filters";
 import { RecipeCard } from "@/src/components/recipe/recipe-card";
 import { RecipeLoadingSkeleton } from "./recipe-loading-skeleton";
 import { RecipeEmptyState } from "./recipe-empty-state";
+import LogRocket from "logrocket";
+
 // import dynamic from "next/dynamic";
 
 // Temporarily disabled PDF functionality due to build issues
@@ -52,10 +54,12 @@ export const Recipes = ({ session }: Props) => {
     toggleTag,
   } = useRecipes();
 
-  console.log(recipes);
-
   // Toggle favorite
   const toggleFavorite = async (recipeId: number) => {
+    LogRocket.track("Recipe Fav clicked", {
+      timestamp: new Date().toISOString(),
+      userAgent: navigator.userAgent,
+    });
     if (isFavorited(recipeId)) {
       await removeFromFavorites(recipeId);
     } else {

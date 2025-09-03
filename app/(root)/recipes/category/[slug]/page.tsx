@@ -1,7 +1,7 @@
 // app/(root)/recipes/category/[slug]/page.tsx
 
 import { Metadata } from "next";
-import { SingleRecipeView } from "@/src/components/recipe-server-component/single-recipe-view";
+import { RecipeDetailedView } from "@/src/components/recipe-server-component/recipe-detailed-view";
 import { auth } from "@/src/utils/auth";
 import { headers } from "next/headers";
 import { notFound } from "next/navigation";
@@ -74,8 +74,7 @@ export default async function RecipePage({ params }: PageProps) {
 
   return (
     <div className="wrapper page">
-      <SingleRecipeView
-        session={session}
+      <RecipeDetailedView
         recipe={recipeData as unknown as Recipe}
         canView={canView}
       />

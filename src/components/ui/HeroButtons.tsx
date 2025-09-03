@@ -4,11 +4,11 @@ import Link from "next/link";
 
 export default function HeroButtons() {
   return (
-    <div className="flex gap-4 mt-8">
-      <Link href="/recipes">
+    <div className="flex flex-col sm:flex-row gap-4 mt-8 w-full max-w-md">
+      <Link href="/recipes" className="flex-1">
         <Button
           variant="icon"
-          className="bg-black text-white border-black hover:bg-gray-900 hover:text-white"
+          className="murakamicity-button w-full font-semibold text-base"
         >
           <svg
             width="20"
@@ -16,6 +16,7 @@ export default function HeroButtons() {
             viewBox="0 0 20 20"
             fill="none"
             xmlns="http://www.w3.org/2000/svg"
+            className="mr-2"
           >
             <path
               d="M10 2C7.23858 2 5 4.23858 5 7C5 8.65685 6.34315 10 8 10H12C13.6569 10 15 8.65685 15 7C15 4.23858 12.7614 2 10 2Z"
@@ -31,7 +32,7 @@ export default function HeroButtons() {
       </Link>
       <Button
         variant="icon"
-        className="bg-white text-black border-gray-300 hover:bg-gray-100"
+        className="murakamicity-button-outline w-full sm:flex-1 font-semibold text-base"
       >
         <svg
           width="20"
@@ -39,6 +40,7 @@ export default function HeroButtons() {
           viewBox="0 0 20 20"
           fill="none"
           xmlns="http://www.w3.org/2000/svg"
+          className="mr-2"
         >
           <path
             d="M10 2V4M10 16V18M4.22 4.22L5.64 5.64M14.36 14.36L15.78 15.78M2 10H4M16 10H18M4.22 15.78L5.64 14.36M14.36 5.64L15.78 4.22M10 6A4 4 0 1 1 6 10"

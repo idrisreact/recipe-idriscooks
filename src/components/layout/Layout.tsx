@@ -38,139 +38,145 @@ export function LayoutHeader({ children }: LayoutHeaderProps) {
 
   return (
     <>
-      <header className="wrapper flex items-center justify-between py-4 md:py-8 relative">
-        {/* Logo */}
-        <Link href="/" aria-label="Go to homepage">
-          <Image
-            src="/images/idriscooks-logo.png"
-            alt="Idris Cooks"
-            width={50}
-            height={50}
-          />
-        </Link>
+      <div className="murakamicity-nav relative">
+        <div className="wrapper flex items-center justify-between py-4 md:py-6">
+          {/* Logo */}
+          <Link href="/" aria-label="Idris Cooks Logo" className="flex items-center">
+            <Image
+              src="/images/idriscooks-logo.png"
+              alt="Idris Cooks"
+              width={50}
+              height={50}
+              className="hover:scale-105 transition-transform duration-200"
+            />
+          </Link>
 
-        {/* Desktop nav */}
-        <nav className="hidden md:flex space-x-6" role="navigation" aria-label="Main navigation">
-          {primaryLinks.map(({ href, label, auth }) =>
-            auth && !session ? null : (
-              <Link 
-                key={href} 
-                href={href}
-                className="text-gray-700 hover:text-blue-600 focus:text-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 rounded-md px-2 py-1 transition-colors"
+          {/* Desktop nav */}
+          <nav className="hidden md:flex space-x-8" role="navigation" aria-label="Main navigation">
+            {primaryLinks.map(({ href, label, auth }) =>
+              auth && !session ? null : (
+                <Link 
+                  key={href} 
+                  href={href}
+                  className="text-foreground hover:text-primary focus:text-primary focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 focus:ring-offset-background rounded-sm px-3 py-2 transition-all duration-200 font-medium"
+                >
+                  {label}
+                </Link>
+              )
+            )}
+          </nav>
+
+          {/* Greeting + Subscription + Hamburger */}
+          <div className="flex items-center gap-3">
+            {session && (
+              <Text as="p" className="hidden sm:block font-medium text-sm">
+                Welcome Back, {session.user.name}
+              </Text>
+            )}
+            <SubscriptionBadge />
+            {/* Desktop Auth Controls */}
+            {session ? (
+              <Button
+                className="hidden md:block murakamicity-button-outline text-sm font-medium"
+                variant="outline"
+                size="sm"
+                onClick={signOut}
               >
-                {label}
-              </Link>
-            )
-          )}
-        </nav>
-
-        {/* Greeting + Subscription + Hamburger */}
-        <div className="flex items-center gap-3">
-          {session && (
-            <Text as="p" className="hidden sm:block">
-              Welcome Back, {session.user.name}
-            </Text>
-          )}
-          <SubscriptionBadge />
-          {/* Desktop Auth Controls */}
-          {session ? (
+                Sign Out
+              </Button>
+            ) : (
+              <>
+                <Button
+                  className="hidden md:block murakamicity-button-outline text-sm font-medium"
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setShowSignInModal(true)}
+                >
+                  Sign In
+                </Button>
+                <Button
+                  className="hidden md:block murakamicity-button text-sm font-medium"
+                  variant="outline"
+                  size="sm"
+                  onClick={() => router.push("/sign-up")}
+                >
+                  Sign Up
+                </Button>
+              </>
+            )}
+            {/* Hamburger for mobile */}
             <Button
-              className="hidden md:block"
+              className="md:hidden border-border hover:border-primary focus:ring-primary focus:ring-offset-background"
               variant="outline"
-              size="sm"
-              onClick={signOut}
+              size="icon"
+              onClick={() => setShowMenu((v) => !v)}
+              aria-label={showMenu ? "Close menu" : "Open menu"}
+              aria-expanded={showMenu}
+              aria-controls="mobile-menu"
             >
-              Sign Out
+              <HamburgerMenuIcon />
             </Button>
-          ) : (
-            <>
-              <Button
-                className="hidden md:block"
-                variant="outline"
-                size="sm"
-                onClick={() => setShowSignInModal(true)}
-              >
-                Sign In
-              </Button>
-              <Button
-                className="hidden md:block"
-                variant="outline"
-                size="sm"
-                onClick={() => router.push("/sign-up")}
-              >
-                Sign Up
-              </Button>
-            </>
-          )}
-          {/* Hamburger for mobile */}
-          <Button
-            className="md:hidden"
-            variant="outline"
-            size="icon"
-            onClick={() => setShowMenu((v) => !v)}
-            aria-label={showMenu ? "Close menu" : "Open menu"}
-            aria-expanded={showMenu}
-            aria-controls="mobile-menu"
-          >
-            <HamburgerMenuIcon />
-          </Button>
+          </div>
         </div>
-
+        
         {/* Mobile dropdown */}
         {showMenu && (
           <div
             id="mobile-menu"
-            className="absolute top-full inset-x-0 bg-white shadow-lg z-50 md:hidden"
+            className="absolute top-full left-0 right-0 bg-background/95 backdrop-blur-md border-t border-border shadow-2xl z-50 md:hidden"
             onClick={() => setShowMenu(false)}
           >
-            <nav className="flex flex-col space-y-3 p-4" role="navigation" aria-label="Mobile navigation">
-              {/* Primary links */}
-              {primaryLinks.map(({ href, label, auth }) =>
-                auth && !session ? null : (
-                  <Link
-                    key={href}
-                    href={href}
-                    className="block text-lg"
-                    onClick={() => setShowMenu(false)}
-                  >
-                    {label}
-                  </Link>
-                )
-              )}
+          <nav className="flex flex-col space-y-1 p-6" role="navigation" aria-label="Mobile navigation">
+            {/* Primary links */}
+            {primaryLinks.map(({ href, label, auth }) =>
+              auth && !session ? null : (
+                <Link
+                  key={href}
+                  href={href}
+                  className="block text-base font-medium py-3 px-2 hover:text-primary transition-colors duration-200 rounded-sm"
+                  onClick={() => setShowMenu(false)}
+                >
+                  {label}
+                </Link>
+              )
+            )}
 
-              <hr className="my-2" />
+            <hr className="my-4 border-border" />
 
-              {/* Auth controls */}
-              {!session ? (
-                <>
-                  <button
-                    onClick={() => {
-                      setShowSignInModal(true);
-                      setShowMenu(false);
-                    }}
-                    className="w-full text-left text-lg"
-                  >
-                    Sign In
-                  </button>
-                  <button
-                    onClick={() => {
-                      router.push("/sign-up");
-                      setShowMenu(false);
-                    }}
-                    className="w-full text-left text-lg"
-                  >
-                    Sign Up
-                  </button>
-                </>
-              ) : (
-                <button onClick={signOut} className="w-full text-left text-lg">
-                  Sign Out
+            {/* Auth controls */}
+            {!session ? (
+              <div className="space-y-3">
+                <button
+                  onClick={() => {
+                    setShowSignInModal(true);
+                    setShowMenu(false);
+                  }}
+                  className="w-full text-left murakamicity-button-outline py-3 px-4 text-center font-medium"
+                >
+                  Sign In
                 </button>
-              )}
-            </nav>
+                <button
+                  onClick={() => {
+                    router.push("/sign-up");
+                    setShowMenu(false);
+                  }}
+                  className="w-full text-left murakamicity-button py-3 px-4 text-center font-medium"
+                >
+                  Sign Up
+                </button>
+              </div>
+            ) : (
+              <button 
+                onClick={signOut} 
+                className="w-full text-left murakamicity-button-outline py-3 px-4 text-center font-medium"
+              >
+                Sign Out
+              </button>
+            )}
+          </nav>
           </div>
         )}
-      </header>
+      </div>
 
       <main>{children}</main>
 

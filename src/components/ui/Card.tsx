@@ -50,7 +50,7 @@ export const Card = (props: CardProps) => {
 
     return (
       <article
-        className={`relative w-64 h-80 rounded-lg overflow-hidden bg-center bg-cover cursor-pointer group focus-within:ring-2 focus-within:ring-blue-500 focus-within:ring-offset-2 ${className}`}
+        className={`relative w-full max-w-sm h-80 rounded-sm overflow-hidden bg-center bg-cover cursor-pointer group focus-within:ring-2 focus-within:ring-primary focus-within:ring-offset-2 focus-within:ring-offset-background transition-all duration-300 hover:scale-[1.02] ${className}`}
         style={{ backgroundImage: `url(${backgroundImage})` }}
         aria-labelledby={`recipe-title-${title.replace(/\s+/g, '-').toLowerCase()}`}
         onClick={onClick}
@@ -58,7 +58,7 @@ export const Card = (props: CardProps) => {
         tabIndex={0}
         role="button"
       >
-        <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/20 to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-transparent" />
 
         {/* Actions overlay */}
         {actions && (
@@ -81,7 +81,7 @@ export const Card = (props: CardProps) => {
         <div className="absolute bottom-4 left-4 right-4 text-white">
           <h2 
             id={`recipe-title-${title.replace(/\s+/g, '-').toLowerCase()}`}
-            className="text-lg font-semibold"
+            className="text-lg font-semibold tracking-wide"
           >
             {title}
           </h2>
@@ -116,7 +116,7 @@ export const Card = (props: CardProps) => {
     const { bgColor = "bg-gray-200", label, badge, overlayText } = props;
     return (
       <div
-        className={`relative w-64 h-80 rounded-2xl overflow-hidden shadow-md flex flex-col justify-end items-center ${bgColor} ${className}`}
+        className={`relative w-full max-w-sm h-80 rounded-sm overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300 flex flex-col justify-end items-center ${bgColor} ${className}`}
         onClick={onClick}
       >
         {badge && (
@@ -142,7 +142,7 @@ export const Card = (props: CardProps) => {
   if (variant === 'basic') {
     const { content } = props;
     return (
-      <div className={`rounded-lg shadow-md ${className}`} onClick={onClick}>
+      <div className={`murakamicity-card ${className}`} onClick={onClick}>
         {content}
         {children}
       </div>

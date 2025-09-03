@@ -9,6 +9,10 @@ const nextConfig: NextConfig = {
         hostname: "placehold.co",
         pathname: "/300x400/png",
       },
+      {
+        protocol: "https",
+        hostname: "images.unsplash.com",
+      },
     ],
   },
   webpack: (config) => {

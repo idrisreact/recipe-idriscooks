@@ -4,6 +4,7 @@ import Image from "next/image";
 import { useEffect, useRef } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { Text } from "@/src/components/ui/Text";
 
 const journeyStepsData = [
   {
@@ -88,58 +89,106 @@ export const JourneySteps = () => {
 
   return (
     <section
-      className="w-full md:w-4/5 mx-auto px-4 md:px-60 wrapper"
+      className="w-full max-w-6xl mx-auto px-4"
       aria-labelledby="journey-title"
     >
-      <h2
+      <Text
+        as="h2"
         id="journey-title"
-        className="text-2xl md:text-3xl font-bold text-gray-800 mb-8 text-center"
+        variant="heading"
+        className="mb-16 text-center"
       >
         My Journey
-      </h2>
-      <div className="flex flex-col ">
+      </Text>
+      <div className="flex flex-col space-y-24">
         {journeyStepsData.map((step, i) => (
           <article
             key={i}
-            className="
-              flex flex-col gap-5 md:flex-row 
+            className={`
+              flex flex-col gap-8 md:gap-12
               items-center justify-center 
-              py-16 md:py-0 
-              md:min-h-[75vh]
-            "
+              ${i % 2 === 0 ? 'md:flex-row' : 'md:flex-row-reverse'}
+            `}
             aria-label={step.title}
           >
             {/* Image */}
             <figure
-              className="flex-1 flex justify-center md:justify-start mb-8 md:mb-0 opacity-0"
+              className="flex-1 flex justify-center opacity-0"
               ref={(el: HTMLDivElement | null) => {
                 imageRefs.current[i] = el;
               }}
             >
-              <Image
-                src={step.image}
-                alt={step.alt}
-                width={400}
-                height={400}
-                className="rounded-2xl border-4 border-red-200 shadow-lg object-cover bg-gray-50 max-h-60 md:max-h-[40vh] w-auto md:mr-8"
-              />
+              <div className="murakamicity-card p-6 max-w-md">
+                <Image
+                  src={step.image}
+                  alt={step.alt}
+                  width={400}
+                  height={400}
+                  className="rounded-lg border-2 border-primary/20 shadow-lg object-cover bg-muted w-full h-auto"
+                />
+              </div>
             </figure>
             {/* Text */}
             <div
-              className="flex-1 flex flex-col justify-center items-center md:items-start text-center md:text-left px-2 md:px-0 opacity-0"
+              className="flex-1 flex flex-col justify-center items-center md:items-start text-center md:text-left px-4 md:px-8 opacity-0"
               ref={(el: HTMLDivElement | null) => {
                 textRefs.current[i] = el;
               }}
             >
-              <h3 className="text-2xl md:text-4xl font-bold text-gray-900 mb-4">
-                {step.title}
-              </h3>
-              <p className="text-gray-700 text-base md:text-lg leading-relaxed max-w-md">
-                {step.description}
-              </p>
+              <div className="murakamicity-card p-8 max-w-lg">
+                <div className="flex items-center gap-3 mb-6">
+                  <div className="w-8 h-8 bg-primary rounded-full flex items-center justify-center text-primary-foreground font-bold text-sm">
+                    {i + 1}
+                  </div>
+                  <div className="h-px bg-primary/30 flex-1"></div>
+                </div>
+                
+                <Text 
+                  as="h3" 
+                  variant="subheading" 
+                  className="mb-6 text-primary"
+                >
+                  {step.title}
+                </Text>
+                <Text 
+                  variant="large" 
+                  className="text-muted-foreground leading-relaxed"
+                >
+                  {step.description}
+                </Text>
+              </div>
             </div>
           </article>
         ))}
+      </div>
+      
+      {/* Call to Action */}
+      <div className="mt-24 text-center">
+        <div className="murakamicity-card p-8 max-w-2xl mx-auto">
+          <Text variant="subheading" className="mb-4 text-primary">
+            Ready to Cook Together?
+          </Text>
+          <Text variant="large" className="text-muted-foreground mb-6">
+            Join me on this culinary adventure! Follow along for new recipes, 
+            cooking tips, and behind-the-scenes kitchen moments.
+          </Text>
+          <div className="flex flex-wrap gap-4 justify-center">
+            <a 
+              href="https://tiktok.com/@idriscooks" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="murakamicity-button flex items-center gap-2"
+            >
+              Follow on TikTok
+            </a>
+            <a 
+              href="/recipes" 
+              className="murakamicity-button-outline flex items-center gap-2"
+            >
+              Browse Recipes
+            </a>
+          </div>
+        </div>
       </div>
     </section>
   );

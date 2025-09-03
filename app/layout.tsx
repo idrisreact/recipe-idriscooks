@@ -1,17 +1,15 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Montserrat } from "next/font/google";
 import "./globals.css";
 import { ReactQueryProvider } from "@/src/components/react-query-provider/react-query-provider";
 import { Toaster } from "react-hot-toast";
+import LogRocket from "logrocket";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
+const montserrat = Montserrat({
+  variable: "--font-montserrat",
   subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
+  weight: ["300", "400", "500", "600", "700", "800", "900"],
+  display: "swap",
 });
 
 export const metadata: Metadata = {
@@ -19,15 +17,19 @@ export const metadata: Metadata = {
   description: "recipes for you",
 };
 
+if (typeof window !== "undefined" && process.env.NODE_ENV === "production") {
+  LogRocket.init("mml61w/idriscooks");
+}
+
 export default function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="en" className="dark">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        className={`${montserrat.variable} font-montserrat antialiased`}
       >
         <ReactQueryProvider>
           {children}
@@ -36,8 +38,11 @@ export default function RootLayout({
             toastOptions={{
               duration: 4000,
               style: {
-                background: "#363636",
-                color: "#fff",
+                background: "#171717",
+                color: "#ffffff",
+                border: "1px solid #2a2a2a",
+                borderRadius: "4px",
+                fontFamily: "Montserrat, sans-serif",
               },
             }}
           />

@@ -101,7 +101,7 @@ export const RecipePreviewModal = ({
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
       <div 
         ref={modalRef}
-        className="bg-white rounded-lg max-w-2xl w-full max-h-[90vh] overflow-hidden relative"
+        className="bg-background border border-border rounded-lg max-w-2xl w-full max-h-[90vh] overflow-hidden relative"
         role="dialog"
         aria-modal="true"
         aria-labelledby="recipe-preview-title"
@@ -118,11 +118,11 @@ export const RecipePreviewModal = ({
               size="sm"
               variant="secondary"
               onClick={async () => await onFavorite(recipe.id)}
-              className="bg-white/90 hover:bg-white"
+              className="murakamicity-button-outline bg-background/90 hover:bg-background"
             >
               <Heart
                 className={`w-4 h-4 ${
-                  isFavorited ? "fill-red-500 text-red-500" : "text-gray-600"
+                  isFavorited ? "fill-primary text-primary" : "text-foreground"
                 }`}
               />
             </Button>
@@ -130,17 +130,17 @@ export const RecipePreviewModal = ({
               size="sm"
               variant="secondary"
               onClick={shareRecipe}
-              className="bg-white/90 hover:bg-white"
+              className="murakamicity-button-outline bg-background/90 hover:bg-background"
             >
-              <Share2 className="w-4 h-4 text-gray-600" />
+              <Share2 className="w-4 h-4 text-foreground" />
             </Button>
             <Button
               size="sm"
               variant="secondary"
               onClick={onClose}
-              className="bg-white/90 hover:bg-white"
+              className="murakamicity-button-outline bg-background/90 hover:bg-background"
             >
-              <X className="w-4 h-4 text-gray-600" />
+              <X className="w-4 h-4 text-foreground" />
             </Button>
           </div>
           <div className="absolute bottom-4 left-4 right-4 text-white">
@@ -162,26 +162,26 @@ export const RecipePreviewModal = ({
 
         {/* Content */}
         <div className="p-6 overflow-y-auto max-h-[calc(90vh-12rem)]">
-          <Text className="text-gray-600 mb-6">{recipe.description}</Text>
+          <Text className="text-muted-foreground mb-6">{recipe.description}</Text>
 
           {/* Tabs */}
-          <div className="flex gap-4 mb-4 border-b">
+          <div className="flex gap-4 mb-4 border-b border-border">
             <button
               onClick={() => setActiveTab("ingredients")}
-              className={`pb-2 px-1 border-b-2 font-medium ${
+              className={`pb-2 px-1 border-b-2 font-medium transition-colors ${
                 activeTab === "ingredients"
-                  ? "border-blue-500 text-blue-600"
-                  : "border-transparent text-gray-500"
+                  ? "border-primary text-primary"
+                  : "border-transparent text-muted-foreground hover:text-foreground"
               }`}
             >
               Ingredients
             </button>
             <button
               onClick={() => setActiveTab("steps")}
-              className={`pb-2 px-1 border-b-2 font-medium ${
+              className={`pb-2 px-1 border-b-2 font-medium transition-colors ${
                 activeTab === "steps"
-                  ? "border-blue-500 text-blue-600"
-                  : "border-transparent text-gray-500"
+                  ? "border-primary text-primary"
+                  : "border-transparent text-muted-foreground hover:text-foreground"
               }`}
             >
               Steps
@@ -197,13 +197,13 @@ export const RecipePreviewModal = ({
               <ul className="space-y-2">
                 {recipe.ingredients?.map((ingredient, index) => (
                   <li key={index} className="flex items-center gap-2">
-                    <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
-                    <Text>
+                    <div className="w-2 h-2 bg-primary rounded-full"></div>
+                    <Text className="text-foreground">
                       {ingredient.quantity} {ingredient.unit} {ingredient.name}
                     </Text>
                   </li>
                 )) || (
-                  <Text className="text-gray-500">No ingredients listed</Text>
+                  <Text className="text-muted-foreground">No ingredients listed</Text>
                 )}
               </ul>
             </div>
@@ -217,12 +217,12 @@ export const RecipePreviewModal = ({
               <ol className="space-y-3">
                 {recipe.steps?.map((step, index) => (
                   <li key={index} className="flex gap-3">
-                    <div className="flex-shrink-0 w-6 h-6 bg-blue-500 text-white rounded-full flex items-center justify-center text-sm font-medium">
+                    <div className="flex-shrink-0 w-6 h-6 bg-primary text-primary-foreground rounded-full flex items-center justify-center text-sm font-medium">
                       {index + 1}
                     </div>
-                    <Text>{step}</Text>
+                    <Text className="text-foreground">{step}</Text>
                   </li>
-                )) || <Text className="text-gray-500">No steps listed</Text>}
+                )) || <Text className="text-muted-foreground">No steps listed</Text>}
               </ol>
             </div>
           )}
@@ -237,7 +237,7 @@ export const RecipePreviewModal = ({
                 {recipe.tags.map((tag, index) => (
                   <span
                     key={index}
-                    className="px-3 py-1 bg-gray-100 text-gray-700 rounded-full text-sm"
+                    className="px-3 py-1 bg-muted text-muted-foreground rounded-full text-sm"
                   >
                     {tag}
                   </span>
@@ -248,13 +248,13 @@ export const RecipePreviewModal = ({
         </div>
 
         {/* Footer */}
-        <div className="p-6 border-t bg-gray-50">
+        <div className="p-6 border-t border-border bg-muted">
           <div className="flex gap-3">
-            <Button onClick={() => onNavigate(recipe)} className="flex-1">
+            <Button onClick={() => onNavigate(recipe)} className="flex-1 murakamicity-button">
               <BookOpen className="w-4 h-4 mr-2" />
               View Full Recipe
             </Button>
-            <Button variant="outline" onClick={onClose}>
+            <Button variant="outline" onClick={onClose} className="murakamicity-button-outline">
               Close
             </Button>
           </div>

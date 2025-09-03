@@ -1,165 +1,90 @@
 "use client";
 
-import { useSubscription } from "@/src/hooks/use-subscription";
-import { Badge } from "@/src/components/ui/badge";
-import { Card } from "@/src/components/ui/Card";
-import { Button } from "@/components/ui/button";
-import { Crown, Star, Zap } from "lucide-react";
+import { Text } from "@/src/components/ui/Text";
+import { FileText, Heart, CheckCircle } from "lucide-react";
+import { authClient } from "@/src/utils/auth-client";
+import { useState, useEffect } from "react";
 
 export default function SubscriptionStatus() {
-  const {
-    subscription,
-    plan,
-    isLoading,
-    error,
-    isAuthenticated,
-    isPremium,
-    isPro,
-    isFree,
-  } = useSubscription();
+  const { data: session, isPending } = authClient.useSession();
+  const [currentPlan, setCurrentPlan] = useState<'free' | 'pdf'>('free');
 
-  console.log(subscription);
+  // In a real app, you'd fetch this from your database
+  useEffect(() => {
+    if (session?.user?.id) {
+      // Simulate checking user's PDF access from database
+      // For demo purposes, everyone starts as free
+      setCurrentPlan('free');
+    }
+  }, [session]);
 
-  if (!isAuthenticated) {
+  if (isPending) {
     return (
-      <Card 
-        variant="basic"
-        content={
-          <div className="text-center">
-            <p className="text-sm text-gray-600">
-              Sign in to view subscription status
-            </p>
-          </div>
-        }
-        className="p-4 border-dashed"
-      />
+      <div className="murakamicity-card p-6 animate-pulse">
+        <div className="h-4 bg-muted rounded w-3/4 mb-3"></div>
+        <div className="h-3 bg-muted rounded w-1/2"></div>
+      </div>
     );
   }
 
-  if (isLoading) {
+  if (!session) {
     return (
-      <Card 
-        variant="basic"
-        content={
-          <div className="animate-pulse">
-            <div className="h-4 bg-gray-200 rounded w-3/4 mb-2"></div>
-            <div className="h-3 bg-gray-200 rounded w-1/2"></div>
-          </div>
-        }
-        className="p-4"
-      />
+      <div className="murakamicity-card p-6 border-dashed border-2">
+        <div className="text-center">
+          <Text className="text-muted-foreground">
+            Sign in to view your plan
+          </Text>
+        </div>
+      </div>
     );
   }
 
-  if (error) {
-    return (
-      <Card 
-        variant="basic"
-        content={
-          <div className="text-center">
-            <p className="text-sm text-red-600">Failed to load subscription</p>
-            <Button variant="outline" size="sm" className="mt-2">
-              Retry
-            </Button>
-          </div>
-        }
-        className="p-4 border-red-200 bg-red-50"
-      />
-    );
-  }
-
-  const getPlanIcon = () => {
-    if (isPro) return <Crown className="w-4 h-4 text-purple-600" />;
-    if (isPremium) return <Star className="w-4 h-4 text-blue-600" />;
-    return <Zap className="w-4 h-4 text-gray-600" />;
-  };
-
-  const getPlanColor = () => {
-    if (isPro) return "bg-purple-100 text-purple-800 border-purple-200";
-    if (isPremium) return "bg-blue-100 text-blue-800 border-blue-200";
-    return "bg-gray-100 text-gray-800 border-gray-200";
-  };
-
-  const getStatusColor = () => {
-    if (subscription?.status === "active") return "bg-green-100 text-green-800";
-    if (subscription?.status === "trialing")
-      return "bg-yellow-100 text-yellow-800";
-    return "bg-red-100 text-red-800";
-  };
+  const isPdfPlan = currentPlan === 'pdf';
 
   return (
-    <Card 
-      variant="basic"
-      content={
-        <div className="space-y-3">
-          {/* Plan Information */}
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              {getPlanIcon()}
-              <span className="font-medium">{plan?.name || "Free"}</span>
-            </div>
-            <Badge className={getPlanColor()}>{plan?.planType || "free"}</Badge>
-          </div>
-
-          {/* Subscription Status */}
-          {subscription && (
-            <div className="flex items-center justify-between text-sm">
-              <span className="text-gray-600">Status:</span>
-              <Badge className={getStatusColor()}>{subscription.status}</Badge>
-            </div>
-          )}
-
-          {/* Price */}
-          {plan && plan.price !== "0.00" && (
-            <div className="flex items-center justify-between text-sm">
-              <span className="text-gray-600">Price:</span>
-              <span className="font-medium">
-                ${plan.price}/{plan.billingCycle}
-              </span>
-            </div>
-          )}
-
-          {/* Period */}
-          {subscription && (
-            <div className="flex items-center justify-between text-sm">
-              <span className="text-gray-600">Period:</span>
-              <span className="text-xs">
-                {new Date(subscription.currentPeriodStart).toLocaleDateString()} -{" "}
-                {new Date(subscription.currentPeriodEnd).toLocaleDateString()}
-              </span>
-            </div>
-          )}
-
-          {/* Trial Status */}
-          {subscription?.status === "trialing" && subscription.trialEnd && (
-            <div className="bg-yellow-50 border border-yellow-200 rounded p-2">
-              <p className="text-xs text-yellow-800">
-                Trial ends: {new Date(subscription.trialEnd).toLocaleDateString()}
-              </p>
-            </div>
-          )}
-
-          {/* Action Buttons */}
-          <div className="flex gap-2 pt-2">
-            {isFree && (
-              <Button size="sm" className="flex-1">
-                Upgrade to Premium
-              </Button>
-            )}
-            {isPremium && (
-              <Button size="sm" variant="outline" className="flex-1">
-                Upgrade to Pro
-              </Button>
-            )}
-            {(isPremium || isPro) && (
-              <Button size="sm" variant="outline" className="flex-1">
-                Manage Subscription
-              </Button>
-            )}
-          </div>
+    <div className="murakamicity-card p-6">
+      <div className="flex items-center gap-4 mb-4">
+        {isPdfPlan ? (
+          <FileText className="w-8 h-8 text-primary" />
+        ) : (
+          <Heart className="w-8 h-8 text-muted-foreground" />
+        )}
+        <div>
+          <Text as="h3" variant="large" className="font-semibold">
+            {isPdfPlan ? 'PDF Access' : 'Free Plan'}
+          </Text>
+          <Text className="text-muted-foreground text-sm">
+            {isPdfPlan ? 'Lifetime access to PDF exports' : 'Perfect for exploring recipes'}
+          </Text>
         </div>
-      }
-      className="p-4"
-    />
+      </div>
+
+      <div className="flex items-center gap-2 mb-4">
+        <CheckCircle className="w-5 h-5 text-green-500" />
+        <Text className="text-green-600 font-medium">Active</Text>
+      </div>
+
+      {isPdfPlan && (
+        <div className="bg-primary/10 border border-primary/20 rounded-lg p-4">
+          <div className="flex items-center gap-2 mb-2">
+            <CheckCircle className="w-5 h-5 text-primary" />
+            <Text className="font-medium">PDF Access Enabled</Text>
+          </div>
+          <Text className="text-muted-foreground text-sm">
+            You have lifetime access to download any recipe as a PDF. 
+            No expiry date, no recurring fees.
+          </Text>
+        </div>
+      )}
+
+      {!isPdfPlan && (
+        <div className="bg-muted/50 rounded-lg p-4 mt-4">
+          <Text className="text-muted-foreground text-sm">
+            You're currently on the free plan. Upgrade to get PDF exports 
+            and offline access to all recipes.
+          </Text>
+        </div>
+      )}
+    </div>
   );
 }

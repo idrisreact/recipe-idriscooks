@@ -1,195 +1,179 @@
 "use client";
 
-import { useQuery } from "@tanstack/react-query";
-import { Card } from "@/src/components/ui/Card";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/src/components/ui/badge";
-import { Check, Crown, Star, Zap } from "lucide-react";
-import type { SubscriptionPlan } from "@/src/types/subscription.types";
+import { Text } from "@/src/components/ui/Text";
+import { Check, FileText, Heart, Star } from "lucide-react";
+import { authClient } from "@/src/utils/auth-client";
+import { useState } from "react";
+
+// Static plans - no need for database queries
+const plans = [
+  {
+    id: "free",
+    name: "Free",
+    price: "0",
+    currency: "£",
+    billingCycle: "forever",
+    description: "Perfect for exploring recipes",
+    features: [
+      "Browse all recipes",
+      "Save favorite recipes", 
+      "Recipe search & filters",
+      "Mobile-friendly access",
+      "Community features"
+    ],
+    popular: false,
+    current: true
+  },
+  {
+    id: "pdf",
+    name: "PDF Access",
+    price: "19.99",
+    currency: "£",
+    billingCycle: "one-time",
+    description: "Lifetime access to PDF exports",
+    features: [
+      "Everything in Free",
+      "PDF recipe exports",
+      "Printable recipe cards",
+      "Offline recipe access",
+      "Beautiful formatting",
+      "Lifetime access"
+    ],
+    popular: true,
+    current: false
+  }
+];
 
 export default function SubscriptionPlans() {
-  const {
-    data: plans,
-    isLoading,
-    error,
-  } = useQuery({
-    queryKey: ["subscription-plans"],
-    queryFn: async () => {
-      const response = await fetch("/api/subscription/plans");
-      if (!response.ok) {
-        throw new Error("Failed to fetch plans");
+  const { data: session } = authClient.useSession();
+  const [loading, setLoading] = useState(false);
+
+  const handlePlanSelection = async (planId: string) => {
+    if (!session) {
+      // Redirect to login or show login modal
+      return;
+    }
+
+    if (planId === "free") {
+      // Already free, no action needed
+      return;
+    }
+
+    if (planId === "pdf") {
+      setLoading(true);
+      try {
+        // Here you would integrate with payment processor (Stripe, PayPal, etc.)
+        console.log("Redirecting to payment for PDF access...");
+        // For now, just simulate
+        await new Promise(resolve => setTimeout(resolve, 1000));
+        alert("Payment integration would happen here!");
+      } finally {
+        setLoading(false);
       }
-      return response.json();
-    },
-  });
-
-  if (isLoading) {
-    return (
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        {[1, 2, 3].map((i) => (
-          <Card 
-            key={i} 
-            variant="basic"
-            content={
-              <div className="animate-pulse space-y-4">
-                <div className="h-6 bg-gray-200 rounded w-3/4"></div>
-                <div className="h-8 bg-gray-200 rounded w-1/2"></div>
-                <div className="space-y-2">
-                  {[1, 2, 3].map((j) => (
-                    <div key={j} className="h-4 bg-gray-200 rounded"></div>
-                  ))}
-                </div>
-              </div>
-            }
-            className="p-6"
-          />
-        ))}
-      </div>
-    );
-  }
-
-  if (error || !plans) {
-    return (
-      <Card 
-        variant="basic"
-        content={
-          <>
-            <p className="text-red-600">Failed to load subscription plans</p>
-            <Button variant="outline" className="mt-4">
-              Retry
-            </Button>
-          </>
-        }
-        className="p-6 text-center"
-      />
-    );
-  }
-
-  const getPlanIcon = (planType: string) => {
-    switch (planType) {
-      case "pro":
-        return <Crown className="w-5 h-5 text-purple-600" />;
-      case "premium":
-        return <Star className="w-5 h-5 text-blue-600" />;
-      default:
-        return <Zap className="w-5 h-5 text-gray-600" />;
     }
-  };
-
-  const getPlanColor = (planType: string) => {
-    switch (planType) {
-      case "pro":
-        return "border-purple-200 bg-purple-50";
-      case "premium":
-        return "border-blue-200 bg-blue-50";
-      default:
-        return "border-gray-200";
-    }
-  };
-
-  const getFeatureList = (plan: SubscriptionPlan) => {
-    const features = plan.features || {};
-    const limits = plan.limits || {};
-
-    const featureList = [];
-
-    if (features.canCreateRecipes) featureList.push("Create recipes");
-    if (features.canExportPdf) featureList.push("PDF export");
-    if (features.canShareRecipes) featureList.push("Share recipes");
-    if (features.hasNutritionInfo) featureList.push("Nutrition information");
-    if (features.hasCustomThemes) featureList.push("Custom themes");
-    if (features.hasPrioritySupport) featureList.push("Priority support");
-    if (features.hasAdvancedSearch) featureList.push("Advanced search");
-    if (features.hasOfflineAccess) featureList.push("Offline access");
-
-    if (limits.totalCollections)
-      featureList.push(`${limits.totalCollections} recipe collections`);
-    if (limits.activeMealPlans)
-      featureList.push(`${limits.activeMealPlans} meal plans`);
-    if (limits.pdfExportsPerMonth)
-      featureList.push(`${limits.pdfExportsPerMonth} PDF exports/month`);
-
-    return featureList;
   };
 
   return (
-    <div className="space-y-6">
-      <div className="text-center">
-        <h2 className="text-3xl font-bold text-gray-900">Choose Your Plan</h2>
-        <p className="text-gray-600 mt-2">
-          Unlock premium features to enhance your cooking experience
-        </p>
-      </div>
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
+      {plans.map((plan) => (
+        <div
+          key={plan.id}
+          className={`murakamicity-card p-8 relative transition-all duration-200 ${
+            plan.popular 
+              ? 'ring-2 ring-primary shadow-lg transform scale-105' 
+              : 'hover:shadow-lg hover:scale-102'
+          }`}
+        >
+          {/* Popular Badge */}
+          {plan.popular && (
+            <div className="absolute -top-3 left-1/2 transform -translate-x-1/2">
+              <div className="bg-primary text-primary-foreground px-4 py-1 rounded-full text-sm font-medium flex items-center gap-1">
+                <Star className="w-4 h-4" />
+                Most Popular
+              </div>
+            </div>
+          )}
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        {plans.map((plan: SubscriptionPlan) => (
-          <Card
-            key={plan.id}
-            variant="basic"
-            content={
-              <>
-                {plan.planType === "premium" && (
-                  <Badge className="absolute -top-3 left-1/2 transform -translate-x-1/2 bg-blue-600 text-white">
-                    Most Popular
-                  </Badge>
-                )}
+          {/* Current Badge */}
+          {plan.current && (
+            <div className="absolute top-4 right-4">
+              <div className="bg-green-500/20 text-green-600 px-3 py-1 rounded-full text-sm font-medium">
+                Current Plan
+              </div>
+            </div>
+          )}
 
-                <div className="space-y-4">
-                  {/* Plan Header */}
-                  <div className="text-center">
-                    <div className="flex items-center justify-center gap-2 mb-2">
-                      {getPlanIcon(plan.planType)}
-                      <h3 className="text-xl font-bold">{plan.name}</h3>
-                    </div>
-                    <div className="mb-2">
-                      <span className="text-3xl font-bold">${plan.price}</span>
-                      <span className="text-gray-600">/{plan.billingCycle}</span>
-                    </div>
-                    {plan.description && (
-                      <p className="text-sm text-gray-600">{plan.description}</p>
-                    )}
-                  </div>
+          {/* Plan Header */}
+          <div className="text-center mb-8">
+            <div className="flex items-center justify-center gap-2 mb-3">
+              {plan.id === 'pdf' ? (
+                <FileText className="w-6 h-6 text-primary" />
+              ) : (
+                <Heart className="w-6 h-6 text-muted-foreground" />
+              )}
+              <Text as="h3" variant="subheading">
+                {plan.name}
+              </Text>
+            </div>
+            
+            <div className="mb-4">
+              <span className="text-4xl font-bold text-foreground">
+                {plan.currency}{plan.price}
+              </span>
+              <Text className="text-muted-foreground ml-2">
+                {plan.billingCycle}
+              </Text>
+            </div>
+            
+            <Text className="text-muted-foreground">
+              {plan.description}
+            </Text>
+          </div>
 
-                  {/* Features List */}
-                  <div className="space-y-2">
-                    {getFeatureList(plan).map((feature, index) => (
-                      <div key={index} className="flex items-center gap-2">
-                        <Check className="w-4 h-4 text-green-600 flex-shrink-0" />
-                        <span className="text-sm">{feature}</span>
-                      </div>
-                    ))}
-                  </div>
+          {/* Features List */}
+          <div className="space-y-3 mb-8">
+            {plan.features.map((feature, index) => (
+              <div key={index} className="flex items-center gap-3">
+                <Check className="w-5 h-5 text-primary flex-shrink-0" />
+                <Text>{feature}</Text>
+              </div>
+            ))}
+          </div>
 
-                  {/* CTA Button */}
-                  <Button
-                    className={`w-full ${
-                      plan.planType === "free"
-                        ? "bg-gray-600 hover:bg-gray-700"
-                        : plan.planType === "premium"
-                        ? "bg-blue-600 hover:bg-blue-700"
-                        : "bg-purple-600 hover:bg-purple-700"
-                    }`}
-                  >
-                    {plan.planType === "free"
-                      ? "Current Plan"
-                      : `Choose ${plan.name}`}
-                  </Button>
-
-                  {/* Trial Info */}
-                  {plan.trialDays > 0 && plan.planType !== "free" && (
-                    <p className="text-xs text-center text-gray-600">
-                      {plan.trialDays}-day free trial
-                    </p>
-                  )}
-                </div>
-              </>
-            }
-            className={`p-6 relative ${getPlanColor(plan.planType)} ${
-              plan.planType === "premium" ? "ring-2 ring-blue-500" : ""
+          {/* CTA Button */}
+          <button
+            onClick={() => handlePlanSelection(plan.id)}
+            disabled={plan.current || loading}
+            className={`w-full py-4 px-6 rounded-sm font-medium transition-all duration-200 ${
+              plan.current
+                ? 'bg-green-500/20 text-green-600 cursor-not-allowed'
+                : plan.popular
+                ? 'murakamicity-button hover:scale-105'
+                : 'murakamicity-button-outline hover:bg-primary hover:text-primary-foreground'
             }`}
-          />
-        ))}
-      </div>
+          >
+            {loading && plan.id === 'pdf' ? (
+              <div className="flex items-center justify-center gap-2">
+                <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin"></div>
+                Processing...
+              </div>
+            ) : plan.current ? (
+              "Current Plan"
+            ) : plan.id === 'pdf' ? (
+              "Get PDF Access"
+            ) : (
+              "Stay Free"
+            )}
+          </button>
+
+          {/* Additional Info */}
+          {plan.id === 'pdf' && (
+            <Text className="text-center text-muted-foreground text-sm mt-4">
+              One-time payment • No recurring fees • Lifetime access
+            </Text>
+          )}
+        </div>
+      ))}
     </div>
   );
 }
