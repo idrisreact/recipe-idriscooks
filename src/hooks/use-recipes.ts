@@ -1,17 +1,17 @@
-import { useState, useMemo } from "react";
-import { useQuery, keepPreviousData } from "@tanstack/react-query";
-import { Recipe } from "@/src/types/recipes.types";
-import { useDebounce } from "./use-debounce";
+import { useState, useMemo } from 'react';
+import { useQuery, keepPreviousData } from '@tanstack/react-query';
+import { Recipe } from '@/src/types/recipes.types';
+import { useDebounce } from './use-debounce';
 
-type SortOption = "newest" | "oldest" | "title" | "cookTime" | "servings";
-type ViewMode = "grid" | "list";
+type SortOption = 'newest' | 'oldest' | 'title' | 'cookTime' | 'servings';
+type ViewMode = 'grid' | 'list';
 
 export function useRecipes() {
-  const [sortBy, setSortBy] = useState<SortOption>("newest");
-  const [viewMode, setViewMode] = useState<ViewMode>("grid");
+  const [sortBy, setSortBy] = useState<SortOption>('newest');
+  const [viewMode, setViewMode] = useState<ViewMode>('grid');
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
   const [showFilters, setShowFilters] = useState(false);
-  const [search, setSearch] = useState("");
+  const [search, setSearch] = useState('');
 
   const debouncedSearch = useDebounce(search, 500);
 
@@ -21,11 +21,11 @@ export function useRecipes() {
     isError,
     error,
   } = useQuery<Recipe[]>({
-    queryKey: ["recipes", debouncedSearch],
+    queryKey: ['recipes', debouncedSearch],
     queryFn: async () => {
-      const url = new URL("/api/recipes", window.location.origin);
+      const url = new URL('/api/recipes', window.location.origin);
       if (debouncedSearch.length >= 3) {
-        url.searchParams.set("search", debouncedSearch);
+        url.searchParams.set('search', debouncedSearch);
       }
       const res = await fetch(url.toString());
       if (!res.ok) {
@@ -37,7 +37,6 @@ export function useRecipes() {
     placeholderData: keepPreviousData,
   });
 
-  // Extract unique tags from recipes
   const allTags = useMemo(() => {
     const tags = new Set<string>();
     recipes.forEach((recipe) => {
@@ -46,29 +45,26 @@ export function useRecipes() {
     return Array.from(tags);
   }, [recipes]);
 
-  // Filter and sort recipes
   const filteredAndSortedRecipes = useMemo(() => {
     let filtered = recipes;
 
-    // Filter by selected tags
     if (selectedTags.length > 0) {
       filtered = filtered.filter((recipe) =>
         recipe.tags?.some((tag) => selectedTags.includes(tag))
       );
     }
 
-    // Sort recipes
     return filtered.sort((a, b) => {
       switch (sortBy) {
-        case "newest":
+        case 'newest':
           return b.id - a.id;
-        case "oldest":
+        case 'oldest':
           return a.id - b.id;
-        case "title":
+        case 'title':
           return a.title.localeCompare(b.title);
-        case "cookTime":
+        case 'cookTime':
           return a.cookTime - b.cookTime;
-        case "servings":
+        case 'servings':
           return a.servings - b.servings;
         default:
           return 0;
@@ -78,14 +74,11 @@ export function useRecipes() {
 
   const toggleTag = (tag: string) => {
     setSelectedTags((prev) =>
-      prev.includes(tag)
-        ? prev.filter((t) => t !== tag)
-        : [...prev, tag]
+      prev.includes(tag) ? prev.filter((t) => t !== tag) : [...prev, tag]
     );
   };
 
   return {
-    // State
     sortBy,
     setSortBy,
     viewMode,
@@ -95,15 +88,13 @@ export function useRecipes() {
     setShowFilters,
     search,
     setSearch,
-    
-    // Data
+
     recipes: filteredAndSortedRecipes,
     allTags,
     isLoading,
     isError,
     error,
-    
-    // Actions
+
     toggleTag,
   };
-} 
+}

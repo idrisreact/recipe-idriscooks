@@ -1,14 +1,10 @@
 import { PlanFeatures, PlanLimits, PlanType, UserUsage } from '../types/subscription.types';
 
-// Feature access validation utilities
 export class SubscriptionService {
   /**
    * Check if a user can access a specific feature based on their plan
    */
-  static canAccessFeature(
-    feature: keyof PlanFeatures,
-    userPlanFeatures: PlanFeatures
-  ): boolean {
+  static canAccessFeature(feature: keyof PlanFeatures, userPlanFeatures: PlanFeatures): boolean {
     return Boolean(userPlanFeatures[feature]);
   }
 
@@ -101,7 +97,10 @@ export class SubscriptionService {
   /**
    * Get feature comparison matrix for plan selection
    */
-  static getFeatureComparison(): Record<keyof PlanFeatures, Record<PlanType, boolean | number | string>> {
+  static getFeatureComparison(): Record<
+    keyof PlanFeatures,
+    Record<PlanType, boolean | number | string>
+  > {
     return {
       maxRecipeViews: {
         free: 100,
@@ -192,14 +191,17 @@ export class SubscriptionService {
       collections: {
         current: usage.collectionsCount || 0,
         limit: limits.totalCollections,
-        percentage: this.getUsagePercentage('totalCollections', usage.collectionsCount || 0, limits),
+        percentage: this.getUsagePercentage(
+          'totalCollections',
+          usage.collectionsCount || 0,
+          limits
+        ),
         remaining: this.getRemainingUsage('totalCollections', usage.collectionsCount || 0, limits),
       },
     };
   }
 }
 
-// Premium feature definitions and benefits
 export const PREMIUM_FEATURES = {
   RECIPE_CREATION: {
     name: 'Create Your Own Recipes',
@@ -263,7 +265,6 @@ export const PREMIUM_FEATURES = {
   },
 } as const;
 
-// Content gating helpers
 export const CONTENT_GATES = {
   RECIPE_VIEW_LIMIT: {
     free: 10, // recipes per month

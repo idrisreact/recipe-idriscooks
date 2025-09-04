@@ -1,5 +1,5 @@
-import { Text } from "@/src/components/ui/Text";
-import { ChevronRightIcon } from "@radix-ui/react-icons";
+import { Text } from '@/src/components/ui/Text';
+import { ChevronRightIcon } from '@radix-ui/react-icons';
 
 type CategoryTitleProps = {
   title: string;
@@ -8,8 +8,8 @@ type CategoryTitleProps = {
 
 export const CategoryTitle = ({ title, onClick }: CategoryTitleProps) => {
   return (
-    <button 
-      className="cursor-pointer focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 rounded-md p-1" 
+    <button
+      className="cursor-pointer focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 rounded-md p-1"
       onClick={onClick}
       aria-label={`View ${title} category`}
     >

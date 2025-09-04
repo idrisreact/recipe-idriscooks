@@ -16,10 +16,8 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Retrieve the checkout session from Stripe
     const session = await stripe.checkout.sessions.retrieve(sessionId);
 
-    // Verify the payment was successful
     if (session.payment_status === 'paid') {
       return NextResponse.json({
         success: true,
@@ -34,15 +32,14 @@ export async function POST(request: NextRequest) {
       });
     } else {
       return NextResponse.json(
-        { 
-          success: false, 
+        {
+          success: false,
           error: 'Payment not completed',
-          payment_status: session.payment_status 
+          payment_status: session.payment_status,
         },
         { status: 400 }
       );
     }
-
   } catch (error) {
     console.error('Session verification error:', error);
     return NextResponse.json(

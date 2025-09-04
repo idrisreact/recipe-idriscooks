@@ -34,11 +34,7 @@ export const MurakamicityCard = ({
   className = '',
   ...props
 }: MurakamicityCardProps) => {
-  const baseClasses = [
-    'rounded-lg',
-    'transition-all',
-    'duration-200',
-  ];
+  const baseClasses = ['rounded-lg', 'transition-all', 'duration-200'];
 
   const paddingClasses = {
     none: [],
@@ -48,44 +44,24 @@ export const MurakamicityCard = ({
   };
 
   const variantClasses = {
-    default: [
-      'bg-white',
-      'border',
-      'border-gray-200',
-      'shadow-sm',
-    ],
-    recipe: [
-      'bg-white',
-      'border',
-      'border-gray-200',
-      'shadow-md',
-      'overflow-hidden',
-      'relative',
-    ],
-    elevated: [
-      'bg-white',
-      'shadow-lg',
-      'border',
-      'border-gray-100',
-    ],
-    bordered: [
-      'bg-white',
-      'border-2',
-      'border-[#F20094]',
-      'shadow-sm',
-    ],
+    default: ['bg-white', 'border', 'border-gray-200', 'shadow-sm'],
+    recipe: ['bg-white', 'border', 'border-gray-200', 'shadow-md', 'overflow-hidden', 'relative'],
+    elevated: ['bg-white', 'shadow-lg', 'border', 'border-gray-100'],
+    bordered: ['bg-white', 'border-2', 'border-[#F20094]', 'shadow-sm'],
   };
 
-  const interactiveClasses = interactive ? [
-    'cursor-pointer',
-    'hover:scale-105',
-    'hover:shadow-xl',
-    'active:scale-95',
-    'focus:outline-none',
-    'focus:ring-2',
-    'focus:ring-[#F20094]',
-    'focus:ring-offset-2',
-  ] : [];
+  const interactiveClasses = interactive
+    ? [
+        'cursor-pointer',
+        'hover:scale-105',
+        'hover:shadow-xl',
+        'active:scale-95',
+        'focus:outline-none',
+        'focus:ring-2',
+        'focus:ring-[#F20094]',
+        'focus:ring-offset-2',
+      ]
+    : [];
 
   const allClasses = [
     ...baseClasses,
@@ -98,18 +74,20 @@ export const MurakamicityCard = ({
   const cardContent = (
     <>
       {backgroundImage && variant === 'recipe' && (
-        <div 
+        <div
           className="absolute inset-0 bg-cover bg-center bg-no-repeat"
           style={{ backgroundImage: `url(${backgroundImage})` }}
         >
           <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent" />
         </div>
       )}
-      
+
       {(title || subtitle) && (
         <div className={`${backgroundImage ? 'relative z-10 text-white' : ''} mb-4`}>
           {title && (
-            <h3 className={`font-semibold text-lg ${backgroundImage ? 'text-white' : 'text-gray-900'}`}>
+            <h3
+              className={`font-semibold text-lg ${backgroundImage ? 'text-white' : 'text-gray-900'}`}
+            >
               {title}
             </h3>
           )}
@@ -120,10 +98,8 @@ export const MurakamicityCard = ({
           )}
         </div>
       )}
-      
-      <div className={backgroundImage ? 'relative z-10' : ''}>
-        {children}
-      </div>
+
+      <div className={backgroundImage ? 'relative z-10' : ''}>{children}</div>
     </>
   );
 

@@ -2,9 +2,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import Stripe from 'stripe';
 import { auth } from '@/src/utils/auth';
 
-// Initialize Stripe
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-  apiVersion:'2025-08-27.basil'
+  apiVersion: '2025-08-27.basil',
 });
 
 export async function POST(request: NextRequest) {
@@ -12,20 +11,14 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
     const { recipeCount } = body;
 
-    // Validate recipe count
     if (!recipeCount || recipeCount < 1) {
-      return NextResponse.json(
-        { error: 'Invalid recipe count' },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: 'Invalid recipe count' }, { status: 400 });
     }
 
-    // Get user session (optional - can allow guest purchases)
     const session = await auth.api.getSession({
       headers: request.headers,
     });
 
-    // Create Stripe checkout session
     const checkoutSession = await stripe.checkout.sessions.create({
       payment_method_types: ['card'],
       line_items: [
@@ -35,10 +28,7 @@ export async function POST(request: NextRequest) {
             product_data: {
               name: `PDF Recipe Collection`,
               description: `Download ${recipeCount} favorite recipe${recipeCount > 1 ? 's' : ''} as a beautifully formatted PDF`,
-              images: [
-                // Add your product image URL here
-                `${process.env.NEXT_PUBLIC_BASE_URL}/images/pdf-preview.png`
-              ],
+              images: [`${process.env.NEXT_PUBLIC_BASE_URL}/images/pdf-preview.png`],
             },
             unit_amount: calculatePrice(recipeCount), // Price in cents
           },
@@ -60,17 +50,12 @@ export async function POST(request: NextRequest) {
       sessionId: checkoutSession.id,
       url: checkoutSession.url,
     });
-
   } catch (error) {
     console.error('Stripe checkout error:', error);
-    return NextResponse.json(
-      { error: 'Failed to create checkout session' },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: 'Failed to create checkout session' }, { status: 500 });
   }
 }
 
-// Calculate price based on recipe count (e.g., $2.99 for 1-5 recipes, $4.99 for 6-10, etc.)
 function calculatePrice(recipeCount: number): number {
   if (recipeCount <= 5) return 299; // $2.99
   if (recipeCount <= 10) return 499; // $4.99

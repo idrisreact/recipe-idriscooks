@@ -23,4 +23,4 @@ export interface AddToFavoritesRequest {
 
 export interface RemoveFromFavoritesRequest {
   recipeId: number;
-} 
+}

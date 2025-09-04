@@ -1,35 +1,37 @@
-"use client";
+'use client';
 
-import { useFavorites } from "@/src/hooks/use-favorites";
-import { Card } from "@/src/components/ui/Card";
-import { ActionButton } from "@/src/components/ui/ActionButton";
-import { RecipeMetadata } from "@/src/components/ui/RecipeMetadata";
-import { Text } from "@/src/components/ui/Text";
-import { Heading } from "@/src/components/common/heading/heading";
-import { VerticalSpace } from "@/src/components/ui/VerticalSpace";
-import { useRouter } from "next/navigation";
-import { Heart, Share2, Eye, LogIn } from "lucide-react";
-import { RecipePreviewModal } from "@/src/components/recipe-server-component/recipe-preview-modal";
-import dynamic from "next/dynamic";
-import { Suspense } from "react";
+import { useFavorites } from '@/src/hooks/use-favorites';
+import { Card } from '@/src/components/ui/Card';
+import { ActionButton } from '@/src/components/ui/ActionButton';
+import { RecipeMetadata } from '@/src/components/ui/RecipeMetadata';
+import { Text } from '@/src/components/ui/Text';
+import { Heading } from '@/src/components/common/heading/heading';
+import { VerticalSpace } from '@/src/components/ui/VerticalSpace';
+import { useRouter } from 'next/navigation';
+import { Heart, Share2, Eye, LogIn } from 'lucide-react';
+import { RecipePreviewModal } from '@/src/components/recipe-server-component/recipe-preview-modal';
+import dynamic from 'next/dynamic';
+import { Suspense } from 'react';
 
 const PDFGenerator = dynamic(
-  () => import("@/src/components/recipe-server-component/pdf-generator").then(mod => ({ default: mod.PDFGenerator })),
+  () =>
+    import('@/src/components/recipe-server-component/pdf-generator').then((mod) => ({
+      default: mod.PDFGenerator,
+    })),
   {
     ssr: false,
-    loading: () => <div className="animate-pulse w-24 h-10 bg-muted rounded"></div>
+    loading: () => <div className="animate-pulse w-24 h-10 bg-muted rounded"></div>,
   }
 );
-import { useState, useEffect } from "react";
-import { Recipe } from "@/src/types/recipes.types";
-import { authClient } from "@/src/utils/auth-client";
-import { SignInModal } from "@/src/components/auth/sign-in-modal/SignInModal";
-import { useSearchParams } from "next/navigation";
+import { useState, useEffect } from 'react';
+import { Recipe } from '@/src/types/recipes.types';
+import { authClient } from '@/src/utils/auth-client';
+import { SignInModal } from '@/src/components/auth/sign-in-modal/SignInModal';
+import { useSearchParams } from 'next/navigation';
 
 function FavoritesContent() {
   const { data: session, isPending } = authClient.useSession();
-  const { favorites, loading, error, removeFromFavorites, isFavorited } =
-    useFavorites();
+  const { favorites, loading, error, removeFromFavorites, isFavorited } = useFavorites();
   const router = useRouter();
   const searchParams = useSearchParams();
   const [previewRecipe, setPreviewRecipe] = useState<Recipe | null>(null);
@@ -43,19 +45,17 @@ function FavoritesContent() {
     }
   };
 
-  // Handle auto-download from payment success
   useEffect(() => {
     const downloadParam = searchParams.get('download');
     if (downloadParam === 'true' && !loading && favorites.length > 0) {
       setShouldAutoDownload(true);
-      // Clean up the URL parameter
+
       const url = new URL(window.location.href);
       url.searchParams.delete('download');
       window.history.replaceState({}, '', url.toString());
     }
   }, [searchParams, loading, favorites.length]);
 
-  // Show loading while checking authentication
   if (isPending) {
     return (
       <div className="wrapper page">
@@ -69,7 +69,6 @@ function FavoritesContent() {
     );
   }
 
-  // Show sign-in prompt for unauthenticated users
   if (!session) {
     return (
       <div className="wrapper page">
@@ -90,17 +89,15 @@ function FavoritesContent() {
               Sign In
             </button>
             <button
-              onClick={() => router.push("/recipes")}
+              onClick={() => router.push('/recipes')}
               className="murakamicity-button-outline flex items-center gap-2"
             >
               Browse Recipes
             </button>
           </div>
         </div>
-        
-        {showSignInModal && (
-          <SignInModal onClose={() => setShowSignInModal(false)} />
-        )}
+
+        {showSignInModal && <SignInModal onClose={() => setShowSignInModal(false)} />}
       </div>
     );
   }
@@ -127,10 +124,7 @@ function FavoritesContent() {
         <VerticalSpace space="16" />
         <div className="recipe-grid">
           {[...Array(6)].map((_, i) => (
-            <div
-              key={i}
-              className="w-full h-80 bg-muted rounded-sm animate-pulse"
-            />
+            <div key={i} className="w-full h-80 bg-muted rounded-sm animate-pulse" />
           ))}
         </div>
       </div>
@@ -145,11 +139,10 @@ function FavoritesContent() {
         <Text as="h2" className="text-destructive mb-4" variant="subheading">
           Failed to load favorites
         </Text>
-        <Text variant="large" className="text-muted-foreground mb-8 max-w-md mx-auto">{error}</Text>
-        <button 
-          onClick={() => window.location.reload()}
-          className="murakamicity-button mx-auto"
-        >
+        <Text variant="large" className="text-muted-foreground mb-8 max-w-md mx-auto">
+          {error}
+        </Text>
+        <button onClick={() => window.location.reload()} className="murakamicity-button mx-auto">
           Try Again
         </button>
       </div>
@@ -170,8 +163,8 @@ function FavoritesContent() {
           <Text variant="large" className="text-muted-foreground mb-8 max-w-md mx-auto">
             Start exploring recipes and add them to your favorites!
           </Text>
-          <button 
-            onClick={() => router.push("/recipes")}
+          <button
+            onClick={() => router.push('/recipes')}
             className="murakamicity-button flex items-center gap-2 mx-auto"
           >
             <Heart className="w-4 h-4" />
@@ -183,13 +176,13 @@ function FavoritesContent() {
           <div className="mb-6 flex justify-between items-center flex-wrap gap-4">
             <Text variant="large" className="text-muted-foreground font-medium">
               {favorites.length} favorite recipe
-              {favorites.length !== 1 ? "s" : ""}
+              {favorites.length !== 1 ? 's' : ''}
             </Text>
-            
+
             {favorites.length > 0 && (
               <div className="flex items-center gap-3">
                 <PDFGenerator
-                  recipes={favorites.map(fav => fav.recipe)}
+                  recipes={favorites.map((fav) => fav.recipe)}
                   title="My Favorite Recipes"
                   autoDownload={shouldAutoDownload}
                   onAutoDownloadComplete={() => setShouldAutoDownload(false)}
@@ -246,10 +239,8 @@ function FavoritesContent() {
                     variant="recipe"
                     backgroundImage={favorite.recipe.imageUrl}
                     title={favorite.recipe.title}
-                    subtitle={favorite.recipe.description.slice(0, 50) + "..."}
-                    onClick={() =>
-                      router.push(`/recipes/category/${favorite.recipe.title}`)
-                    }
+                    subtitle={favorite.recipe.description.slice(0, 50) + '...'}
+                    onClick={() => router.push(`/recipes/category/${favorite.recipe.title}`)}
                     actions={actions}
                     metadata={metadata}
                   />
@@ -258,7 +249,7 @@ function FavoritesContent() {
             })}
           </div>
 
-          {/* Recipe Preview Modal */}
+          {}
           <RecipePreviewModal
             recipe={previewRecipe}
             isOpen={isPreviewOpen}
@@ -278,7 +269,13 @@ function FavoritesContent() {
 
 export default function FavoritesPage() {
   return (
-    <Suspense fallback={<div className="wrapper page"><div className="animate-pulse">Loading...</div></div>}>
+    <Suspense
+      fallback={
+        <div className="wrapper page">
+          <div className="animate-pulse">Loading...</div>
+        </div>
+      }
+    >
       <FavoritesContent />
     </Suspense>
   );

@@ -1,21 +1,21 @@
-"use client";
-import { Recipe } from "@/src/types/recipes.types";
-// Using regular button element since no Button component in ui folder
-import { Download, CreditCard } from "lucide-react";
-import { useState, useEffect } from "react";
-import toast from "react-hot-toast";
-import { authClient } from "@/src/utils/auth-client";
-import { SignInOverlay } from "./sign-in-overlay";
-import { MyDocument } from "./my-document";
-import { useSearchParams } from "next/navigation";
+'use client';
+import { Recipe } from '@/src/types/recipes.types';
 
-import dynamic from "next/dynamic";
+import { Download, CreditCard } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import toast from 'react-hot-toast';
+import { authClient } from '@/src/utils/auth-client';
+import { SignInOverlay } from './sign-in-overlay';
+import { MyDocument } from './my-document';
+import { useSearchParams } from 'next/navigation';
+
+import dynamic from 'next/dynamic';
 
 const PDFDownloadLink = dynamic(
-  () => import("@react-pdf/renderer").then((mod) => ({ default: mod.PDFDownloadLink })),
+  () => import('@react-pdf/renderer').then((mod) => ({ default: mod.PDFDownloadLink })),
   {
     ssr: false,
-    loading: () => <div className="animate-pulse">Loading PDF generator...</div>
+    loading: () => <div className="animate-pulse">Loading PDF generator...</div>,
   }
 );
 
@@ -28,11 +28,10 @@ interface PDFGeneratorProps {
   onAutoDownloadComplete?: () => void;
 }
 
-
 export function PDFGenerator({
   recipes,
   isGenerating = false,
-  title = "My Favorite Recipes",
+  title = 'My Favorite Recipes',
   autoDownload = false,
   onAutoDownloadComplete,
 }: PDFGeneratorProps) {
@@ -44,12 +43,10 @@ export function PDFGenerator({
   const searchParams = useSearchParams();
   const [shouldAutoDownload, setShouldAutoDownload] = useState(false);
 
-  // Check if user has PDF access
   useEffect(() => {
     const checkPDFAccess = async () => {
       if (session?.user?.id) {
         try {
-          // Add cache busting to ensure fresh data after payment
           const response = await fetch('/api/user/pdf-access?' + new Date().getTime());
           const data = await response.json();
           setHasPDFAccess(data.hasAccess);
@@ -63,11 +60,9 @@ export function PDFGenerator({
     checkPDFAccess();
   }, [session]);
 
-  // Handle direct download from payment success
   useEffect(() => {
     const download = searchParams.get('download');
     if (download === 'true' && !checkingAccess && session?.user?.id) {
-      // Recheck access from database when coming from payment success
       const recheckAccess = async () => {
         try {
           console.log('Rechecking PDF access after payment...');
@@ -77,17 +72,15 @@ export function PDFGenerator({
           setHasPDFAccess(data.hasAccess);
         } catch (error) {
           console.error('Error rechecking PDF access:', error);
-          // Fallback: allow access temporarily
+
           setHasPDFAccess(true);
         }
       };
-      
-      // Add delay to allow webhook to process
+
       setTimeout(recheckAccess, 1000);
     }
   }, [searchParams, checkingAccess, session]);
 
-  // Handle auto-download trigger from parent component
   useEffect(() => {
     if (autoDownload && hasPDFAccess && !checkingAccess) {
       console.log('Auto-download triggered');
@@ -97,10 +90,10 @@ export function PDFGenerator({
 
   const handlePDFClick = (e: React.MouseEvent) => {
     if (hasPDFAccess) {
-      toast.success("PDF download started!");
+      toast.success('PDF download started!');
       return;
     }
-    
+
     e.preventDefault();
     if (!session) {
       setShowLoginModal(true);
@@ -111,7 +104,7 @@ export function PDFGenerator({
 
   const handlePurchase = async () => {
     setProcessingPayment(true);
-    
+
     try {
       const response = await fetch('/api/stripe/checkout', {
         method: 'POST',
@@ -120,9 +113,8 @@ export function PDFGenerator({
       });
 
       const data = await response.json();
-      
+
       if (data.url) {
-        // Redirect to Stripe checkout
         window.location.href = data.url;
       } else {
         throw new Error(data.error || 'Failed to create checkout session');
@@ -136,7 +128,7 @@ export function PDFGenerator({
 
   const refreshAccess = async () => {
     if (!session?.user?.id) return;
-    
+
     setCheckingAccess(true);
     try {
       console.log('Refreshing PDF access...');
@@ -144,7 +136,7 @@ export function PDFGenerator({
       const data = await response.json();
       console.log('Access refresh result:', data);
       setHasPDFAccess(data.hasAccess);
-      
+
       if (data.hasAccess) {
         toast.success('PDF access confirmed!');
       } else {
@@ -158,7 +150,6 @@ export function PDFGenerator({
     }
   };
 
-  // Calculate display price
   const calculateDisplayPrice = (recipeCount: number): string => {
     if (recipeCount <= 5) return '2.99';
     if (recipeCount <= 10) return '4.99';
@@ -175,7 +166,6 @@ export function PDFGenerator({
     );
   }
 
-  // If user has access, show regular download button
   if (hasPDFAccess) {
     return (
       <PDFDownloadLink
@@ -183,7 +173,6 @@ export function PDFGenerator({
         fileName="my-favorite-recipes.pdf"
       >
         {({ loading, url }) => {
-          // Handle auto-download
           if (shouldAutoDownload && url && !loading) {
             setShouldAutoDownload(false);
             const link = document.createElement('a');
@@ -192,7 +181,7 @@ export function PDFGenerator({
             document.body.appendChild(link);
             link.click();
             document.body.removeChild(link);
-            toast.success("PDF download started!");
+            toast.success('PDF download started!');
             if (onAutoDownloadComplete) {
               onAutoDownloadComplete();
             }
@@ -204,25 +193,24 @@ export function PDFGenerator({
               disabled={loading || isGenerating || recipes.length === 0}
               className="murakamicity-button flex items-center gap-2 bg-primary hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed"
             >
-            {loading || isGenerating ? (
-              <>
-                <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                Generating PDF...
-              </>
-            ) : (
-              <>
-                <Download className="w-4 h-4" />
-                Download PDF ({recipes.length} recipes)
-              </>
-            )}
-          </button>
+              {loading || isGenerating ? (
+                <>
+                  <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                  Generating PDF...
+                </>
+              ) : (
+                <>
+                  <Download className="w-4 h-4" />
+                  Download PDF ({recipes.length} recipes)
+                </>
+              )}
+            </button>
           );
         }}
       </PDFDownloadLink>
     );
   }
 
-  // If user doesn't have access, show purchase button
   return (
     <>
       <div className="flex items-center gap-2 flex-wrap">
@@ -243,7 +231,7 @@ export function PDFGenerator({
             </>
           )}
         </button>
-        
+
         {session?.user && (
           <button
             onClick={refreshAccess}
@@ -257,9 +245,7 @@ export function PDFGenerator({
                 Checking...
               </>
             ) : (
-              <>
-                🔄 Refresh Access
-              </>
+              <>🔄 Refresh Access</>
             )}
           </button>
         )}
@@ -267,10 +253,7 @@ export function PDFGenerator({
       {showLoginModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
           <div className="relative">
-            <SignInOverlay
-              noBackground
-              onClose={() => setShowLoginModal(false)}
-            />
+            <SignInOverlay noBackground onClose={() => setShowLoginModal(false)} />
             <button
               className="absolute top-2 right-2 text-gray-500 hover:text-gray-700 text-2xl"
               onClick={() => setShowLoginModal(false)}

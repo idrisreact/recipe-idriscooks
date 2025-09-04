@@ -1,11 +1,11 @@
-"use client";
-import { Recipe } from "@/src/types/recipes.types";
-import { X, Clock, Users, Heart, Share2, BookOpen } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Text } from "@/src/components/ui/Text";
-import { useState, useEffect, useRef } from "react";
-import { authClient } from "@/src/utils/auth-client";
-import { SignInOverlay } from "./sign-in-overlay";
+'use client';
+import { Recipe } from '@/src/types/recipes.types';
+import { X, Clock, Users, Heart, Share2, BookOpen } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Text } from '@/src/components/ui/Text';
+import { useState, useEffect, useRef } from 'react';
+import { authClient } from '@/src/utils/auth-client';
+import { SignInOverlay } from './sign-in-overlay';
 
 interface RecipePreviewModalProps {
   recipe: Recipe | null;
@@ -24,24 +24,20 @@ export const RecipePreviewModal = ({
   isFavorited,
   onNavigate,
 }: RecipePreviewModalProps) => {
-  const [activeTab, setActiveTab] = useState<"ingredients" | "steps">(
-    "ingredients"
-  );
+  const [activeTab, setActiveTab] = useState<'ingredients' | 'steps'>('ingredients');
   const { data: session } = authClient.useSession();
   const modalRef = useRef<HTMLDivElement>(null);
   const previousActiveElement = useRef<HTMLElement | null>(null);
 
   useEffect(() => {
     if (isOpen) {
-      // Save current focus and manage body scroll
       previousActiveElement.current = document.activeElement as HTMLElement;
-      document.body.style.overflow = "hidden";
+      document.body.style.overflow = 'hidden';
 
-      // Focus management
       const focusableElements = modalRef.current?.querySelectorAll(
         'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
       ) as NodeListOf<HTMLElement>;
-      
+
       const firstElement = focusableElements?.[0];
       const lastElement = focusableElements?.[focusableElements.length - 1];
 
@@ -55,13 +51,11 @@ export const RecipePreviewModal = ({
           if (focusableElements.length === 0) return;
 
           if (e.shiftKey) {
-            // Shift + Tab
             if (document.activeElement === firstElement) {
               e.preventDefault();
               lastElement?.focus();
             }
           } else {
-            // Tab
             if (document.activeElement === lastElement) {
               e.preventDefault();
               firstElement?.focus();
@@ -74,7 +68,7 @@ export const RecipePreviewModal = ({
       firstElement?.focus();
 
       return () => {
-        document.body.style.overflow = "auto";
+        document.body.style.overflow = 'auto';
         document.removeEventListener('keydown', handleKeyDown);
         previousActiveElement.current?.focus();
       };
@@ -99,7 +93,7 @@ export const RecipePreviewModal = ({
 
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-      <div 
+      <div
         ref={modalRef}
         className="bg-background border border-border rounded-lg max-w-2xl w-full max-h-[90vh] overflow-hidden relative"
         role="dialog"
@@ -107,7 +101,7 @@ export const RecipePreviewModal = ({
         aria-labelledby="recipe-preview-title"
       >
         {!session && <SignInOverlay onClose={onClose} />}
-        {/* Header */}
+        {}
         <div
           className="relative h-48 bg-cover bg-center"
           style={{ backgroundImage: `url(${recipe.imageUrl})` }}
@@ -122,7 +116,7 @@ export const RecipePreviewModal = ({
             >
               <Heart
                 className={`w-4 h-4 ${
-                  isFavorited ? "fill-primary text-primary" : "text-foreground"
+                  isFavorited ? 'fill-primary text-primary' : 'text-foreground'
                 }`}
               />
             </Button>
@@ -160,36 +154,36 @@ export const RecipePreviewModal = ({
           </div>
         </div>
 
-        {/* Content */}
+        {}
         <div className="p-6 overflow-y-auto max-h-[calc(90vh-12rem)]">
           <Text className="text-muted-foreground mb-6">{recipe.description}</Text>
 
-          {/* Tabs */}
+          {}
           <div className="flex gap-4 mb-4 border-b border-border">
             <button
-              onClick={() => setActiveTab("ingredients")}
+              onClick={() => setActiveTab('ingredients')}
               className={`pb-2 px-1 border-b-2 font-medium transition-colors ${
-                activeTab === "ingredients"
-                  ? "border-primary text-primary"
-                  : "border-transparent text-muted-foreground hover:text-foreground"
+                activeTab === 'ingredients'
+                  ? 'border-primary text-primary'
+                  : 'border-transparent text-muted-foreground hover:text-foreground'
               }`}
             >
               Ingredients
             </button>
             <button
-              onClick={() => setActiveTab("steps")}
+              onClick={() => setActiveTab('steps')}
               className={`pb-2 px-1 border-b-2 font-medium transition-colors ${
-                activeTab === "steps"
-                  ? "border-primary text-primary"
-                  : "border-transparent text-muted-foreground hover:text-foreground"
+                activeTab === 'steps'
+                  ? 'border-primary text-primary'
+                  : 'border-transparent text-muted-foreground hover:text-foreground'
               }`}
             >
               Steps
             </button>
           </div>
 
-          {/* Tab Content */}
-          {activeTab === "ingredients" && (
+          {}
+          {activeTab === 'ingredients' && (
             <div>
               <Text as="h3" className="font-semibold mb-3">
                 Ingredients
@@ -202,14 +196,12 @@ export const RecipePreviewModal = ({
                       {ingredient.quantity} {ingredient.unit} {ingredient.name}
                     </Text>
                   </li>
-                )) || (
-                  <Text className="text-muted-foreground">No ingredients listed</Text>
-                )}
+                )) || <Text className="text-muted-foreground">No ingredients listed</Text>}
               </ul>
             </div>
           )}
 
-          {activeTab === "steps" && (
+          {activeTab === 'steps' && (
             <div>
               <Text as="h3" className="font-semibold mb-3">
                 Instructions
@@ -227,7 +219,7 @@ export const RecipePreviewModal = ({
             </div>
           )}
 
-          {/* Tags */}
+          {}
           {recipe.tags && recipe.tags.length > 0 && (
             <div className="mt-6">
               <Text as="h3" className="font-semibold mb-2">
@@ -247,7 +239,7 @@ export const RecipePreviewModal = ({
           )}
         </div>
 
-        {/* Footer */}
+        {}
         <div className="p-6 border-t border-border bg-muted">
           <div className="flex gap-3">
             <Button onClick={() => onNavigate(recipe)} className="flex-1 murakamicity-button">

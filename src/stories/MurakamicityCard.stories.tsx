@@ -9,7 +9,8 @@ const meta = {
     layout: 'centered',
     docs: {
       description: {
-        component: 'The Murakamicity card component provides consistent containers for content with various styling options. Features hover animations, background images for recipe cards, and consistent spacing following the design system.',
+        component:
+          'The Murakamicity card component provides consistent containers for content with various styling options. Features hover animations, background images for recipe cards, and consistent spacing following the design system.',
       },
     },
   },
@@ -53,7 +54,9 @@ export const Default: Story = {
     children: (
       <div>
         <h3 className="font-semibold text-lg mb-2">Card Title</h3>
-        <p className="text-gray-600">This is a default card with some content inside. It has subtle borders and shadows.</p>
+        <p className="text-gray-600">
+          This is a default card with some content inside. It has subtle borders and shadows.
+        </p>
       </div>
     ),
   },
@@ -71,7 +74,8 @@ export const Recipe: Story = {
     variant: 'recipe',
     title: 'Chocolate Chip Cookies',
     subtitle: 'Classic homemade cookies that are crispy outside, chewy inside',
-    backgroundImage: 'https://images.unsplash.com/photo-1558961363-fa8fdf82db35?w=400&h=300&fit=crop',
+    backgroundImage:
+      'https://images.unsplash.com/photo-1558961363-fa8fdf82db35?w=400&h=300&fit=crop',
     interactive: true,
     children: (
       <div className="mt-4">
@@ -119,7 +123,9 @@ export const Bordered: Story = {
     children: (
       <div>
         <h3 className="font-semibold text-lg mb-2 text-[#F20094]">Premium Feature</h3>
-        <p className="text-gray-600">This card uses the bordered variant with the signature pink border.</p>
+        <p className="text-gray-600">
+          This card uses the bordered variant with the signature pink border.
+        </p>
       </div>
     ),
   },
@@ -150,14 +156,16 @@ export const Interactive: Story = {
     },
   },
 };
+{
+}
 
 export const NoPadding: Story = {
   args: {
     padding: 'none',
     children: (
       <div className="p-0">
-        <img 
-          src="https://images.unsplash.com/photo-1567620905732-2d1ec7ab7445?w=400&h=200&fit=crop" 
+        <img
+          src="https://images.unsplash.com/photo-1567620905732-2d1ec7ab7445?w=400&h=200&fit=crop"
           alt="Pancakes"
           className="w-full h-48 object-cover rounded-t-lg"
         />
@@ -207,7 +215,9 @@ export const LargePadding: Story = {
           <span className="text-white text-2xl">👨‍🍳</span>
         </div>
         <h3 className="font-semibold text-xl mb-2">Join Our Community</h3>
-        <p className="text-gray-600 mb-4">Connect with fellow food enthusiasts and share your favorite recipes.</p>
+        <p className="text-gray-600 mb-4">
+          Connect with fellow food enthusiasts and share your favorite recipes.
+        </p>
         <button className="px-6 py-2 bg-[#F20094] text-white rounded-lg hover:bg-[#D1007A] transition-colors">
           Get Started
         </button>
@@ -223,30 +233,36 @@ export const LargePadding: Story = {
   },
 };
 
-// Showcase stories
 export const AllVariants: Story = {
   args: {
     children: 'Card Content',
     onClick: () => {},
   },
   render: () => (
-    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '1rem', maxWidth: '800px' }}>
+    <div
+      style={{
+        display: 'grid',
+        gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))',
+        gap: '1rem',
+        maxWidth: '800px',
+      }}
+    >
       <MurakamicityCard variant="default">
         <h4 className="font-semibold mb-2">Default</h4>
         <p className="text-sm text-gray-600">Standard card styling</p>
       </MurakamicityCard>
-      
+
       <MurakamicityCard variant="elevated">
         <h4 className="font-semibold mb-2">Elevated</h4>
         <p className="text-sm text-gray-600">Enhanced shadow</p>
       </MurakamicityCard>
-      
+
       <MurakamicityCard variant="bordered">
         <h4 className="font-semibold mb-2 text-[#F20094]">Bordered</h4>
         <p className="text-sm text-gray-600">Pink border accent</p>
       </MurakamicityCard>
-      
-      <MurakamicityCard 
+
+      <MurakamicityCard
         variant="recipe"
         title="Recipe Card"
         subtitle="With background image"
@@ -271,29 +287,38 @@ export const RecipeGrid: Story = {
     onClick: () => {},
   },
   render: () => (
-    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '1.5rem', maxWidth: '900px' }}>
+    <div
+      style={{
+        display: 'grid',
+        gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))',
+        gap: '1.5rem',
+        maxWidth: '900px',
+      }}
+    >
       {[
         {
           title: 'Classic Margherita Pizza',
           subtitle: 'Traditional Italian pizza with fresh mozzarella',
-          image: 'https://images.unsplash.com/photo-1574071318508-1cdbab80d002?w=400&h=300&fit=crop',
+          image:
+            'https://images.unsplash.com/photo-1574071318508-1cdbab80d002?w=400&h=300&fit=crop',
           time: '45 min',
-          servings: '4'
+          servings: '4',
         },
         {
           title: 'Chocolate Brownies',
           subtitle: 'Rich and fudgy chocolate brownies',
-          image: 'https://images.unsplash.com/photo-1606313564200-e75d5e30476c?w=400&h=300&fit=crop',
+          image:
+            'https://images.unsplash.com/photo-1606313564200-e75d5e30476c?w=400&h=300&fit=crop',
           time: '35 min',
-          servings: '16'
+          servings: '16',
         },
         {
           title: 'Caesar Salad',
           subtitle: 'Crisp romaine with classic Caesar dressing',
           image: 'https://images.unsplash.com/photo-1551248429-40975aa4de74?w=400&h=300&fit=crop',
           time: '15 min',
-          servings: '4'
-        }
+          servings: '4',
+        },
       ].map((recipe, index) => (
         <MurakamicityCard
           key={index}

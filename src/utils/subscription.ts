@@ -1,13 +1,13 @@
 import { db } from '../db';
 import { userSubscriptions, subscriptionPlans, userUsage } from '../db/schemas';
 import { eq, and } from 'drizzle-orm';
-import type { 
-  SubscriptionPlan, 
-  UserSubscription, 
+import type {
+  SubscriptionPlan,
+  UserSubscription,
   UserUsage,
   SubscriptionAccessCheck,
   PlanFeatures,
-  PlanLimits
+  PlanLimits,
 } from '../types/subscription.types';
 
 /**
@@ -22,12 +22,7 @@ export async function getUserSubscription(userId: string): Promise<{
       .select()
       .from(userSubscriptions)
       .leftJoin(subscriptionPlans, eq(userSubscriptions.planId, subscriptionPlans.id))
-      .where(
-        and(
-          eq(userSubscriptions.userId, userId),
-          eq(userSubscriptions.status, 'active')
-        )
-      )
+      .where(and(eq(userSubscriptions.userId, userId), eq(userSubscriptions.status, 'active')))
       .limit(1);
 
     if (result.length === 0) {
@@ -37,7 +32,7 @@ export async function getUserSubscription(userId: string): Promise<{
     const row = result[0];
     return {
       subscription: row.user_subscriptions as UserSubscription,
-      plan: row.subscription_plans as SubscriptionPlan
+      plan: row.subscription_plans as SubscriptionPlan,
     };
   } catch (error) {
     console.error('Error fetching user subscription:', error);
@@ -76,12 +71,7 @@ export async function getUserUsage(userId: string): Promise<UserUsage | null> {
     const usage = await db
       .select()
       .from(userUsage)
-      .where(
-        and(
-          eq(userUsage.userId, userId),
-          eq(userUsage.month, monthString)
-        )
-      )
+      .where(and(eq(userUsage.userId, userId), eq(userUsage.month, monthString)))
       .limit(1);
 
     return usage.length > 0 ? (usage[0] as UserUsage) : null;
@@ -100,12 +90,12 @@ export async function checkFeatureAccess(
 ): Promise<SubscriptionAccessCheck> {
   try {
     const { subscription, plan } = await getUserSubscription(userId);
-    
+
     if (!subscription || !plan) {
       return {
         hasAccess: false,
         reason: 'No active subscription',
-        upgradeRequired: true
+        upgradeRequired: true,
       };
     }
 
@@ -117,20 +107,20 @@ export async function checkFeatureAccess(
         hasAccess: false,
         reason: `Feature not available in ${plan.name} plan`,
         upgradeRequired: true,
-        featureName: feature
+        featureName: feature,
       };
     }
 
     return {
       hasAccess: true,
-      featureName: feature
+      featureName: feature,
     };
   } catch (error) {
     console.error('Error checking feature access:', error);
     return {
       hasAccess: false,
       reason: 'Error checking access',
-      upgradeRequired: false
+      upgradeRequired: false,
     };
   }
 }
@@ -145,54 +135,51 @@ export async function checkUsageLimit(
   try {
     const { subscription, plan } = await getUserSubscription(userId);
     const usage = await getUserUsage(userId);
-    
+
     if (!subscription || !plan) {
       return {
         hasAccess: false,
         reason: 'No active subscription',
-        upgradeRequired: true
+        upgradeRequired: true,
       };
     }
 
     const limits = plan.limits as PlanLimits;
     const limit = limits[limitType];
 
-    // If no limit is set (unlimited), access is granted
     if (limit === undefined || limit === null) {
       return {
         hasAccess: true,
-        featureName: limitType
+        featureName: limitType,
       };
     }
 
     if (!usage) {
-      // No usage data means user hasn't used the feature yet
       return {
         hasAccess: true,
         remainingUsage: limit,
-        featureName: limitType
+        featureName: limitType,
       };
     }
 
-    // Map limit types to usage fields
     const usageMapping: Record<string, keyof UserUsage> = {
       monthlyRecipeViews: 'recipeViews',
       totalFavorites: 'favoritesCount',
       totalCollections: 'collectionsCount',
       activeMealPlans: 'mealPlansCount',
       sharedRecipesPerMonth: 'recipesShared',
-      pdfExportsPerMonth: 'pdfExports'
+      pdfExportsPerMonth: 'pdfExports',
     };
 
     const usageField = usageMapping[limitType];
     if (!usageField) {
       return {
         hasAccess: true,
-        featureName: limitType
+        featureName: limitType,
       };
     }
 
-    const currentUsage = usage[usageField] as number || 0;
+    const currentUsage = (usage[usageField] as number) || 0;
     const remaining = limit - currentUsage;
 
     return {
@@ -200,14 +187,14 @@ export async function checkUsageLimit(
       reason: remaining <= 0 ? `${limitType} limit reached` : undefined,
       remainingUsage: Math.max(0, remaining),
       upgradeRequired: remaining <= 0,
-      featureName: limitType
+      featureName: limitType,
     };
   } catch (error) {
     console.error('Error checking usage limit:', error);
     return {
       hasAccess: false,
       reason: 'Error checking usage',
-      upgradeRequired: false
+      upgradeRequired: false,
     };
   }
 }
@@ -226,40 +213,36 @@ export async function incrementUsage(
     const monthNum = (currentDate.getMonth() + 1).toString().padStart(2, '0');
     const monthString = `${year}-${monthNum}`; // YYYY-MM format
 
-    // Skip non-numeric fields
-    if (!['recipeViews', 'favoritesCount', 'collectionsCount', 'mealPlansCount', 'recipesCreated', 'pdfExports', 'recipesShared'].includes(usageType)) {
+    if (
+      ![
+        'recipeViews',
+        'favoritesCount',
+        'collectionsCount',
+        'mealPlansCount',
+        'recipesCreated',
+        'pdfExports',
+        'recipesShared',
+      ].includes(usageType)
+    ) {
       return true;
     }
 
-    // First, try to update existing usage record
     const existingUsage = await db
       .select()
       .from(userUsage)
-      .where(
-        and(
-          eq(userUsage.userId, userId),
-          eq(userUsage.month, monthString)
-        )
-      )
+      .where(and(eq(userUsage.userId, userId), eq(userUsage.month, monthString)))
       .limit(1);
 
     if (existingUsage.length > 0) {
-      // Update existing record
       const currentValue = (existingUsage[0][usageType] as number) || 0;
       await db
         .update(userUsage)
         .set({
           [usageType]: currentValue + amount,
-          updatedAt: new Date()
+          updatedAt: new Date(),
         })
-        .where(
-          and(
-            eq(userUsage.userId, userId),
-            eq(userUsage.month, monthString)
-          )
-        );
+        .where(and(eq(userUsage.userId, userId), eq(userUsage.month, monthString)));
     } else {
-      // Create new usage record with proper defaults
       const newUsage = {
         id: `${userId}-${monthString}`, // Simple ID format
         userId,
@@ -272,10 +255,9 @@ export async function incrementUsage(
         pdfExports: 0,
         recipesShared: 0,
         createdAt: new Date(),
-        updatedAt: new Date()
+        updatedAt: new Date(),
       };
 
-      // Set the specific usage type to the amount
       if (usageType === 'recipeViews') newUsage.recipeViews = amount;
       else if (usageType === 'favoritesCount') newUsage.favoritesCount = amount;
       else if (usageType === 'collectionsCount') newUsage.collectionsCount = amount;
@@ -303,28 +285,25 @@ export async function canPerformAction(
   limitType?: keyof PlanLimits
 ): Promise<SubscriptionAccessCheck> {
   try {
-    // First check if user has access to the feature
     const featureCheck = await checkFeatureAccess(userId, feature);
-    
+
     if (!featureCheck.hasAccess) {
       return featureCheck;
     }
 
-    // If no limit type specified, just return feature access result
     if (!limitType) {
       return featureCheck;
     }
 
-    // Check usage limits
     const usageCheck = await checkUsageLimit(userId, limitType);
-    
+
     return usageCheck;
   } catch (error) {
     console.error('Error checking action permission:', error);
     return {
       hasAccess: false,
       reason: 'Error checking permissions',
-      upgradeRequired: false
+      upgradeRequired: false,
     };
   }
 }
@@ -344,7 +323,7 @@ export async function comparePlans(
   try {
     const [currentPlan, targetPlan] = await Promise.all([
       db.select().from(subscriptionPlans).where(eq(subscriptionPlans.id, currentPlanId)).limit(1),
-      db.select().from(subscriptionPlans).where(eq(subscriptionPlans.id, targetPlanId)).limit(1)
+      db.select().from(subscriptionPlans).where(eq(subscriptionPlans.id, targetPlanId)).limit(1),
     ]);
 
     if (currentPlan.length === 0 || targetPlan.length === 0) {
@@ -361,22 +340,20 @@ export async function comparePlans(
     const featureDifferences: Record<string, boolean | number | undefined> = {};
     const limitDifferences: Record<string, number | undefined> = {};
 
-    // Compare features
     const currentFeatures = current.features as PlanFeatures;
     const targetFeatures = target.features as PlanFeatures;
 
-    (Object.keys(targetFeatures) as Array<keyof PlanFeatures>).forEach(featureKey => {
+    (Object.keys(targetFeatures) as Array<keyof PlanFeatures>).forEach((featureKey) => {
       if (currentFeatures[featureKey] !== targetFeatures[featureKey]) {
         featureDifferences[featureKey] = targetFeatures[featureKey];
       }
     });
 
-    // Compare limits
     const currentLimits = current.limits as PlanLimits;
     const targetLimits = target.limits as PlanLimits;
 
     if (targetLimits) {
-      (Object.keys(targetLimits) as Array<keyof PlanLimits>).forEach(limitKey => {
+      (Object.keys(targetLimits) as Array<keyof PlanLimits>).forEach((limitKey) => {
         if (currentLimits?.[limitKey] !== targetLimits[limitKey]) {
           limitDifferences[limitKey] = targetLimits[limitKey];
         }
@@ -387,7 +364,7 @@ export async function comparePlans(
       isUpgrade: priceDifference > 0,
       priceDifference,
       featureDifferences,
-      limitDifferences
+      limitDifferences,
     };
   } catch (error) {
     console.error('Error comparing plans:', error);

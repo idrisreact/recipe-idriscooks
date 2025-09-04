@@ -1,15 +1,14 @@
-"use client";
-import { Recipe } from "@/src/types/recipes.types";
-import { useEffect, useState } from "react";
+'use client';
+import { Recipe } from '@/src/types/recipes.types';
+import { useEffect, useState } from 'react';
 
-const PRIMARY = "#F20094"; // Murakamicity primary color
-const ACCENT = "#FF6B9D"; // Lighter pink accent
-const TEXT = "#0A0A0A"; // Dark text
-const MUTED = "#6B7280"; // Muted text
-const BG = "#FAFAFA"; // Light background
-const CARD_BG = "#FFFFFF"; // Card background
+const PRIMARY = '#F20094'; // Murakamicity primary color
+const ACCENT = '#FF6B9D'; // Lighter pink accent
+const TEXT = '#0A0A0A'; // Dark text
+const MUTED = '#6B7280'; // Muted text
+const BG = '#FAFAFA'; // Light background
+const CARD_BG = '#FFFFFF'; // Card background
 
-// Helper to dynamically import all @react-pdf/renderer components
 function usePDFRenderer() {
   const [pdf, setPdf] = useState<{
     Document: React.ComponentType<any>; // eslint-disable-line @typescript-eslint/no-explicit-any
@@ -21,7 +20,7 @@ function usePDFRenderer() {
   } | null>(null);
   useEffect(() => {
     let mounted = true;
-    import("@react-pdf/renderer").then((mod) => {
+    import('@react-pdf/renderer').then((mod) => {
       if (mounted) {
         setPdf({
           Document: mod.Document,
@@ -40,35 +39,28 @@ function usePDFRenderer() {
   return pdf;
 }
 
-export function MyDocument({
-  recipes,
-  title,
-}: {
-  recipes: Recipe[];
-  title: string;
-}) {
+export function MyDocument({ recipes, title }: { recipes: Recipe[]; title: string }) {
   const pdf = usePDFRenderer();
   if (!pdf) return null;
   const { Document, Page, Text, View, StyleSheet, Image } = pdf;
 
-  // Murakamicity-styled PDF layout
   const styles = StyleSheet.create({
     page: {
       padding: 40,
-      fontFamily: "Helvetica",
+      fontFamily: 'Helvetica',
       backgroundColor: BG,
       color: TEXT,
     },
     coverPage: {
-      display: "flex",
-      flexDirection: "column",
-      justifyContent: "center",
-      alignItems: "center",
-      textAlign: "center",
+      display: 'flex',
+      flexDirection: 'column',
+      justifyContent: 'center',
+      alignItems: 'center',
+      textAlign: 'center',
     },
     coverTitle: {
       fontSize: 48,
-      fontWeight: "bold",
+      fontWeight: 'bold',
       color: PRIMARY,
       marginBottom: 16,
       letterSpacing: -1,
@@ -81,7 +73,7 @@ export function MyDocument({
     coverStats: {
       fontSize: 14,
       color: PRIMARY,
-      fontWeight: "bold",
+      fontWeight: 'bold',
       backgroundColor: CARD_BG,
       padding: 16,
       borderRadius: 8,
@@ -89,16 +81,16 @@ export function MyDocument({
     },
     tocTitle: {
       fontSize: 32,
-      fontWeight: "bold",
+      fontWeight: 'bold',
       color: PRIMARY,
       marginBottom: 24,
       borderBottom: `3px solid ${PRIMARY}`,
       paddingBottom: 8,
     },
     tocItem: {
-      flexDirection: "row",
-      justifyContent: "space-between",
-      alignItems: "center",
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'center',
       marginBottom: 16,
       padding: 12,
       backgroundColor: CARD_BG,
@@ -107,61 +99,61 @@ export function MyDocument({
     },
     tocItemTitle: {
       fontSize: 14,
-      fontWeight: "bold",
+      fontWeight: 'bold',
       color: TEXT,
       flex: 1,
     },
     tocItemPage: {
       fontSize: 12,
       color: PRIMARY,
-      fontWeight: "bold",
+      fontWeight: 'bold',
       backgroundColor: BG,
       padding: 4,
       borderRadius: 4,
       minWidth: 40,
-      textAlign: "center",
+      textAlign: 'center',
     },
     recipeHeader: {
       backgroundColor: PRIMARY,
       padding: 24,
       borderRadius: 16,
       marginBottom: 32,
-      color: "white",
+      color: 'white',
     },
     recipeTitle: {
       fontSize: 36,
-      fontWeight: "bold",
+      fontWeight: 'bold',
       marginBottom: 8,
-      color: "white",
+      color: 'white',
     },
     recipeDescription: {
       fontSize: 14,
-      color: "white",
+      color: 'white',
       opacity: 0.9,
       marginBottom: 16,
     },
     recipeMeta: {
-      flexDirection: "row",
+      flexDirection: 'row',
       gap: 20,
     },
     metaItem: {
-      flexDirection: "row",
-      alignItems: "center",
+      flexDirection: 'row',
+      alignItems: 'center',
       gap: 4,
     },
     metaLabel: {
       fontSize: 12,
-      color: "white",
+      color: 'white',
       opacity: 0.8,
     },
     metaValue: {
       fontSize: 14,
-      fontWeight: "bold",
-      color: "white",
+      fontWeight: 'bold',
+      color: 'white',
     },
     badges: {
-      flexDirection: "row",
-      flexWrap: "wrap",
+      flexDirection: 'row',
+      flexWrap: 'wrap',
       marginBottom: 32,
       gap: 8,
     },
@@ -171,8 +163,8 @@ export function MyDocument({
       paddingHorizontal: 12,
       borderRadius: 16,
       backgroundColor: ACCENT,
-      color: "white",
-      fontWeight: "bold",
+      color: 'white',
+      fontWeight: 'bold',
     },
     contentSection: {
       backgroundColor: CARD_BG,
@@ -183,14 +175,14 @@ export function MyDocument({
     },
     sectionTitle: {
       fontSize: 20,
-      fontWeight: "bold",
+      fontWeight: 'bold',
       color: PRIMARY,
       marginBottom: 16,
       borderBottom: `2px solid ${PRIMARY}`,
       paddingBottom: 8,
     },
     contentRow: {
-      flexDirection: "row",
+      flexDirection: 'row',
       gap: 24,
     },
     textCol: {
@@ -200,13 +192,13 @@ export function MyDocument({
       width: 120,
       height: 120,
       borderRadius: 16,
-      overflow: "hidden",
+      overflow: 'hidden',
       border: `3px solid ${PRIMARY}`,
     },
     recipeImage: {
-      width: "100%",
-      height: "100%",
-      objectFit: "cover",
+      width: '100%',
+      height: '100%',
+      objectFit: 'cover',
     },
     ingredient: {
       fontSize: 12,
@@ -226,26 +218,26 @@ export function MyDocument({
     },
     stepNumber: {
       fontSize: 14,
-      fontWeight: "bold",
+      fontWeight: 'bold',
       color: PRIMARY,
       marginBottom: 4,
     },
     footer: {
-      position: "absolute",
+      position: 'absolute',
       bottom: 40,
       left: 40,
       right: 40,
-      textAlign: "center",
+      textAlign: 'center',
       fontSize: 10,
       color: MUTED,
       borderTop: `1px solid ${BG}`,
       paddingTop: 12,
     },
     watermark: {
-      position: "absolute",
-      top: "50%",
-      left: "50%",
-      transform: "translate(-50%, -50%) rotate(-45deg)",
+      position: 'absolute',
+      top: '50%',
+      left: '50%',
+      transform: 'translate(-50%, -50%) rotate(-45deg)',
       fontSize: 80,
       color: PRIMARY,
       opacity: 0.05,
@@ -255,19 +247,17 @@ export function MyDocument({
 
   return (
     <Document>
-      {/* Cover Page */}
+      {}
       <Page size="A4" style={[styles.page, styles.coverPage]}>
         <Text style={styles.watermark}>IDRISCOOKS</Text>
         <Text style={styles.coverTitle}>{title}</Text>
-        <Text style={styles.coverSubtitle}>
-          A curated collection of your favorite recipes
-        </Text>
+        <Text style={styles.coverSubtitle}>A curated collection of your favorite recipes</Text>
         <Text style={styles.coverStats}>
           {recipes.length} Recipe{recipes.length !== 1 ? 's' : ''} • Generated by Idris Cooks
         </Text>
       </Page>
 
-      {/* Table of Contents */}
+      {}
       <Page size="A4" style={styles.page}>
         <Text style={styles.tocTitle}>Table of Contents</Text>
         {recipes.map((r, idx) => (
@@ -275,17 +265,15 @@ export function MyDocument({
             <Text style={styles.tocItemTitle}>
               {idx + 1}. {r.title}
             </Text>
-            <Text style={styles.tocItemPage}>
-              {idx + 3}
-            </Text>
+            <Text style={styles.tocItemPage}>{idx + 3}</Text>
           </View>
         ))}
       </Page>
 
-      {/* Recipe Pages */}
+      {}
       {recipes.map((r) => (
         <Page key={r.id} size="A4" style={styles.page}>
-          {/* Recipe Header */}
+          {}
           <View style={styles.recipeHeader}>
             <Text style={styles.recipeTitle}>{r.title}</Text>
             <Text style={styles.recipeDescription}>{r.description}</Text>
@@ -305,7 +293,7 @@ export function MyDocument({
             </View>
           </View>
 
-          {/* Tags */}
+          {}
           {r.tags && r.tags.length > 0 && (
             <View style={styles.badges}>
               {r.tags.map((t) => (
@@ -316,10 +304,10 @@ export function MyDocument({
             </View>
           )}
 
-          {/* Content */}
+          {}
           <View style={styles.contentRow}>
             <View style={styles.textCol}>
-              {/* Ingredients */}
+              {}
               <View style={styles.contentSection}>
                 <Text style={styles.sectionTitle}>Ingredients</Text>
                 {Array.isArray(r.ingredients) && r.ingredients.length > 0 ? (
@@ -333,7 +321,7 @@ export function MyDocument({
                 )}
               </View>
 
-              {/* Instructions */}
+              {}
               <View style={styles.contentSection}>
                 <Text style={styles.sectionTitle}>Instructions</Text>
                 {Array.isArray(r.steps) && r.steps.length > 0 ? (
@@ -349,7 +337,7 @@ export function MyDocument({
               </View>
             </View>
 
-            {/* Recipe Image */}
+            {}
             {r.imageUrl && (
               <View style={styles.imgCol}>
                 <Image src={r.imageUrl} alt={r.title} style={styles.recipeImage} />
@@ -357,10 +345,8 @@ export function MyDocument({
             )}
           </View>
 
-          {/* Footer */}
-          <Text style={styles.footer}>
-            Generated with ❤️ by Idris Cooks • www.idriscooks.com
-          </Text>
+          {}
+          <Text style={styles.footer}>Generated with ❤️ by Idris Cooks • www.idriscooks.com</Text>
         </Page>
       ))}
     </Document>

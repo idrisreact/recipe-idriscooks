@@ -1,4 +1,4 @@
-"use client";
+'use client';
 
 import { useEffect, useState, Suspense } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
@@ -29,21 +29,20 @@ function PaymentSuccessContent() {
       return;
     }
 
-    // Verify the payment session
     fetch('/api/stripe/verify-session', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ sessionId }),
     })
-      .then(res => res.json())
-      .then(data => {
+      .then((res) => res.json())
+      .then((data) => {
         if (data.success) {
           setSessionData(data.session);
         } else {
           setError(data.error || 'Payment verification failed');
         }
       })
-      .catch(err => {
+      .catch((err) => {
         setError('Failed to verify payment');
         console.error(err);
       })
@@ -53,7 +52,6 @@ function PaymentSuccessContent() {
   }, [sessionId]);
 
   const handleDownloadPDF = () => {
-    // Redirect to favorites page with PDF download enabled
     router.push('/favorites?download=true');
   };
 
@@ -87,10 +85,7 @@ function PaymentSuccessContent() {
           <Text variant="large" className="text-muted-foreground mb-8 max-w-md mx-auto">
             {error}
           </Text>
-          <button 
-            onClick={() => router.push('/favorites')}
-            className="murakamicity-button"
-          >
+          <button onClick={() => router.push('/favorites')} className="murakamicity-button">
             Return to Favorites
           </button>
         </div>
@@ -101,21 +96,22 @@ function PaymentSuccessContent() {
   return (
     <div className="wrapper page">
       <div className="max-w-2xl mx-auto text-center py-16">
-        {/* Success Icon */}
+        {}
         <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-8">
           <CheckCircle className="w-12 h-12 text-green-600" />
         </div>
 
-        {/* Success Message */}
+        {}
         <Text as="h1" variant="heading" className="text-green-600 mb-4">
           Payment Successful!
         </Text>
-        
+
         <Text variant="large" className="text-muted-foreground mb-8">
-          Thank you for your purchase. You now have access to download your favorite recipes as a PDF.
+          Thank you for your purchase. You now have access to download your favorite recipes as a
+          PDF.
         </Text>
 
-        {/* Payment Details */}
+        {}
         {sessionData && (
           <div className="murakamicity-card p-6 mb-8 text-left">
             <Text as="h3" variant="subheading" className="mb-4 text-center">
@@ -144,7 +140,7 @@ function PaymentSuccessContent() {
           </div>
         )}
 
-        {/* Action Buttons */}
+        {}
         <div className="flex flex-col sm:flex-row gap-4 justify-center">
           <button
             onClick={handleDownloadPDF}
@@ -153,7 +149,7 @@ function PaymentSuccessContent() {
             <Download className="w-4 h-4" />
             Download PDF Now
           </button>
-          
+
           <button
             onClick={handleContinueShopping}
             className="murakamicity-button-outline flex items-center gap-2"
@@ -163,7 +159,7 @@ function PaymentSuccessContent() {
           </button>
         </div>
 
-        {/* Additional Info */}
+        {}
         <div className="mt-12 p-6 bg-muted/30 rounded-lg">
           <Text as="h4" variant="large" className="font-semibold mb-2">
             What&apos;s Next?
@@ -183,7 +179,13 @@ function PaymentSuccessContent() {
 
 export default function PaymentSuccessPage() {
   return (
-    <Suspense fallback={<div className="wrapper page"><div className="animate-pulse">Loading...</div></div>}>
+    <Suspense
+      fallback={
+        <div className="wrapper page">
+          <div className="animate-pulse">Loading...</div>
+        </div>
+      }
+    >
       <PaymentSuccessContent />
     </Suspense>
   );

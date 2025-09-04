@@ -9,13 +9,9 @@ export async function GET(
     const { userId } = await params;
 
     if (!userId) {
-      return NextResponse.json(
-        { error: 'User ID is required' },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: 'User ID is required' }, { status: 400 });
     }
 
-    // Get subscription data using our utility function
     const { subscription, plan } = await getUserSubscription(userId);
 
     return NextResponse.json({
@@ -24,9 +20,6 @@ export async function GET(
     });
   } catch (error) {
     console.error('Error fetching subscription:', error);
-    return NextResponse.json(
-      { error: 'Failed to fetch subscription' },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: 'Failed to fetch subscription' }, { status: 500 });
   }
 }

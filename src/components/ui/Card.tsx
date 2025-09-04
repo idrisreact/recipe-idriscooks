@@ -1,5 +1,5 @@
-import Image from "next/image";
-import { ReactNode } from "react";
+import Image from 'next/image';
+import { ReactNode } from 'react';
 
 interface BaseCardProps {
   className?: string;
@@ -36,11 +36,11 @@ interface BasicCardProps extends BaseCardProps {
 type CardProps = RecipeCardProps | FeatureCardProps | BasicCardProps;
 
 export const Card = (props: CardProps) => {
-  const { variant, className = "", onClick, children } = props;
+  const { variant, className = '', onClick, children } = props;
 
   if (variant === 'recipe') {
     const { backgroundImage, title, subtitle, avatar, metadata, actions } = props;
-    
+
     const handleKeyDown = (e: React.KeyboardEvent) => {
       if (e.key === 'Enter' || e.key === ' ') {
         e.preventDefault();
@@ -60,16 +60,16 @@ export const Card = (props: CardProps) => {
       >
         <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-transparent" />
 
-        {/* Actions overlay */}
+        {}
         {actions && (
           <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 group-focus-within:opacity-100 transition-opacity">
             {actions}
           </div>
         )}
 
-        {/* Metadata overlay */}
+        {}
         {metadata && (
-          <div 
+          <div
             className="absolute top-2 left-2 opacity-0 group-hover:opacity-100 group-focus-within:opacity-100 transition-opacity"
             aria-label="Recipe details"
           >
@@ -77,9 +77,9 @@ export const Card = (props: CardProps) => {
           </div>
         )}
 
-        {/* Content */}
+        {}
         <div className="absolute bottom-4 left-4 right-4 text-white">
-          <h2 
+          <h2
             id={`recipe-title-${title.replace(/\s+/g, '-').toLowerCase()}`}
             className="text-lg font-semibold tracking-wide"
           >
@@ -113,7 +113,7 @@ export const Card = (props: CardProps) => {
   }
 
   if (variant === 'feature') {
-    const { bgColor = "bg-gray-200", label, badge, overlayText } = props;
+    const { bgColor = 'bg-gray-200', label, badge, overlayText } = props;
     return (
       <div
         className={`relative w-full max-w-sm h-80 rounded-sm overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300 flex flex-col justify-end items-center ${bgColor} ${className}`}

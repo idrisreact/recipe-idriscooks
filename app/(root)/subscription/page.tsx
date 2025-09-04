@@ -1,51 +1,51 @@
-import SubscriptionStatus from "@/src/components/subscription/subscription-status";
-import SubscriptionPlans from "@/src/components/subscription/subscription-plans";
-import { Text } from "@/src/components/ui/Text";
-import { Heading } from "@/src/components/common/heading/heading";
-import { VerticalSpace } from "@/src/components/ui/VerticalSpace";
-import { Check, X, FileText, Heart, Search, Clock } from "lucide-react";
+import SubscriptionStatus from '@/src/components/subscription/subscription-status';
+import SubscriptionPlans from '@/src/components/subscription/subscription-plans';
+import { Text } from '@/src/components/ui/Text';
+import { Heading } from '@/src/components/common/heading/heading';
+import { VerticalSpace } from '@/src/components/ui/VerticalSpace';
+import { Check, X, FileText, Heart, Search, Clock } from 'lucide-react';
 
 export default function SubscriptionPage() {
   const features = [
     {
-      name: "Browse all recipes",
+      name: 'Browse all recipes',
       free: true,
       pdf: true,
       icon: Search,
     },
     {
-      name: "Save favorite recipes",
+      name: 'Save favorite recipes',
       free: true,
       pdf: true,
       icon: Heart,
     },
     {
-      name: "Recipe search & filters",
+      name: 'Recipe search & filters',
       free: true,
       pdf: true,
       icon: Search,
     },
     {
-      name: "Mobile-friendly access",
+      name: 'Mobile-friendly access',
       free: true,
       pdf: true,
       icon: Clock,
     },
     {
-      name: "PDF recipe exports",
+      name: 'PDF recipe exports',
       free: false,
       pdf: true,
       icon: FileText,
       highlight: true,
     },
     {
-      name: "Printable recipe cards",
+      name: 'Printable recipe cards',
       free: false,
       pdf: true,
       icon: FileText,
     },
     {
-      name: "Offline recipe access",
+      name: 'Offline recipe access',
       free: false,
       pdf: true,
       icon: FileText,
@@ -54,15 +54,12 @@ export default function SubscriptionPage() {
 
   return (
     <div className="wrapper page min-h-screen">
-      {/* Page Header */}
+      {}
       <div className="text-center mb-16">
-        <Heading
-          title="Choose Your Plan"
-          subTitle="Simple pricing for amazing recipes"
-        />
+        <Heading title="Choose Your Plan" subTitle="Simple pricing for amazing recipes" />
       </div>
 
-      {/* Current Subscription Status */}
+      {}
       <div className="max-w-md mx-auto mb-16">
         <Text as="h2" variant="subheading" className="mb-6 text-center">
           Current Plan
@@ -70,12 +67,12 @@ export default function SubscriptionPage() {
         <SubscriptionStatus />
       </div>
 
-      {/* Available Plans */}
+      {}
       <div className="mb-16">
         <SubscriptionPlans />
       </div>
 
-      {/* Features Comparison */}
+      {}
       <div className="murakamicity-card p-8 max-w-4xl mx-auto">
         <Text as="h2" variant="subheading" className="text-center mb-8">
           What&apos Included
@@ -100,9 +97,7 @@ export default function SubscriptionPage() {
                     <Text variant="large" className="font-medium text-primary">
                       PDF Access
                     </Text>
-                    <Text className="text-muted-foreground text-sm">
-                      £19.99 one-time
-                    </Text>
+                    <Text className="text-muted-foreground text-sm">£19.99 one-time</Text>
                   </div>
                 </th>
               </tr>
@@ -112,15 +107,13 @@ export default function SubscriptionPage() {
                 <tr
                   key={index}
                   className={`border-b border-border/50 transition-colors hover:bg-muted/30 ${
-                    feature.highlight ? "bg-primary/5" : ""
+                    feature.highlight ? 'bg-primary/5' : ''
                   }`}
                 >
                   <td className="py-4">
                     <div className="flex items-center gap-3">
                       <feature.icon className="w-5 h-5 text-muted-foreground" />
-                      <Text className={feature.highlight ? "font-medium" : ""}>
-                        {feature.name}
-                      </Text>
+                      <Text className={feature.highlight ? 'font-medium' : ''}>{feature.name}</Text>
                     </div>
                   </td>
                   <td className="text-center py-4">
@@ -145,9 +138,9 @@ export default function SubscriptionPage() {
             <div>
               <Text className="font-medium mb-2">About PDF Access</Text>
               <Text className="text-muted-foreground text-sm leading-relaxed">
-                Get lifetime access to download any recipe as a beautifully
-                formatted PDF. Perfect for printing, sharing, or building your
-                personal recipe collection. One-time payment, no subscriptions.
+                Get lifetime access to download any recipe as a beautifully formatted PDF. Perfect
+                for printing, sharing, or building your personal recipe collection. One-time
+                payment, no subscriptions.
               </Text>
             </div>
           </div>
