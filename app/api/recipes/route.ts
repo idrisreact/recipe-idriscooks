@@ -1,8 +1,33 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/src/db';
 import { recipes } from '@/src/db/schemas';
-import { sql } from 'drizzle-orm';
+import { sql, and, desc, asc } from 'drizzle-orm';
 import { z } from 'zod';
+
+// Optimized query parameter schema - handle null values properly
+const QuerySchema = z
+  .object({
+    search: z.string().nullish(),
+    tag: z.string().nullish(),
+    title: z.string().nullish(),
+    limit: z
+      .string()
+      .nullish()
+      .transform((val) => (val ? parseInt(val, 10) : undefined)),
+    sort: z.enum(['newest', 'oldest', 'title', 'cookTime', 'recent']).nullish(),
+    offset: z
+      .string()
+      .nullish()
+      .transform((val) => (val ? parseInt(val, 10) : undefined)),
+  })
+  .transform((data) => ({
+    search: data.search || undefined,
+    tag: data.tag || undefined,
+    title: data.title || undefined,
+    limit: data.limit && data.limit > 0 && data.limit <= 100 ? data.limit : undefined,
+    sort: data.sort || undefined,
+    offset: data.offset && data.offset >= 0 ? data.offset : undefined,
+  }));
 
 const CreateRecipeSchema = z.object({
   title: z.string().min(1, 'Title is required').max(255),
@@ -25,130 +50,94 @@ const CreateRecipeSchema = z.object({
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
-    const search = searchParams.get('search')?.trim().toLowerCase();
-    const tag = searchParams.get('tag')?.trim().toLowerCase();
-    const title = searchParams.get('title')?.trim();
-    const limit = searchParams.get('limit') ? parseInt(searchParams.get('limit')!) : undefined;
-    const sort = searchParams.get('sort')?.trim().toLowerCase();
 
-    if (title) {
+    // Parse and validate all parameters at once
+    const params = QuerySchema.parse({
+      search: searchParams.get('search')?.trim(),
+      tag: searchParams.get('tag')?.trim(),
+      title: searchParams.get('title')?.trim(),
+      limit: searchParams.get('limit'),
+      sort: searchParams.get('sort')?.trim(),
+      offset: searchParams.get('offset'),
+    });
+
+    // Handle single recipe by title (early return)
+    if (params.title) {
       const recipe = await db
         .select()
         .from(recipes)
-        .where(sql`LOWER(${recipes.title}) = ${title.toLowerCase()}`)
+        .where(sql`LOWER(${recipes.title}) = ${params.title.toLowerCase()}`)
         .limit(1);
 
-      if (recipe.length === 0) {
-        return NextResponse.json({ error: 'Recipe not found' }, { status: 404 });
-      }
-
-      return NextResponse.json(recipe[0]);
+      return NextResponse.json(
+        recipe.length === 0 ? { error: 'Recipe not found' } : recipe[0],
+        recipe.length === 0 ? { status: 404 } : undefined
+      );
     }
 
-    const baseQuery = db.select().from(recipes);
+    // Build dynamic WHERE conditions
+    const whereConditions = [];
 
-    let results;
-
-    if (search && tag && sort && limit) {
-      results = await db
-        .select()
-        .from(recipes)
-        .where(
-          sql`LOWER(${recipes.title}) LIKE ${`%${search}%`} AND ${recipes.tags} @> ${JSON.stringify([tag])}`
-        )
-        .orderBy(sql`${recipes.id} DESC`)
-        .limit(limit);
-    } else if (search && tag && sort) {
-      results = await db
-        .select()
-        .from(recipes)
-        .where(
-          sql`LOWER(${recipes.title}) LIKE ${`%${search}%`} AND ${recipes.tags} @> ${JSON.stringify([tag])}`
-        )
-        .orderBy(sql`${recipes.id} DESC`);
-    } else if (search && tag && limit) {
-      results = await db
-        .select()
-        .from(recipes)
-        .where(
-          sql`LOWER(${recipes.title}) LIKE ${`%${search}%`} AND ${recipes.tags} @> ${JSON.stringify([tag])}`
-        )
-        .limit(limit);
-    } else if (search && sort && limit) {
-      results = await db
-        .select()
-        .from(recipes)
-        .where(sql`LOWER(${recipes.title}) LIKE ${`%${search}%`}`)
-        .orderBy(sql`${recipes.id} DESC`)
-        .limit(limit);
-    } else if (tag && sort && limit) {
-      results = await db
-        .select()
-        .from(recipes)
-        .where(sql`${recipes.tags} @> ${JSON.stringify([tag])}`)
-        .orderBy(sql`${recipes.id} DESC`)
-        .limit(limit);
-    } else if (search && tag) {
-      results = await db
-        .select()
-        .from(recipes)
-        .where(
-          sql`LOWER(${recipes.title}) LIKE ${`%${search}%`} AND ${recipes.tags} @> ${JSON.stringify([tag])}`
-        );
-    } else if (search && sort) {
-      results = await db
-        .select()
-        .from(recipes)
-        .where(sql`LOWER(${recipes.title}) LIKE ${`%${search}%`}`)
-        .orderBy(sql`${recipes.id} DESC`);
-    } else if (search && limit) {
-      results = await db
-        .select()
-        .from(recipes)
-        .where(sql`LOWER(${recipes.title}) LIKE ${`%${search}%`}`)
-        .limit(limit);
-    } else if (tag && sort) {
-      results = await db
-        .select()
-        .from(recipes)
-        .where(sql`${recipes.tags} @> ${JSON.stringify([tag])}`)
-        .orderBy(sql`${recipes.id} DESC`);
-    } else if (tag && limit) {
-      results = await db
-        .select()
-        .from(recipes)
-        .where(sql`${recipes.tags} @> ${JSON.stringify([tag])}`)
-        .limit(limit);
-    } else if (sort && limit) {
-      results = await db
-        .select()
-        .from(recipes)
-        .orderBy(sql`${recipes.id} DESC`)
-        .limit(limit);
-    } else if (search) {
-      results = await db
-        .select()
-        .from(recipes)
-        .where(sql`LOWER(${recipes.title}) LIKE ${`%${search}%`}`);
-    } else if (tag) {
-      results = await db
-        .select()
-        .from(recipes)
-        .where(sql`${recipes.tags} @> ${JSON.stringify([tag])}`);
-    } else if (sort) {
-      results = await db
-        .select()
-        .from(recipes)
-        .orderBy(sql`${recipes.id} DESC`);
-    } else if (limit) {
-      results = await db.select().from(recipes).limit(limit);
-    } else {
-      results = await baseQuery;
+    if (params.search) {
+      whereConditions.push(sql`LOWER(${recipes.title}) LIKE ${`%${params.search.toLowerCase()}%`}`);
     }
 
+    if (params.tag) {
+      whereConditions.push(sql`${recipes.tags} @> ${JSON.stringify([params.tag])}`);
+    }
+
+    // Build ORDER BY clause
+    let orderBy;
+    switch (params.sort) {
+      case 'oldest':
+        orderBy = asc(recipes.id);
+        break;
+      case 'title':
+        orderBy = asc(recipes.title);
+        break;
+      case 'cookTime':
+        orderBy = asc(recipes.cookTime);
+        break;
+      case 'recent':
+      case 'newest':
+      default:
+        orderBy = desc(recipes.id);
+        break;
+    }
+
+    // Execute single optimized query
+    let queryBuilder = db.select().from(recipes);
+
+    if (whereConditions.length > 0) {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      queryBuilder = queryBuilder.where(and(...whereConditions)) as any;
+    }
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    queryBuilder = queryBuilder.orderBy(orderBy) as any;
+
+    if (params.offset) {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      queryBuilder = queryBuilder.offset(params.offset) as any;
+    }
+
+    if (params.limit) {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      queryBuilder = queryBuilder.limit(params.limit) as any;
+    }
+
+    const results = await queryBuilder;
     return NextResponse.json(results);
   } catch (error) {
     console.error('Error fetching recipes:', error);
+
+    if (error instanceof z.ZodError) {
+      return NextResponse.json(
+        { error: 'Invalid parameters', details: error.errors },
+        { status: 400 }
+      );
+    }
+
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
