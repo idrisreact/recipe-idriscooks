@@ -1,12 +1,12 @@
 "use client";
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, Suspense } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { CheckCircle, Download, ArrowRight } from 'lucide-react';
 import { Text } from '@/src/components/ui/Text';
 import { authClient } from '@/src/utils/auth-client';
 
-export default function PaymentSuccessPage() {
+function PaymentSuccessContent() {
   const [sessionData, setSessionData] = useState<{
     id: string;
     customer_email: string | null;
@@ -178,5 +178,13 @@ export default function PaymentSuccessPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function PaymentSuccessPage() {
+  return (
+    <Suspense fallback={<div className="wrapper page"><div className="animate-pulse">Loading...</div></div>}>
+      <PaymentSuccessContent />
+    </Suspense>
   );
 }

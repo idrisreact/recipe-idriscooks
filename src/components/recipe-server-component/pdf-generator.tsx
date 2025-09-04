@@ -2,7 +2,7 @@
 import { Recipe } from "@/src/types/recipes.types";
 // Using regular button element since no Button component in ui folder
 import { Download, CreditCard } from "lucide-react";
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import toast from "react-hot-toast";
 import { authClient } from "@/src/utils/auth-client";
 import { SignInOverlay } from "./sign-in-overlay";
@@ -42,7 +42,7 @@ export function PDFGenerator({
   const [processingPayment, setProcessingPayment] = useState(false);
   const { data: session } = authClient.useSession();
   const searchParams = useSearchParams();
-  const downloadLinkRef = useRef<HTMLAnchorElement>(null);
+  const [shouldAutoDownload, setShouldAutoDownload] = useState(false);
 
   // Check if user has PDF access
   useEffect(() => {
@@ -73,17 +73,11 @@ export function PDFGenerator({
 
   // Handle auto-download trigger from parent component
   useEffect(() => {
-    if (autoDownload && hasPDFAccess && !checkingAccess && downloadLinkRef.current) {
-      // Trigger the PDF download
-      downloadLinkRef.current.click();
-      toast.success("PDF download started!");
-      
-      // Notify parent that auto-download is complete
-      if (onAutoDownloadComplete) {
-        onAutoDownloadComplete();
-      }
+    if (autoDownload && hasPDFAccess && !checkingAccess) {
+      console.log('Auto-download triggered');
+      setShouldAutoDownload(true);
     }
-  }, [autoDownload, hasPDFAccess, checkingAccess, onAutoDownloadComplete]);
+  }, [autoDownload, hasPDFAccess, checkingAccess]);
 
   const handlePDFClick = (e: React.MouseEvent) => {
     if (hasPDFAccess) {
@@ -147,14 +141,29 @@ export function PDFGenerator({
       <PDFDownloadLink
         document={<MyDocument recipes={recipes} title={title} />}
         fileName="my-favorite-recipes.pdf"
-        innerRef={downloadLinkRef}
       >
-        {({ loading }) => (
-          <button
-            onClick={handlePDFClick}
-            disabled={loading || isGenerating || recipes.length === 0}
-            className="murakamicity-button flex items-center gap-2 bg-primary hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed"
-          >
+        {({ loading, url }) => {
+          // Handle auto-download
+          if (shouldAutoDownload && url && !loading) {
+            setShouldAutoDownload(false);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = 'my-favorite-recipes.pdf';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            toast.success("PDF download started!");
+            if (onAutoDownloadComplete) {
+              onAutoDownloadComplete();
+            }
+          }
+
+          return (
+            <button
+              onClick={handlePDFClick}
+              disabled={loading || isGenerating || recipes.length === 0}
+              className="murakamicity-button flex items-center gap-2 bg-primary hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
             {loading || isGenerating ? (
               <>
                 <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
@@ -167,7 +176,8 @@ export function PDFGenerator({
               </>
             )}
           </button>
-        )}
+          );
+        }}
       </PDFDownloadLink>
     );
   }

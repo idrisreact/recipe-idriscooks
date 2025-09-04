@@ -1,5 +1,5 @@
-import type { Meta, StoryObj } from '@storybook/react';
-import { fn } from '@storybook/test';
+import type { Meta, StoryObj } from '@storybook/nextjs-vite';
+import React from 'react';
 import { MurakamicityCard } from './MurakamicityCard';
 
 const meta = {
@@ -42,7 +42,7 @@ const meta = {
       description: 'Card subtitle text',
     },
   },
-  args: { onClick: fn() },
+  args: { onClick: () => {} },
 } satisfies Meta<typeof MurakamicityCard>;
 
 export default meta;
@@ -225,6 +225,10 @@ export const LargePadding: Story = {
 
 // Showcase stories
 export const AllVariants: Story = {
+  args: {
+    children: 'Card Content',
+    onClick: () => {},
+  },
   render: () => (
     <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '1rem', maxWidth: '800px' }}>
       <MurakamicityCard variant="default">
@@ -262,6 +266,10 @@ export const AllVariants: Story = {
 };
 
 export const RecipeGrid: Story = {
+  args: {
+    children: 'Card Content',
+    onClick: () => {},
+  },
   render: () => (
     <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '1.5rem', maxWidth: '900px' }}>
       {[

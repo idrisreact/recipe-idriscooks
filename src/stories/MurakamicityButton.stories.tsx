@@ -1,5 +1,5 @@
-import type { Meta, StoryObj } from '@storybook/react';
-import { fn } from '@storybook/test';
+import type { Meta, StoryObj } from '@storybook/nextjs-vite';
+import React from 'react';
 import { MurakamicityButton } from './MurakamicityButton';
 
 const meta = {
@@ -38,7 +38,7 @@ const meta = {
       description: 'Show loading spinner and disable interactions',
     },
   },
-  args: { onClick: fn() },
+  args: { onClick: () => {} },
 } satisfies Meta<typeof MurakamicityButton>;
 
 export default meta;
@@ -208,6 +208,10 @@ export const WithIcon: Story = {
 
 // Showcase stories
 export const AllVariants: Story = {
+  args: {
+    children: 'Button',
+    onClick: () => {},
+  },
   render: () => (
     <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
       <MurakamicityButton variant="primary">Primary</MurakamicityButton>
@@ -226,6 +230,10 @@ export const AllVariants: Story = {
 };
 
 export const AllSizes: Story = {
+  args: {
+    children: 'Button',
+    onClick: () => {},
+  },
   render: () => (
     <div style={{ display: 'flex', gap: '1rem', alignItems: 'center', flexWrap: 'wrap' }}>
       <MurakamicityButton size="small">Small</MurakamicityButton>
@@ -243,6 +251,10 @@ export const AllSizes: Story = {
 };
 
 export const RecipeActions: Story = {
+  args: {
+    children: 'Button',
+    onClick: () => {},
+  },
   render: () => (
     <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap', alignItems: 'center' }}>
       <MurakamicityButton variant="primary" size="large">
@@ -266,6 +278,10 @@ export const RecipeActions: Story = {
 };
 
 export const ResponsiveExample: Story = {
+  args: {
+    children: 'Button',
+    onClick: () => {},
+  },
   render: () => (
     <div style={{ width: '100%', maxWidth: '400px' }}>
       <div style={{ marginBottom: '1rem' }}>

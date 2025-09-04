@@ -11,6 +11,7 @@ import { useRouter } from "next/navigation";
 import { Heart, Share2, Eye, LogIn } from "lucide-react";
 import { RecipePreviewModal } from "@/src/components/recipe-server-component/recipe-preview-modal";
 import dynamic from "next/dynamic";
+import { Suspense } from "react";
 
 const PDFGenerator = dynamic(
   () => import("@/src/components/recipe-server-component/pdf-generator").then(mod => ({ default: mod.PDFGenerator })),
@@ -25,7 +26,7 @@ import { authClient } from "@/src/utils/auth-client";
 import { SignInModal } from "@/src/components/auth/sign-in-modal/SignInModal";
 import { useSearchParams } from "next/navigation";
 
-export default function FavoritesPage() {
+function FavoritesContent() {
   const { data: session, isPending } = authClient.useSession();
   const { favorites, loading, error, removeFromFavorites, isFavorited } =
     useFavorites();
@@ -272,5 +273,13 @@ export default function FavoritesPage() {
         </>
       )}
     </div>
+  );
+}
+
+export default function FavoritesPage() {
+  return (
+    <Suspense fallback={<div className="wrapper page"><div className="animate-pulse">Loading...</div></div>}>
+      <FavoritesContent />
+    </Suspense>
   );
 }

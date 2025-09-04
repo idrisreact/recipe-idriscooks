@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { authClient } from '@/src/utils/auth-client';
+import { auth } from '@/src/utils/auth';
 import { db } from '@/src/db';
 import { premiumFeatures } from '@/src/db/schemas/premium-features.schema';
 import { eq, and } from 'drizzle-orm';
@@ -7,7 +7,7 @@ import { eq, and } from 'drizzle-orm';
 export async function GET(request: NextRequest) {
   try {
     // Get user session
-    const session = await authClient.api.getSession({
+    const session = await auth.api.getSession({
       headers: request.headers,
     });
 
