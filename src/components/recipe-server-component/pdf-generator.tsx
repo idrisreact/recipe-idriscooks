@@ -1,12 +1,13 @@
 "use client";
 import { Recipe } from "@/src/types/recipes.types";
-import { Button } from "@/components/ui/button";
-import { Download } from "lucide-react";
-import { useState } from "react";
+// Using regular button element since no Button component in ui folder
+import { Download, CreditCard } from "lucide-react";
+import { useState, useEffect, useRef } from "react";
 import toast from "react-hot-toast";
 import { authClient } from "@/src/utils/auth-client";
 import { SignInOverlay } from "./sign-in-overlay";
 import { MyDocument } from "./my-document";
+import { useSearchParams } from "next/navigation";
 
 import dynamic from "next/dynamic";
 
@@ -14,7 +15,7 @@ const PDFDownloadLink = dynamic(
   () => import("@react-pdf/renderer").then((mod) => ({ default: mod.PDFDownloadLink })),
   {
     ssr: false,
-    loading: () => <p>Loading PDF generator...</p>
+    loading: () => <div className="animate-pulse">Loading PDF generator...</div>
   }
 );
 
@@ -23,6 +24,8 @@ interface PDFGeneratorProps {
   isGenerating?: boolean;
   onGenerate?: () => void;
   title?: string;
+  autoDownload?: boolean;
+  onAutoDownloadComplete?: () => void;
 }
 
 
@@ -30,30 +33,127 @@ export function PDFGenerator({
   recipes,
   isGenerating = false,
   title = "My Favorite Recipes",
+  autoDownload = false,
+  onAutoDownloadComplete,
 }: PDFGeneratorProps) {
   const [showLoginModal, setShowLoginModal] = useState(false);
+  const [hasPDFAccess, setHasPDFAccess] = useState(false);
+  const [checkingAccess, setCheckingAccess] = useState(true);
+  const [processingPayment, setProcessingPayment] = useState(false);
   const { data: session } = authClient.useSession();
+  const searchParams = useSearchParams();
+  const downloadLinkRef = useRef<HTMLAnchorElement>(null);
+
+  // Check if user has PDF access
+  useEffect(() => {
+    const checkPDFAccess = async () => {
+      if (session?.user?.id) {
+        try {
+          const response = await fetch('/api/user/pdf-access');
+          const data = await response.json();
+          setHasPDFAccess(data.hasAccess);
+        } catch (error) {
+          console.error('Error checking PDF access:', error);
+        }
+      }
+      setCheckingAccess(false);
+    };
+
+    checkPDFAccess();
+  }, [session]);
+
+  // Handle direct download from payment success
+  useEffect(() => {
+    const download = searchParams.get('download');
+    if (download === 'true' && !checkingAccess) {
+      // Allow download after payment
+      setHasPDFAccess(true);
+    }
+  }, [searchParams, checkingAccess]);
+
+  // Handle auto-download trigger from parent component
+  useEffect(() => {
+    if (autoDownload && hasPDFAccess && !checkingAccess && downloadLinkRef.current) {
+      // Trigger the PDF download
+      downloadLinkRef.current.click();
+      toast.success("PDF download started!");
+      
+      // Notify parent that auto-download is complete
+      if (onAutoDownloadComplete) {
+        onAutoDownloadComplete();
+      }
+    }
+  }, [autoDownload, hasPDFAccess, checkingAccess, onAutoDownloadComplete]);
 
   const handlePDFClick = (e: React.MouseEvent) => {
-    if (!session) {
-      e.preventDefault();
-      setShowLoginModal(true);
+    if (hasPDFAccess) {
+      toast.success("PDF download started!");
       return;
     }
-    toast.success("PDF download started!");
+    
+    e.preventDefault();
+    if (!session) {
+      setShowLoginModal(true);
+    } else {
+      handlePurchase();
+    }
   };
 
-  return (
-    <>
+  const handlePurchase = async () => {
+    setProcessingPayment(true);
+    
+    try {
+      const response = await fetch('/api/stripe/checkout', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ recipeCount: recipes.length }),
+      });
+
+      const data = await response.json();
+      
+      if (data.url) {
+        // Redirect to Stripe checkout
+        window.location.href = data.url;
+      } else {
+        throw new Error(data.error || 'Failed to create checkout session');
+      }
+    } catch (error) {
+      console.error('Payment error:', error);
+      toast.error('Failed to start payment process');
+      setProcessingPayment(false);
+    }
+  };
+
+  // Calculate display price
+  const calculateDisplayPrice = (recipeCount: number): string => {
+    if (recipeCount <= 5) return '2.99';
+    if (recipeCount <= 10) return '4.99';
+    if (recipeCount <= 20) return '7.99';
+    return '9.99';
+  };
+
+  if (checkingAccess) {
+    return (
+      <div className="animate-pulse flex items-center gap-2 px-4 py-2 bg-muted rounded-lg">
+        <div className="w-4 h-4 bg-muted-foreground/30 rounded"></div>
+        <span className="text-muted-foreground">Checking access...</span>
+      </div>
+    );
+  }
+
+  // If user has access, show regular download button
+  if (hasPDFAccess) {
+    return (
       <PDFDownloadLink
         document={<MyDocument recipes={recipes} title={title} />}
-        fileName="recipes.pdf"
+        fileName="my-favorite-recipes.pdf"
+        innerRef={downloadLinkRef}
       >
         {({ loading }) => (
-          <Button
+          <button
             onClick={handlePDFClick}
             disabled={loading || isGenerating || recipes.length === 0}
-            className="flex items-center gap-2 bg-green-600 hover:bg-green-700"
+            className="murakamicity-button flex items-center gap-2 bg-primary hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {loading || isGenerating ? (
               <>
@@ -66,9 +166,32 @@ export function PDFGenerator({
                 Download PDF ({recipes.length} recipes)
               </>
             )}
-          </Button>
+          </button>
         )}
       </PDFDownloadLink>
+    );
+  }
+
+  // If user doesn't have access, show purchase button
+  return (
+    <>
+      <button
+        onClick={handlePDFClick}
+        disabled={processingPayment || recipes.length === 0}
+        className="murakamicity-button flex items-center gap-2 bg-primary hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed"
+      >
+        {processingPayment ? (
+          <>
+            <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+            Processing...
+          </>
+        ) : (
+          <>
+            <CreditCard className="w-4 h-4" />
+            Buy PDF Access - ${calculateDisplayPrice(recipes.length)}
+          </>
+        )}
+      </button>
       {showLoginModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
           <div className="relative">

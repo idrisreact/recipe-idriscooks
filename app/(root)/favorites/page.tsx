@@ -10,25 +10,49 @@ import { VerticalSpace } from "@/src/components/ui/VerticalSpace";
 import { useRouter } from "next/navigation";
 import { Heart, Share2, Eye, LogIn } from "lucide-react";
 import { RecipePreviewModal } from "@/src/components/recipe-server-component/recipe-preview-modal";
-import { useState } from "react";
+import dynamic from "next/dynamic";
+
+const PDFGenerator = dynamic(
+  () => import("@/src/components/recipe-server-component/pdf-generator").then(mod => ({ default: mod.PDFGenerator })),
+  {
+    ssr: false,
+    loading: () => <div className="animate-pulse w-24 h-10 bg-muted rounded"></div>
+  }
+);
+import { useState, useEffect } from "react";
 import { Recipe } from "@/src/types/recipes.types";
 import { authClient } from "@/src/utils/auth-client";
 import { SignInModal } from "@/src/components/auth/sign-in-modal/SignInModal";
+import { useSearchParams } from "next/navigation";
 
 export default function FavoritesPage() {
   const { data: session, isPending } = authClient.useSession();
   const { favorites, loading, error, removeFromFavorites, isFavorited } =
     useFavorites();
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [previewRecipe, setPreviewRecipe] = useState<Recipe | null>(null);
   const [isPreviewOpen, setIsPreviewOpen] = useState(false);
   const [showSignInModal, setShowSignInModal] = useState(false);
+  const [shouldAutoDownload, setShouldAutoDownload] = useState(false);
 
   const toggleFavorite = async (recipeId: number) => {
     if (isFavorited(recipeId)) {
       await removeFromFavorites(recipeId);
     }
   };
+
+  // Handle auto-download from payment success
+  useEffect(() => {
+    const downloadParam = searchParams.get('download');
+    if (downloadParam === 'true' && !loading && favorites.length > 0) {
+      setShouldAutoDownload(true);
+      // Clean up the URL parameter
+      const url = new URL(window.location.href);
+      url.searchParams.delete('download');
+      window.history.replaceState({}, '', url.toString());
+    }
+  }, [searchParams, loading, favorites.length]);
 
   // Show loading while checking authentication
   if (isPending) {
@@ -155,11 +179,22 @@ export default function FavoritesPage() {
         </div>
       ) : (
         <>
-          <div className="mb-6 flex justify-between items-center">
+          <div className="mb-6 flex justify-between items-center flex-wrap gap-4">
             <Text variant="large" className="text-muted-foreground font-medium">
               {favorites.length} favorite recipe
               {favorites.length !== 1 ? "s" : ""}
             </Text>
+            
+            {favorites.length > 0 && (
+              <div className="flex items-center gap-3">
+                <PDFGenerator
+                  recipes={favorites.map(fav => fav.recipe)}
+                  title="My Favorite Recipes"
+                  autoDownload={shouldAutoDownload}
+                  onAutoDownloadComplete={() => setShouldAutoDownload(false)}
+                />
+              </div>
+            )}
           </div>
 
           <div className="recipe-grid">

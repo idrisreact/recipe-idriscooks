@@ -1,0 +1,354 @@
+import { Meta } from '@storybook/blocks';
+
+<Meta title="Design System/Getting Started/Usage Guide" />
+
+# Murakamicity Design System Usage Guide
+
+This guide provides practical instructions for implementing the Murakamicity design system in your React components and applications.
+
+## Installation & Setup
+
+### 1. Tailwind CSS Classes
+
+The design system uses Tailwind CSS utilities. Ensure your `tailwind.config.js` includes the Murakamicity color palette:
+
+```javascript
+module.exports = {
+  theme: {
+    extend: {
+      colors: {
+        primary: '#F20094',
+        'primary-foreground': '#FFFFFF',
+        accent: '#FF6B9D',
+        muted: '#6B7280',
+        'muted-foreground': '#9CA3AF',
+        background: '#FAFAFA',
+        surface: '#FFFFFF',
+        border: '#E5E7EB',
+      }
+    }
+  }
+}
+```
+
+### 2. CSS Custom Properties
+
+Add these CSS variables to your global styles:
+
+```css
+:root {
+  --primary: #F20094;
+  --primary-foreground: #FFFFFF;
+  --accent: #FF6B9D;
+  --muted: #6B7280;
+  --muted-foreground: #9CA3AF;
+  --background: #FAFAFA;
+  --surface: #FFFFFF;
+  --border: #E5E7EB;
+}
+```
+
+## Component Classes
+
+### Murakamicity Button Classes
+
+Pre-built CSS classes for common button styles:
+
+```css
+.murakamicity-button {
+  @apply inline-flex items-center justify-center gap-2 px-4 py-2 
+         bg-primary text-primary-foreground font-medium rounded-lg 
+         transition-all duration-200 hover:bg-primary/90 
+         focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2
+         active:scale-95 disabled:opacity-50 disabled:pointer-events-none;
+}
+
+.murakamicity-button-outline {
+  @apply inline-flex items-center justify-center gap-2 px-4 py-2 
+         bg-transparent text-primary border-2 border-primary font-medium 
+         rounded-lg transition-all duration-200 hover:bg-primary hover:text-white
+         focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2
+         active:scale-95 disabled:opacity-50 disabled:pointer-events-none;
+}
+
+.murakamicity-button-ghost {
+  @apply inline-flex items-center justify-center gap-2 px-4 py-2 
+         bg-transparent text-primary border border-transparent font-medium 
+         rounded-lg transition-all duration-200 hover:bg-primary/10
+         focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2
+         active:scale-95 disabled:opacity-50 disabled:pointer-events-none;
+}
+```
+
+### Murakamicity Card Classes
+
+```css
+.murakamicity-card {
+  @apply bg-surface border border-border rounded-lg shadow-sm 
+         transition-all duration-200 hover:shadow-md hover:scale-105;
+}
+
+.murakamicity-card-elevated {
+  @apply bg-surface border border-border/50 rounded-lg shadow-lg 
+         transition-all duration-200 hover:shadow-xl hover:scale-105;
+}
+
+.murakamicity-card-recipe {
+  @apply bg-surface border border-border rounded-lg shadow-md 
+         overflow-hidden relative transition-all duration-200 
+         hover:shadow-xl hover:scale-105;
+}
+```
+
+## Usage Examples
+
+### Basic Button Implementation
+
+```tsx
+// Using CSS classes
+<button className="murakamicity-button">
+  Add to Favorites
+</button>
+
+<button className="murakamicity-button-outline">
+  Browse Recipes
+</button>
+
+// Using Tailwind utilities directly
+<button className="bg-primary text-white px-4 py-2 rounded-lg font-medium hover:bg-primary/90 transition-colors">
+  Custom Button
+</button>
+```
+
+### Recipe Card Component
+
+```tsx
+const RecipeCard = ({ recipe }: { recipe: Recipe }) => (
+  <div className="murakamicity-card-recipe">
+    <div 
+      className="h-48 bg-cover bg-center"
+      style={{ backgroundImage: `url(${recipe.imageUrl})` }}
+    >
+      <div className="h-full bg-gradient-to-t from-black/60 to-transparent flex flex-col justify-end p-4">
+        <h3 className="text-white font-semibold text-lg">{recipe.title}</h3>
+        <p className="text-white/90 text-sm">{recipe.description}</p>
+        <div className="flex items-center gap-4 mt-2 text-white/80 text-sm">
+          <span>⏱️ {recipe.cookTime}m</span>
+          <span>👥 {recipe.servings} servings</span>
+        </div>
+      </div>
+    </div>
+  </div>
+);
+```
+
+### Typography Implementation
+
+```tsx
+const RecipeContent = () => (
+  <article className="max-w-2xl mx-auto">
+    {/* Display heading */}
+    <h1 className="text-5xl font-bold text-primary mb-2">
+      Chocolate Chip Cookies
+    </h1>
+    
+    {/* Large subtitle */}
+    <p className="text-lg text-muted mb-8">
+      Classic homemade cookies that are crispy outside, chewy inside
+    </p>
+    
+    {/* Section heading */}
+    <h2 className="text-2xl font-semibold text-primary mb-4">
+      Ingredients
+    </h2>
+    
+    {/* Body text */}
+    <ul className="text-base leading-relaxed space-y-2">
+      <li>2¼ cups all-purpose flour</li>
+      <li>1 cup butter, softened</li>
+      <li>¾ cup brown sugar</li>
+    </ul>
+  </article>
+);
+```
+
+### Form Implementation
+
+```tsx
+const ContactForm = () => (
+  <form className="murakamicity-card p-6 max-w-md">
+    <h2 className="text-2xl font-semibold text-primary mb-6">
+      Get in Touch
+    </h2>
+    
+    <div className="space-y-4">
+      <div>
+        <label className="block text-sm font-medium text-gray-700 mb-2">
+          Your Name
+        </label>
+        <input 
+          type="text"
+          className="w-full px-3 py-2 border border-border rounded-lg 
+                     focus:outline-none focus:ring-2 focus:ring-primary 
+                     focus:border-transparent"
+          placeholder="Enter your name"
+        />
+      </div>
+      
+      <div>
+        <label className="block text-sm font-medium text-gray-700 mb-2">
+          Message
+        </label>
+        <textarea 
+          rows={4}
+          className="w-full px-3 py-2 border border-border rounded-lg 
+                     focus:outline-none focus:ring-2 focus:ring-primary 
+                     focus:border-transparent resize-none"
+          placeholder="Your message..."
+        />
+      </div>
+    </div>
+    
+    <div className="flex gap-3 mt-6">
+      <button type="submit" className="murakamicity-button flex-1">
+        Send Message
+      </button>
+      <button type="button" className="murakamicity-button-outline">
+        Cancel
+      </button>
+    </div>
+  </form>
+);
+```
+
+## Animation Guidelines
+
+### Hover Animations
+
+Use subtle scale and shadow changes for interactive elements:
+
+```css
+.interactive-element {
+  transition: all 200ms ease-out;
+}
+
+.interactive-element:hover {
+  transform: scale(1.02);
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+}
+
+.interactive-element:active {
+  transform: scale(0.98);
+}
+```
+
+### Loading States
+
+Implement consistent loading animations:
+
+```tsx
+const LoadingSpinner = () => (
+  <div className="w-5 h-5 border-2 border-current border-t-transparent rounded-full animate-spin" />
+);
+
+const LoadingButton = ({ loading, children, ...props }) => (
+  <button className="murakamicity-button" disabled={loading} {...props}>
+    {loading && <LoadingSpinner />}
+    {children}
+  </button>
+);
+```
+
+## Responsive Design
+
+### Breakpoint Usage
+
+Follow mobile-first responsive design:
+
+```tsx
+const ResponsiveGrid = () => (
+  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+    {recipes.map(recipe => (
+      <RecipeCard key={recipe.id} recipe={recipe} />
+    ))}
+  </div>
+);
+
+const ResponsiveButton = () => (
+  <button className="murakamicity-button w-full sm:w-auto">
+    Add Recipe
+  </button>
+);
+```
+
+## Accessibility Best Practices
+
+### Focus States
+
+Ensure all interactive elements have visible focus states:
+
+```css
+.custom-input {
+  @apply border border-border rounded-lg px-3 py-2
+         focus:outline-none focus:ring-2 focus:ring-primary 
+         focus:border-transparent;
+}
+```
+
+### Color Contrast
+
+Always test color combinations for sufficient contrast:
+
+```tsx
+// Good contrast
+<div className="bg-primary text-white p-4">
+  High contrast text
+</div>
+
+// Avoid low contrast
+<div className="bg-accent text-white p-4">
+  ❌ Lower contrast - harder to read
+</div>
+```
+
+### Semantic HTML
+
+Use proper HTML elements and ARIA attributes:
+
+```tsx
+const AccessibleButton = ({ loading, children, ...props }) => (
+  <button 
+    className="murakamicity-button"
+    aria-label={loading ? "Loading..." : undefined}
+    disabled={loading}
+    {...props}
+  >
+    {loading && <span aria-hidden="true"><LoadingSpinner /></span>}
+    {children}
+  </button>
+);
+```
+
+## Testing Your Implementation
+
+### Visual Testing
+
+- Ensure consistent spacing using the 4px grid system
+- Verify color contrast meets WCAG guidelines
+- Test hover and focus states on interactive elements
+- Check responsive behavior across different screen sizes
+
+### Accessibility Testing
+
+- Use screen readers to test navigation
+- Verify keyboard navigation works properly
+- Test with high contrast mode enabled
+- Ensure all interactive elements have focus indicators
+
+## Resources
+
+- **Color Palette**: Use the defined color tokens consistently
+- **Typography Scale**: Follow the established type hierarchy
+- **Component Library**: Build upon the provided component examples
+- **Spacing System**: Use multiples of 4px for consistent rhythm
+- **Animation Timing**: Use 200ms for micro-interactions, 300ms for standard transitions

@@ -3,6 +3,26 @@ import { relations } from "drizzle-orm";
 import { user } from "./user.schema";
 import { recipes } from "./recipe.schema";
 
+// Premium Features - User access to premium functionality
+export const premiumFeatures = pgTable("premium_features", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  userId: text("user_id").notNull().references(() => user.id, { onDelete: "cascade" }),
+  feature: varchar("feature", { length: 50 }).notNull(), // pdf_downloads, meal_plans, etc.
+  grantedAt: timestamp("granted_at").defaultNow(),
+  expiresAt: timestamp("expires_at"), // null for lifetime access
+  metadata: jsonb("metadata").$type<{
+    sessionId?: string;
+    recipeCount?: number;
+    amountPaid?: number;
+    planType?: string;
+  }>(),
+}, (table) => ({
+  userIdIdx: index("premium_features_user_id_idx").on(table.userId),
+  featureIdx: index("premium_features_feature_idx").on(table.feature),
+  expiresAtIdx: index("premium_features_expires_at_idx").on(table.expiresAt),
+  userFeatureUnique: unique("premium_features_user_feature_unique").on(table.userId, table.feature),
+}));
+
 // Recipe Collections - User-created recipe organization
 export const recipeCollections = pgTable("recipe_collections", {
   id: uuid("id").primaryKey().defaultRandom(),
@@ -337,4 +357,8 @@ export const recipeSharesRelations = relations(recipeShares, ({ one }) => ({
 
 export const userPreferencesRelations = relations(userPreferences, ({ one }) => ({
   user: one(user, { fields: [userPreferences.userId], references: [user.id] }),
+}));
+
+export const premiumFeaturesRelations = relations(premiumFeatures, ({ one }) => ({
+  user: one(user, { fields: [premiumFeatures.userId], references: [user.id] }),
 }));
