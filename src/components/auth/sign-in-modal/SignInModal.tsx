@@ -60,15 +60,15 @@ export const SignInModal: FC<{ onClose: () => void }> = ({ onClose }) => {
     <>
       {}
       <div
-        className="fixed inset-0 bg-black bg-opacity-25 z-50"
+        className="fixed inset-0 bg-black bg-opacity-50 z-50"
         onClick={onClose} // clicking the backdrop closes the modal
       />
 
       {}
-      <div className="fixed inset-0 flex items-center justify-center z-50 pointer-events-none">
+      <div className="fixed inset-0 flex items-center justify-center z-50 pointer-events-none p-4">
         <div
           ref={modalRef}
-          className="relative bg-white rounded-lg shadow-xl w-11/12 max-w-md mx-auto p-6 pointer-events-auto"
+          className="relative bg-white text-gray-900 rounded-lg shadow-xl w-full max-w-md mx-auto p-6 pointer-events-auto border"
           onClick={(e) => e.stopPropagation()} // prevent clicks inside from bubbling to backdrop
           role="dialog"
           aria-modal="true"
@@ -96,11 +96,18 @@ export const SignInModal: FC<{ onClose: () => void }> = ({ onClose }) => {
             </svg>
           </button>
 
-          <h2 id="sign-in-title" className="text-2xl font-semibold mb-4">
-            Sign In
+          <h2 id="sign-in-title" className="text-2xl font-semibold text-gray-900 mb-6 text-center">
+            Welcome back
           </h2>
+          <p className="text-gray-600 text-center mb-6">
+            Sign in to access your recipes and favorites
+          </p>
 
-          <Button variant="icon" className="w-full cursor-pointer" onClick={handleGoogleSignIn}>
+          <Button
+            variant="outline"
+            className="w-full cursor-pointer flex items-center justify-center gap-3 py-3 text-gray-700 hover:bg-gray-50 border border-gray-300"
+            onClick={handleGoogleSignIn}
+          >
             <Image src="/google-icon.svg" height={20} width={20} alt="google logo" />
             Continue with Google
           </Button>
