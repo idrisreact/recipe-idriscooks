@@ -213,7 +213,12 @@ export async function POST(request: NextRequest) {
         console.log(`Webhook: Unhandled event type: ${event.type}`);
     }
 
-    return NextResponse.json({ received: true });
+    return NextResponse.json({ 
+      received: true, 
+      processed: true,
+      eventType: event.type,
+      timestamp: new Date().toISOString()
+    });
   } catch (error) {
     console.error('Webhook: Error processing webhook:', error);
     return NextResponse.json({ error: 'Webhook handler failed' }, { status: 400 });
