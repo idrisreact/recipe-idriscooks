@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import Stripe from 'stripe';
-import { authClient } from '@/src/utils/auth-client';
+import { auth } from '@/src/utils/auth';
 
 // Initialize Stripe
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
@@ -21,11 +21,9 @@ export async function POST(request: NextRequest) {
     }
 
     // Get user session (optional - can allow guest purchases)
-    const session = await authClient.getSession({
-      fetchOptions: {
-        headers: request.headers,
-      },
-    }) as { user?: { id: string; email?: string } } | null;
+    const session = await auth.api.getSession({
+      headers: request.headers,
+    });
 
     // Create Stripe checkout session
     const checkoutSession = await stripe.checkout.sessions.create({
@@ -51,7 +49,7 @@ export async function POST(request: NextRequest) {
       success_url: `${process.env.NEXT_PUBLIC_BASE_URL}/payment/success?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${process.env.NEXT_PUBLIC_BASE_URL}/favorites`,
       metadata: {
-        userId: session && 'user' in session && session.user ? session.user.id : 'guest',
+        userId: session?.user?.id || 'guest',
         recipeCount: recipeCount.toString(),
         type: 'pdf_download',
       },
