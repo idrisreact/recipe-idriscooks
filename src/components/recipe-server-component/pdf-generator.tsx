@@ -49,7 +49,8 @@ export function PDFGenerator({
     const checkPDFAccess = async () => {
       if (session?.user?.id) {
         try {
-          const response = await fetch('/api/user/pdf-access');
+          // Add cache busting to ensure fresh data after payment
+          const response = await fetch('/api/user/pdf-access?' + new Date().getTime());
           const data = await response.json();
           setHasPDFAccess(data.hasAccess);
         } catch (error) {
@@ -65,11 +66,26 @@ export function PDFGenerator({
   // Handle direct download from payment success
   useEffect(() => {
     const download = searchParams.get('download');
-    if (download === 'true' && !checkingAccess) {
-      // Allow download after payment
-      setHasPDFAccess(true);
+    if (download === 'true' && !checkingAccess && session?.user?.id) {
+      // Recheck access from database when coming from payment success
+      const recheckAccess = async () => {
+        try {
+          console.log('Rechecking PDF access after payment...');
+          const response = await fetch('/api/user/pdf-access?' + new Date().getTime());
+          const data = await response.json();
+          console.log('PDF access check result:', data);
+          setHasPDFAccess(data.hasAccess);
+        } catch (error) {
+          console.error('Error rechecking PDF access:', error);
+          // Fallback: allow access temporarily
+          setHasPDFAccess(true);
+        }
+      };
+      
+      // Add delay to allow webhook to process
+      setTimeout(recheckAccess, 1000);
     }
-  }, [searchParams, checkingAccess]);
+  }, [searchParams, checkingAccess, session]);
 
   // Handle auto-download trigger from parent component
   useEffect(() => {
@@ -115,6 +131,30 @@ export function PDFGenerator({
       console.error('Payment error:', error);
       toast.error('Failed to start payment process');
       setProcessingPayment(false);
+    }
+  };
+
+  const refreshAccess = async () => {
+    if (!session?.user?.id) return;
+    
+    setCheckingAccess(true);
+    try {
+      console.log('Refreshing PDF access...');
+      const response = await fetch('/api/user/pdf-access?' + new Date().getTime());
+      const data = await response.json();
+      console.log('Access refresh result:', data);
+      setHasPDFAccess(data.hasAccess);
+      
+      if (data.hasAccess) {
+        toast.success('PDF access confirmed!');
+      } else {
+        toast.error('PDF access not found. Please try again in a moment.');
+      }
+    } catch (error) {
+      console.error('Error refreshing access:', error);
+      toast.error('Failed to check access');
+    } finally {
+      setCheckingAccess(false);
     }
   };
 
@@ -185,23 +225,45 @@ export function PDFGenerator({
   // If user doesn't have access, show purchase button
   return (
     <>
-      <button
-        onClick={handlePDFClick}
-        disabled={processingPayment || recipes.length === 0}
-        className="murakamicity-button flex items-center gap-2 bg-primary hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed"
-      >
-        {processingPayment ? (
-          <>
-            <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-            Processing...
-          </>
-        ) : (
-          <>
-            <CreditCard className="w-4 h-4" />
-            Buy PDF Access - ${calculateDisplayPrice(recipes.length)}
-          </>
+      <div className="flex items-center gap-2 flex-wrap">
+        <button
+          onClick={handlePDFClick}
+          disabled={processingPayment || recipes.length === 0}
+          className="murakamicity-button flex items-center gap-2 bg-primary hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          {processingPayment ? (
+            <>
+              <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+              Processing...
+            </>
+          ) : (
+            <>
+              <CreditCard className="w-4 h-4" />
+              Buy PDF Access - ${calculateDisplayPrice(recipes.length)}
+            </>
+          )}
+        </button>
+        
+        {session?.user && (
+          <button
+            onClick={refreshAccess}
+            disabled={checkingAccess}
+            className="murakamicity-button-outline flex items-center gap-2 text-sm"
+            title="Click if you've already paid but don't see access"
+          >
+            {checkingAccess ? (
+              <>
+                <div className="w-3 h-3 border-2 border-current border-t-transparent rounded-full animate-spin"></div>
+                Checking...
+              </>
+            ) : (
+              <>
+                🔄 Refresh Access
+              </>
+            )}
+          </button>
         )}
-      </button>
+      </div>
       {showLoginModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
           <div className="relative">
