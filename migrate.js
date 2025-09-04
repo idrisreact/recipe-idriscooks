@@ -5,7 +5,7 @@ const { Pool } = require("pg");
 async function runMigrations() {
   const pool = new Pool({
     connectionString: process.env.DATABASE_URL,
-    ssl: process.env.NODE_ENV === "production" ? { rejectUnauthorized: false } : false,
+    ssl: process.env.DATABASE_URL?.includes('neondb.io') || process.env.NODE_ENV === "production" ? { rejectUnauthorized: false } : false,
   });
 
   const db = drizzle(pool);
