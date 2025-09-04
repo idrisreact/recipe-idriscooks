@@ -15,7 +15,7 @@ export async function GET() {
         LIMIT 4
       `
     );
-    return NextResponse.json({ data: popular.rows, count: popular.rows.length });
+    return NextResponse.json(popular.rows);
   } catch (error) {
     console.error('Error fetching popular recipes:', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
