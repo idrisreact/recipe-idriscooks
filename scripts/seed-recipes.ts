@@ -6,20 +6,18 @@ async function seedRecipes() {
   try {
     console.log("🌱 Seeding recipes...");
 
-    // Transform the data to match the database schema
-    const transformedRecipes = recipesData.recipes.map((recipe: any) => ({
-      title: recipe.title,
-      description: recipe.description,
-      imageUrl: recipe.imageUrl,
-      servings: recipe.servings,
-      prepTime: recipe.prepTimeMinutes,
-      cookTime: recipe.cookTimeMinutes,
-      ingredients: recipe.ingredients,
-      steps: recipe.steps,
-      tags: recipe.tags,
+    const transformedRecipes = recipesData.recipes.map((recipe: Record<string, unknown>) => ({
+      title: recipe.title as string,
+      description: recipe.description as string,
+      imageUrl: recipe.imageUrl as string,
+      servings: recipe.servings as number,
+      prepTime: recipe.prepTimeMinutes as number,
+      cookTime: recipe.cookTimeMinutes as number,
+      ingredients: recipe.ingredients as string[],
+      steps: recipe.steps as string[],
+      tags: recipe.tags as string[],
     }));
 
-    // Insert recipes into database
     const insertedRecipes = await db.insert(recipes).values(transformedRecipes).returning();
 
     console.log(`✅ Successfully seeded ${insertedRecipes.length} recipes`);
@@ -31,7 +29,6 @@ async function seedRecipes() {
   }
 }
 
-// Run the seeding function
 seedRecipes()
   .then(() => {
     console.log("🎉 Seeding completed successfully!");
@@ -40,4 +37,4 @@ seedRecipes()
   .catch((error) => {
     console.error("💥 Seeding failed:", error);
     process.exit(1);
-  }); 
+  });

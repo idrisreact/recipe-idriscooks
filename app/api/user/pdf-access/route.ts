@@ -6,19 +6,14 @@ import { eq, and } from 'drizzle-orm';
 
 export async function GET(request: NextRequest) {
   try {
-    // Get user session
     const session = await auth.api.getSession({
       headers: request.headers,
     });
 
     if (!session?.user?.id) {
-      return NextResponse.json(
-        { hasAccess: false, error: 'Not authenticated' },
-        { status: 401 }
-      );
+      return NextResponse.json({ hasAccess: false, error: 'Not authenticated' }, { status: 401 });
     }
 
-    // Check if user has PDF access
     const pdfAccess = await db
       .select()
       .from(premiumFeatures)
@@ -39,7 +34,6 @@ export async function GET(request: NextRequest) {
         expiresAt: pdfAccess[0].expiresAt,
       }),
     });
-
   } catch (error) {
     console.error('PDF access check error:', error);
     return NextResponse.json(

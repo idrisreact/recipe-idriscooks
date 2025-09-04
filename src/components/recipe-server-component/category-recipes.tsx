@@ -1,14 +1,14 @@
-"use client";
+'use client';
 
-import { Session } from "@/src/types";
-import { useRouter } from "next/navigation";
-import { Button } from "@/components/ui/button";
-import { Recipe } from "@/src/types/recipes.types";
-import { useState } from "react";
-import { RecipePreviewModal } from "./recipe-preview-modal";
-import { useFavorites } from "@/src/hooks/use-favorites";
-import { RecipeCard } from "@/src/components/recipe/recipe-card";
-import { RecipeEmptyState } from "./recipe-empty-state";
+import { Session } from '@/src/types';
+import { useRouter } from 'next/navigation';
+import { Button } from '@/components/ui/button';
+import { Recipe } from '@/src/types/recipes.types';
+import { useState } from 'react';
+import { RecipePreviewModal } from './recipe-preview-modal';
+import { useFavorites } from '@/src/hooks/use-favorites';
+import { RecipeCard } from '@/src/components/recipe/recipe-card';
+import { RecipeEmptyState } from './recipe-empty-state';
 
 interface CategoryRecipesProps {
   session: Session | null;
@@ -20,12 +20,10 @@ export function CategoryRecipes({ recipes, category }: CategoryRecipesProps) {
   const router = useRouter();
   const [previewRecipe, setPreviewRecipe] = useState<Recipe | null>(null);
   const [isPreviewOpen, setIsPreviewOpen] = useState(false);
-  const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
+  const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
 
-  // Use the custom hooks
   const { addToFavorites, removeFromFavorites, isFavorited } = useFavorites();
 
-  // Toggle favorite
   const toggleFavorite = async (recipeId: number) => {
     if (isFavorited(recipeId)) {
       await removeFromFavorites(recipeId);
@@ -34,7 +32,6 @@ export function CategoryRecipes({ recipes, category }: CategoryRecipesProps) {
     }
   };
 
-  // Share recipe
   const shareRecipe = (recipe: Recipe) => {
     if (navigator.share) {
       navigator.share({
@@ -43,7 +40,6 @@ export function CategoryRecipes({ recipes, category }: CategoryRecipesProps) {
         url: window.location.origin + `/recipes/category/${recipe.title}`,
       });
     } else {
-      // Fallback: copy to clipboard
       navigator.clipboard.writeText(
         `${recipe.title} - ${window.location.origin}/recipes/category/${recipe.title}`
       );
@@ -52,35 +48,31 @@ export function CategoryRecipes({ recipes, category }: CategoryRecipesProps) {
 
   return (
     <div className="mx-auto lg:w-4xl">
-      {/* View Mode Toggle */}
+      {}
       <div className="flex justify-end mb-6">
         <div className="flex gap-2">
           <Button
             size="sm"
-            variant={viewMode === "grid" ? "default" : "outline"}
-            onClick={() => setViewMode("grid")}
+            variant={viewMode === 'grid' ? 'default' : 'outline'}
+            onClick={() => setViewMode('grid')}
           >
             Grid
           </Button>
           <Button
             size="sm"
-            variant={viewMode === "list" ? "default" : "outline"}
-            onClick={() => setViewMode("list")}
+            variant={viewMode === 'list' ? 'default' : 'outline'}
+            onClick={() => setViewMode('list')}
           >
             List
           </Button>
         </div>
       </div>
 
-      {/* Recipes Grid/List */}
+      {}
       {recipes.length === 0 ? (
         <RecipeEmptyState searchTerm={category} />
       ) : (
-        <div
-          className={`flex gap-5 ${
-            viewMode === "list" ? "flex-col" : "flex-wrap"
-          }`}
-        >
+        <div className={`flex gap-5 ${viewMode === 'list' ? 'flex-col' : 'flex-wrap'}`}>
           {recipes.map((recipe) => (
             <RecipeCard
               key={recipe.id}
@@ -92,15 +84,13 @@ export function CategoryRecipes({ recipes, category }: CategoryRecipesProps) {
                 setPreviewRecipe(recipe);
                 setIsPreviewOpen(true);
               }}
-              onNavigate={(recipe) =>
-                router.push(`/recipes/category/${recipe.title}`)
-              }
+              onNavigate={(recipe) => router.push(`/recipes/category/${recipe.title}`)}
             />
           ))}
         </div>
       )}
 
-      {/* Recipe Preview Modal */}
+      {}
       <RecipePreviewModal
         recipe={previewRecipe}
         isOpen={isPreviewOpen}

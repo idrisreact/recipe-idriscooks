@@ -1,29 +1,23 @@
-"use client";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import { Text } from "@/src/components/ui/Text";
-import { VerticalSpace } from "@/src/components/ui/VerticalSpace";
-import { Grid, List, Filter, X } from "lucide-react";
-import { z } from "zod";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-} from "@/components/ui/form";
+'use client';
+import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
+import { Text } from '@/src/components/ui/Text';
+import { VerticalSpace } from '@/src/components/ui/VerticalSpace';
+import { Grid, List, Filter, X } from 'lucide-react';
+import { z } from 'zod';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { Form, FormControl, FormField, FormItem, FormLabel } from '@/components/ui/form';
 
 type FormValues = {
   search: string;
 };
 
-type SortOption = "newest" | "oldest" | "title" | "cookTime" | "servings";
-type ViewMode = "grid" | "list";
+type SortOption = 'newest' | 'oldest' | 'title' | 'cookTime' | 'servings';
+type ViewMode = 'grid' | 'list';
 
 const formSchema = z.object({
-  search: z.string().min(3, "must be more than 3 letters long"),
+  search: z.string().min(3, 'must be more than 3 letters long'),
 });
 
 interface RecipeFiltersProps {
@@ -58,29 +52,25 @@ export function RecipeFilters({
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      search: "",
+      search: '',
     },
   });
 
   const sortOptions = [
-    { value: "newest", label: "Newest" },
-    { value: "oldest", label: "Oldest" },
-    { value: "title", label: "Title" },
-    { value: "cookTime", label: "Cook Time" },
-    { value: "servings", label: "Servings" },
+    { value: 'newest', label: 'Newest' },
+    { value: 'oldest', label: 'Oldest' },
+    { value: 'title', label: 'Title' },
+    { value: 'cookTime', label: 'Cook Time' },
+    { value: 'servings', label: 'Servings' },
   ];
 
   return (
     <div className="mx-auto lg:w-4xl">
-      {/* Search, View Mode, and Filters all in one row */}
+      {}
       <div className="flex flex-col gap-4 md:flex-row md:items-center md:gap-4 mb-6">
-        {/* Search Input */}
+        {}
         <Form {...form}>
-          <form
-            action=""
-            onSubmit={(e) => e.preventDefault()}
-            className="flex-1 max-w-md"
-          >
+          <form action="" onSubmit={(e) => e.preventDefault()} className="flex-1 max-w-md">
             <FormField
               control={form.control}
               name="search"
@@ -103,8 +93,8 @@ export function RecipeFilters({
                         <button
                           type="button"
                           onClick={() => {
-                            field.onChange("");
-                            onSearchChange("");
+                            field.onChange('');
+                            onSearchChange('');
                           }}
                           className="absolute right-3 top-1/2 transform -translate-y-1/2"
                         >
@@ -119,48 +109,44 @@ export function RecipeFilters({
           </form>
         </Form>
 
-        {/* View Mode Toggle */}
+        {}
         <div className="flex items-center gap-2">
           <Button
-            variant={viewMode === "grid" ? "default" : "outline"}
+            variant={viewMode === 'grid' ? 'default' : 'outline'}
             size="sm"
-            onClick={() => onViewModeChange("grid")}
+            onClick={() => onViewModeChange('grid')}
           >
             <Grid className="w-4 h-4" />
           </Button>
           <Button
-            variant={viewMode === "list" ? "default" : "outline"}
+            variant={viewMode === 'list' ? 'default' : 'outline'}
             size="sm"
-            onClick={() => onViewModeChange("list")}
+            onClick={() => onViewModeChange('list')}
           >
             <List className="w-4 h-4" />
           </Button>
         </div>
 
-        {/* Filters Button */}
+        {}
         <div className="flex-shrink-0">
-          <Button
-            variant="outline"
-            onClick={onToggleFilters}
-            className="w-full md:w-auto"
-          >
+          <Button variant="outline" onClick={onToggleFilters} className="w-full md:w-auto">
             <Filter className="w-4 h-4 mr-2" />
             Filters
           </Button>
         </div>
       </div>
 
-      {/* Filters Section */}
+      {}
       {showFilters && (
         <div className="bg-gray-50 p-4 rounded-lg mb-4">
-          {/* Sort Options */}
+          {}
           <div className="mb-4">
             <Text className="font-medium mb-2">Sort by:</Text>
             <div className="flex gap-2 flex-wrap">
               {sortOptions.map((option) => (
                 <Button
                   key={option.value}
-                  variant={sortBy === option.value ? "default" : "outline"}
+                  variant={sortBy === option.value ? 'default' : 'outline'}
                   size="sm"
                   onClick={() => onSortChange(option.value as SortOption)}
                 >
@@ -170,7 +156,7 @@ export function RecipeFilters({
             </div>
           </div>
 
-          {/* Tag Filters */}
+          {}
           {allTags.length > 0 && (
             <div>
               <Text className="font-medium mb-2">Filter by tags:</Text>
@@ -178,7 +164,7 @@ export function RecipeFilters({
                 {allTags.map((tag) => (
                   <Button
                     key={tag}
-                    variant={selectedTags.includes(tag) ? "default" : "outline"}
+                    variant={selectedTags.includes(tag) ? 'default' : 'outline'}
                     size="sm"
                     onClick={() => onTagToggle(tag)}
                   >
@@ -191,10 +177,10 @@ export function RecipeFilters({
         </div>
       )}
 
-      {/* Results Count */}
+      {}
       <div className="mb-4">
         <Text className="text-gray-600">
-          {resultsCount} recipe{resultsCount !== 1 ? "s" : ""} found
+          {resultsCount} recipe{resultsCount !== 1 ? 's' : ''} found
           {search && ` for "${search}"`}
         </Text>
       </div>

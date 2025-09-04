@@ -9,7 +9,8 @@ const meta = {
     layout: 'centered',
     docs: {
       description: {
-        component: 'The Murakamicity button component follows the design system guidelines with signature pink color (#F20094), consistent spacing, and interactive states. Perfect for call-to-action elements in the recipe platform.',
+        component:
+          'The Murakamicity button component follows the design system guidelines with signature pink color (#F20094), consistent spacing, and interactive states. Perfect for call-to-action elements in the recipe platform.',
       },
     },
   },
@@ -52,7 +53,8 @@ export const Primary: Story = {
   parameters: {
     docs: {
       description: {
-        story: 'Primary button with the signature pink background. Use for main call-to-action elements.',
+        story:
+          'Primary button with the signature pink background. Use for main call-to-action elements.',
       },
     },
   },
@@ -206,7 +208,6 @@ export const WithIcon: Story = {
   },
 };
 
-// Showcase stories
 export const AllVariants: Story = {
   args: {
     children: 'Button',

@@ -12,7 +12,6 @@ const pool = new Pool({
 
 const db = drizzle(pool);
 
-// Development test user
 const testUser = {
   id: 'dev-user-001',
   name: 'Dev Test User',
@@ -23,7 +22,6 @@ const testUser = {
   updatedAt: new Date()
 };
 
-// Test user subscription (Premium plan)
 const testSubscription = {
   id: 'dev-subscription-001',
   userId: 'dev-user-001',
@@ -41,7 +39,6 @@ const testSubscription = {
   updatedAt: new Date()
 };
 
-// 30 Development recipes with varied content
 const developmentRecipes = [
   {
     title: "Classic Margherita Pizza",
@@ -738,16 +735,14 @@ const developmentRecipes = [
 async function seedDevPOC() {
   try {
     console.log('🌱 Starting development POC seeding...');
-    
-    // Check if test user exists
+
     const existingUser = await db.select().from(user).where(eq(user.id, testUser.id)).limit(1);
-    
+
     if (existingUser.length === 0) {
-      // Create test user
+
       await db.insert(user).values(testUser);
       console.log('✅ Created test user:', testUser.email);
-      
-      // Create test subscription
+
       await pool.query(`
         INSERT INTO user_subscriptions (id, user_id, plan_id, status, current_period_start, current_period_end, stripe_subscription_id, stripe_customer_id)
         VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
@@ -766,16 +761,14 @@ async function seedDevPOC() {
     } else {
       console.log('ℹ️ Test user already exists, skipping user creation');
     }
-    
-    // Check existing recipes count
+
     const existingRecipes = await db.select().from(recipes);
     console.log(`📊 Found ${existingRecipes.length} existing recipes`);
-    
-    // Seed development recipes
+
     console.log('🍳 Seeding development recipes...');
     for (let i = 0; i < developmentRecipes.length; i++) {
       const recipe = developmentRecipes[i];
-      
+
       try {
         await db.insert(recipes).values({
           title: recipe.title,
@@ -788,16 +781,15 @@ async function seedDevPOC() {
           steps: recipe.steps as any,
           tags: recipe.tags as any
         });
-        
+
         console.log(`✅ Seeded recipe ${i + 1}/30: ${recipe.title}`);
       } catch (error) {
         console.log(`⚠️ Recipe ${recipe.title} may already exist, skipping...`);
       }
     }
-    
-    // Create some sample user usage data
+
     const currentDate = new Date();
-    
+
     try {
       await pool.query(`
         INSERT INTO user_usage (id, user_id, month, year, api_calls, pdf_exports, recipes_created, storage_used_mb)
@@ -808,24 +800,23 @@ async function seedDevPOC() {
         currentDate.getMonth() + 1, // month number
         currentDate.getFullYear(),  // year
         150, // api calls
-        3,   // pdf exports  
+        3,   // pdf exports
         0,   // recipes created
         25.5 // storage used MB
       ]);
     } catch (error) {
       console.log('ℹ️ Usage data may already exist, continuing...');
     }
-    
+
     console.log('✅ Created sample usage data');
-    
-    // Final summary
+
     const finalRecipeCount = await db.select().from(recipes);
     console.log(`🎉 Development POC seeding completed!`);
     console.log(`📊 Total recipes in database: ${finalRecipeCount.length}`);
     console.log(`👤 Test user: ${testUser.email} (ID: ${testUser.id})`);
     console.log(`💳 Subscription: Premium Monthly (Active)`);
     console.log(`📈 Usage data: Created for current month`);
-    
+
   } catch (error) {
     console.error('❌ Error seeding development POC:', error);
     throw error;
@@ -834,7 +825,6 @@ async function seedDevPOC() {
   }
 }
 
-// Run the seeding if this file is executed directly
 if (require.main === module) {
   seedDevPOC()
     .then(() => {

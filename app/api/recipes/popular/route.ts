@@ -1,11 +1,10 @@
-import {  NextResponse } from "next/server";
-import { db } from "@/src/db";
-import { recipes, favoriteRecipes } from "@/src/db/schemas";
-import { sql } from "drizzle-orm";
+import { NextResponse } from 'next/server';
+import { db } from '@/src/db';
+import { recipes, favoriteRecipes } from '@/src/db/schemas';
+import { sql } from 'drizzle-orm';
 
 export async function GET() {
   try {
-    // Get top 4 recipes by favorite count
     const popular = await db.execute(
       sql`
         SELECT r.*, COUNT(fr.id) as favoriteCount
@@ -21,4 +20,4 @@ export async function GET() {
     console.error('Error fetching popular recipes:', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
-} 
+}

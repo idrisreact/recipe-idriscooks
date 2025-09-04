@@ -6,25 +6,19 @@ import { eq, and } from 'drizzle-orm';
 
 export async function GET(request: NextRequest) {
   try {
-    // Get user session
     const session = await auth.api.getSession({
       headers: request.headers,
     });
 
     if (!session?.user?.id) {
-      return NextResponse.json(
-        { error: 'Not authenticated' },
-        { status: 401 }
-      );
+      return NextResponse.json({ error: 'Not authenticated' }, { status: 401 });
     }
 
-    // Check premium features for this user
     const features = await db
       .select()
       .from(premiumFeatures)
       .where(eq(premiumFeatures.userId, session.user.id));
 
-    // Get specific PDF access
     const pdfAccess = await db
       .select()
       .from(premiumFeatures)
@@ -42,12 +36,8 @@ export async function GET(request: NextRequest) {
       pdfAccess: pdfAccess,
       hasAccess: pdfAccess.length > 0,
     });
-
   } catch (error) {
     console.error('Debug error:', error);
-    return NextResponse.json(
-      { error: 'Debug failed', details: error },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: 'Debug failed', details: error }, { status: 500 });
   }
 }

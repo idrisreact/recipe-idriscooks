@@ -1,6 +1,5 @@
-import { drizzle } from 'drizzle-orm/node-postgres';
 import { Pool } from 'pg';
-import { subscriptionPlans } from '../src/db/schemas/subscription.schema';
+
 import { config } from 'dotenv';
 
 config({ path: '.env' });
@@ -9,7 +8,7 @@ const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
 });
 
-const db = drizzle(pool);
+
 
 const subscriptionPlansData = [
   {
@@ -152,17 +151,15 @@ const subscriptionPlansData = [
 async function seedSubscriptionPlans() {
   try {
     console.log('🌱 Starting subscription plans seeding...');
-    
-    // Check existing table structure first
+
     const result = await pool.query(`
-      SELECT column_name, data_type 
-      FROM information_schema.columns 
+      SELECT column_name, data_type
+      FROM information_schema.columns
       WHERE table_name = 'subscription_plans'
       ORDER BY ordinal_position;
     `);
     console.log('📋 Table structure:', result.rows);
-    
-    // Insert subscription plans based on actual table structure
+
     for (const plan of subscriptionPlansData) {
       const planData = {
         id: plan.id,
@@ -177,7 +174,7 @@ async function seedSubscriptionPlans() {
         limits: plan.limits,
         sort_order: plan.sortOrder
       };
-      
+
       await pool.query(`
         INSERT INTO subscription_plans (id, name, description, plan_type, price, billing_cycle, trial_days, is_active, features, limits, sort_order)
         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
@@ -196,10 +193,10 @@ async function seedSubscriptionPlans() {
         planData.sort_order
       ]);
     }
-    
+
     console.log('✅ Subscription plans seeded successfully!');
     console.log(`📊 Inserted ${subscriptionPlansData.length} subscription plans`);
-    
+
   } catch (error) {
     console.error('❌ Error seeding subscription plans:', error);
     throw error;
@@ -208,7 +205,6 @@ async function seedSubscriptionPlans() {
   }
 }
 
-// Run the seeding if this file is executed directly
 if (require.main === module) {
   seedSubscriptionPlans()
     .then(() => {

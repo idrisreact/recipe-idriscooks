@@ -1,47 +1,46 @@
-"use client";
+'use client';
 
-import { Text } from "@/src/components/ui/Text";
-import { Check, FileText, Heart, Star } from "lucide-react";
-import { authClient } from "@/src/utils/auth-client";
-import { useState } from "react";
+import { Text } from '@/src/components/ui/Text';
+import { Check, FileText, Heart, Star } from 'lucide-react';
+import { authClient } from '@/src/utils/auth-client';
+import { useState } from 'react';
 
-// Static plans - no need for database queries
 const plans = [
   {
-    id: "free",
-    name: "Free",
-    price: "0",
-    currency: "£",
-    billingCycle: "forever",
-    description: "Perfect for exploring recipes",
+    id: 'free',
+    name: 'Free',
+    price: '0',
+    currency: '£',
+    billingCycle: 'forever',
+    description: 'Perfect for exploring recipes',
     features: [
-      "Browse all recipes",
-      "Save favorite recipes", 
-      "Recipe search & filters",
-      "Mobile-friendly access",
-      "Community features"
+      'Browse all recipes',
+      'Save favorite recipes',
+      'Recipe search & filters',
+      'Mobile-friendly access',
+      'Community features',
     ],
     popular: false,
-    current: true
+    current: true,
   },
   {
-    id: "pdf",
-    name: "PDF Access",
-    price: "19.99",
-    currency: "£",
-    billingCycle: "one-time",
-    description: "Lifetime access to PDF exports",
+    id: 'pdf',
+    name: 'PDF Access',
+    price: '19.99',
+    currency: '£',
+    billingCycle: 'one-time',
+    description: 'Lifetime access to PDF exports',
     features: [
-      "Everything in Free",
-      "PDF recipe exports",
-      "Printable recipe cards",
-      "Offline recipe access",
-      "Beautiful formatting",
-      "Lifetime access"
+      'Everything in Free',
+      'PDF recipe exports',
+      'Printable recipe cards',
+      'Offline recipe access',
+      'Beautiful formatting',
+      'Lifetime access',
     ],
     popular: true,
-    current: false
-  }
+    current: false,
+  },
 ];
 
 export default function SubscriptionPlans() {
@@ -50,23 +49,20 @@ export default function SubscriptionPlans() {
 
   const handlePlanSelection = async (planId: string) => {
     if (!session) {
-      // Redirect to login or show login modal
       return;
     }
 
-    if (planId === "free") {
-      // Already free, no action needed
+    if (planId === 'free') {
       return;
     }
 
-    if (planId === "pdf") {
+    if (planId === 'pdf') {
       setLoading(true);
       try {
-        // Here you would integrate with payment processor (Stripe, PayPal, etc.)
-        console.log("Redirecting to payment for PDF access...");
-        // For now, just simulate
-        await new Promise(resolve => setTimeout(resolve, 1000));
-        alert("Payment integration would happen here!");
+        console.log('Redirecting to payment for PDF access...');
+
+        await new Promise((resolve) => setTimeout(resolve, 1000));
+        alert('Payment integration would happen here!');
       } finally {
         setLoading(false);
       }
@@ -79,12 +75,12 @@ export default function SubscriptionPlans() {
         <div
           key={plan.id}
           className={`murakamicity-card p-8 relative transition-all duration-200 ${
-            plan.popular 
-              ? 'ring-2 ring-primary shadow-lg transform scale-105' 
+            plan.popular
+              ? 'ring-2 ring-primary shadow-lg transform scale-105'
               : 'hover:shadow-lg hover:scale-102'
           }`}
         >
-          {/* Popular Badge */}
+          {}
           {plan.popular && (
             <div className="absolute -top-3 left-1/2 transform -translate-x-1/2">
               <div className="bg-primary text-primary-foreground px-4 py-1 rounded-full text-sm font-medium flex items-center gap-1">
@@ -94,7 +90,7 @@ export default function SubscriptionPlans() {
             </div>
           )}
 
-          {/* Current Badge */}
+          {}
           {plan.current && (
             <div className="absolute top-4 right-4">
               <div className="bg-green-500/20 text-green-600 px-3 py-1 rounded-full text-sm font-medium">
@@ -103,7 +99,7 @@ export default function SubscriptionPlans() {
             </div>
           )}
 
-          {/* Plan Header */}
+          {}
           <div className="text-center mb-8">
             <div className="flex items-center justify-center gap-2 mb-3">
               {plan.id === 'pdf' ? (
@@ -115,22 +111,19 @@ export default function SubscriptionPlans() {
                 {plan.name}
               </Text>
             </div>
-            
+
             <div className="mb-4">
               <span className="text-4xl font-bold text-foreground">
-                {plan.currency}{plan.price}
+                {plan.currency}
+                {plan.price}
               </span>
-              <Text className="text-muted-foreground ml-2">
-                {plan.billingCycle}
-              </Text>
+              <Text className="text-muted-foreground ml-2">{plan.billingCycle}</Text>
             </div>
-            
-            <Text className="text-muted-foreground">
-              {plan.description}
-            </Text>
+
+            <Text className="text-muted-foreground">{plan.description}</Text>
           </div>
 
-          {/* Features List */}
+          {}
           <div className="space-y-3 mb-8">
             {plan.features.map((feature, index) => (
               <div key={index} className="flex items-center gap-3">
@@ -140,7 +133,7 @@ export default function SubscriptionPlans() {
             ))}
           </div>
 
-          {/* CTA Button */}
+          {}
           <button
             onClick={() => handlePlanSelection(plan.id)}
             disabled={plan.current || loading}
@@ -148,8 +141,8 @@ export default function SubscriptionPlans() {
               plan.current
                 ? 'bg-green-500/20 text-green-600 cursor-not-allowed'
                 : plan.popular
-                ? 'murakamicity-button hover:scale-105'
-                : 'murakamicity-button-outline hover:bg-primary hover:text-primary-foreground'
+                  ? 'murakamicity-button hover:scale-105'
+                  : 'murakamicity-button-outline hover:bg-primary hover:text-primary-foreground'
             }`}
           >
             {loading && plan.id === 'pdf' ? (
@@ -158,15 +151,15 @@ export default function SubscriptionPlans() {
                 Processing...
               </div>
             ) : plan.current ? (
-              "Current Plan"
+              'Current Plan'
             ) : plan.id === 'pdf' ? (
-              "Get PDF Access"
+              'Get PDF Access'
             ) : (
-              "Stay Free"
+              'Stay Free'
             )}
           </button>
 
-          {/* Additional Info */}
+          {}
           {plan.id === 'pdf' && (
             <Text className="text-center text-muted-foreground text-sm mt-4">
               One-time payment • No recurring fees • Lifetime access

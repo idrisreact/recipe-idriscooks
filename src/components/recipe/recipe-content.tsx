@@ -1,6 +1,6 @@
-"use client";
-import { Recipe } from "@/src/types/recipes.types";
-import { Text } from "@/src/components/ui/Text";
+'use client';
+import { Recipe } from '@/src/types/recipes.types';
+import { Text } from '@/src/components/ui/Text';
 
 interface RecipeContentProps {
   recipe: Recipe;
@@ -9,17 +9,14 @@ interface RecipeContentProps {
 export function RecipeContent({ recipe }: RecipeContentProps) {
   return (
     <div className="grid md:grid-cols-2 gap-8">
-      {/* Ingredients */}
+      {}
       <div>
         <Text as="h2" className="text-2xl font-bold mb-4">
           Ingredients
         </Text>
         <ul className="space-y-3">
           {recipe.ingredients?.map((ingredient, index) => (
-            <li
-              key={index}
-              className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg"
-            >
+            <li key={index} className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
               <div className="w-3 h-3 bg-blue-500 rounded-full flex-shrink-0"></div>
               <Text className="font-medium">
                 {ingredient.quantity} {ingredient.unit} {ingredient.name}
@@ -29,7 +26,7 @@ export function RecipeContent({ recipe }: RecipeContentProps) {
         </ul>
       </div>
 
-      {/* Instructions */}
+      {}
       <div>
         <Text as="h2" className="text-2xl font-bold mb-4">
           Instructions

@@ -1,12 +1,12 @@
-import Image from "next/image";
-import { BouncingText } from "@/src/components/hero-animation-text/hero-animation-text";
-import HeroButtons from "@/src/components/ui/HeroButtons";
-import FeaturesSection from "@/src/components/features-section";
+import Image from 'next/image';
+import { BouncingText } from '@/src/components/hero-animation-text/hero-animation-text';
+import HeroButtons from '@/src/components/ui/HeroButtons';
+import FeaturesSection from '@/src/components/features-section';
 
 export default function Home() {
   return (
     <>
-      {/* Hero Section with Logo and Headline */}
+      {}
       <div
         className="min-h-[100vh] flex items-center justify-center relative bg-cover bg-center bg-no-repeat w-full px-4 sm:px-6"
         style={{ backgroundImage: "url('/images/food background.png')" }}

@@ -14,11 +14,9 @@ export interface UseSubscriptionResult {
 }
 
 export const useSubscription = (): UseSubscriptionResult => {
-  // Get current session
   const { data: session } = authClient.useSession();
   const isAuthenticated = !!session?.user;
 
-  // Fetch subscription data
   const {
     data: subscriptionData,
     isLoading,
@@ -45,7 +43,6 @@ export const useSubscription = (): UseSubscriptionResult => {
   const subscription = subscriptionData?.subscription || null;
   const plan = subscriptionData?.plan || null;
 
-  // Determine subscription type
   const isPremium = plan?.planType === 'premium';
   const isPro = plan?.planType === 'pro';
   const isFree = !plan || plan?.planType === 'free';

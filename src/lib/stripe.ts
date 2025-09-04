@@ -1,6 +1,5 @@
 import { loadStripe } from '@stripe/stripe-js';
 
-// Client-side Stripe instance
 let stripePromise: ReturnType<typeof loadStripe>;
 
 export const getStripe = () => {
@@ -10,7 +9,6 @@ export const getStripe = () => {
   return stripePromise;
 };
 
-// Price configuration
 export const PRICE_CONFIG = {
   tiers: [
     { maxRecipes: 5, price: 2.99, priceInCents: 299 },
@@ -18,14 +16,14 @@ export const PRICE_CONFIG = {
     { maxRecipes: 20, price: 7.99, priceInCents: 799 },
     { maxRecipes: Infinity, price: 9.99, priceInCents: 999 },
   ],
-  
+
   getPriceForRecipeCount: (count: number) => {
-    const tier = PRICE_CONFIG.tiers.find(t => count <= t.maxRecipes);
+    const tier = PRICE_CONFIG.tiers.find((t) => count <= t.maxRecipes);
     return tier ? tier.priceInCents : 999;
   },
-  
+
   getDisplayPriceForRecipeCount: (count: number) => {
-    const tier = PRICE_CONFIG.tiers.find(t => count <= t.maxRecipes);
+    const tier = PRICE_CONFIG.tiers.find((t) => count <= t.maxRecipes);
     return tier ? tier.price.toFixed(2) : '9.99';
   },
 };

@@ -1,5 +1,9 @@
 import { useState, useEffect } from 'react';
-import { FavoriteRecipeWithRecipe, AddToFavoritesRequest, RemoveFromFavoritesRequest } from '../types';
+import {
+  FavoriteRecipeWithRecipe,
+  AddToFavoritesRequest,
+  RemoveFromFavoritesRequest,
+} from '../types';
 
 export function useFavorites() {
   const [favorites, setFavorites] = useState<FavoriteRecipeWithRecipe[]>([]);
@@ -9,14 +13,14 @@ export function useFavorites() {
   const fetchFavorites = async () => {
     setLoading(true);
     setError(null);
-    
+
     try {
       const response = await fetch('/api/favorites');
-      
+
       if (!response.ok) {
         throw new Error('Failed to fetch favorites');
       }
-      
+
       const data = await response.json();
       setFavorites(data.data || []);
     } catch (err) {
@@ -40,7 +44,6 @@ export function useFavorites() {
         throw new Error('Failed to add to favorites');
       }
 
-      // Refresh the favorites list
       await fetchFavorites();
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to add to favorites');
@@ -61,7 +64,6 @@ export function useFavorites() {
         throw new Error('Failed to remove from favorites');
       }
 
-      // Refresh the favorites list
       await fetchFavorites();
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to remove from favorites');
@@ -69,7 +71,7 @@ export function useFavorites() {
   };
 
   const isFavorited = (recipeId: number) => {
-    return favorites.some(favorite => favorite.recipeId === recipeId);
+    return favorites.some((favorite) => favorite.recipeId === recipeId);
   };
 
   useEffect(() => {
@@ -85,4 +87,4 @@ export function useFavorites() {
     isFavorited,
     refetch: fetchFavorites,
   };
-} 
+}

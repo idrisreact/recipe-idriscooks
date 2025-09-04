@@ -1,22 +1,18 @@
-// app/(root)/recipes/category/[slug]/page.tsx
-
-import { Metadata } from "next";
-import { RecipeDetailedView } from "@/src/components/recipe-server-component/recipe-detailed-view";
-import { auth } from "@/src/utils/auth";
-import { headers } from "next/headers";
-import { notFound } from "next/navigation";
-import { db } from "@/src/db";
-import { recipes as recipesTable } from "@/src/db/schemas";
-import { eq } from "drizzle-orm";
-import { Recipe } from "@/src/types/recipes.types";
+import { Metadata } from 'next';
+import { RecipeDetailedView } from '@/src/components/recipe-server-component/recipe-detailed-view';
+import { auth } from '@/src/utils/auth';
+import { headers } from 'next/headers';
+import { notFound } from 'next/navigation';
+import { db } from '@/src/db';
+import { recipes as recipesTable } from '@/src/db/schemas';
+import { eq } from 'drizzle-orm';
+import { Recipe } from '@/src/types/recipes.types';
 
 interface PageProps {
   params: Promise<{ slug: string }>;
 }
 
-export async function generateMetadata({
-  params,
-}: PageProps): Promise<Metadata> {
+export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { slug } = await params;
   const decoded = decodeURIComponent(slug);
 
@@ -55,13 +51,11 @@ export default async function RecipePage({ params }: PageProps) {
     notFound();
   }
 
-  // Only allow full view if logged in
   const canView = !!session;
   let recipeData;
   if (canView) {
     recipeData = recipe;
   } else {
-    // Only send minimal info for unauthenticated users
     recipeData = {
       title: recipe.title,
       description: recipe.description,
@@ -74,10 +68,7 @@ export default async function RecipePage({ params }: PageProps) {
 
   return (
     <div className="wrapper page">
-      <RecipeDetailedView
-        recipe={recipeData as unknown as Recipe}
-        canView={canView}
-      />
+      <RecipeDetailedView recipe={recipeData as unknown as Recipe} canView={canView} />
     </div>
   );
 }

@@ -1,4 +1,3 @@
-// Subscription Plan Types
 export interface SubscriptionPlan {
   id: string;
   name: string;
@@ -40,7 +39,6 @@ export interface PlanLimits {
   pdfExportsPerMonth?: number;
 }
 
-// User Subscription Types
 export interface UserSubscription {
   id: string;
   userId: string;
@@ -59,10 +57,15 @@ export interface UserSubscription {
   plan?: SubscriptionPlan;
 }
 
-export type SubscriptionStatus = 'active' | 'canceled' | 'past_due' | 'incomplete' | 'trialing' | 'unpaid';
+export type SubscriptionStatus =
+  | 'active'
+  | 'canceled'
+  | 'past_due'
+  | 'incomplete'
+  | 'trialing'
+  | 'unpaid';
 export type PlanType = 'free' | 'premium' | 'pro';
 
-// Usage Tracking Types
 export interface UserUsage {
   id: string;
   userId: string;
@@ -78,7 +81,6 @@ export interface UserUsage {
   updatedAt: Date;
 }
 
-// Billing Types
 export interface BillingHistory {
   id: string;
   userId: string;
@@ -97,7 +99,6 @@ export interface BillingHistory {
 export type BillingStatus = 'succeeded' | 'failed' | 'pending' | 'refunded';
 export type BillingType = 'subscription' | 'upgrade' | 'refund' | 'credit';
 
-// Subscription History Types
 export interface SubscriptionHistory {
   id: string;
   userId: string;
@@ -115,7 +116,6 @@ export interface SubscriptionHistory {
 
 export type SubscriptionChangeType = 'upgrade' | 'downgrade' | 'renewal' | 'cancellation';
 
-// Feature Flags Types
 export interface FeatureFlag {
   id: string;
   name: string;
@@ -138,7 +138,6 @@ export interface FeatureFlagConditions {
   deviceTypes?: string[];
 }
 
-// Premium Features Types
 export interface RecipeCollection {
   id: string;
   userId: string;
@@ -404,7 +403,6 @@ export interface PrivacySettings {
   reviewsVisible?: boolean;
 }
 
-// Utility Types for Subscription Management
 export interface SubscriptionAccessCheck {
   hasAccess: boolean;
   reason?: string;

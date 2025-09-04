@@ -1,11 +1,11 @@
-"use client";
+'use client';
 
-import React from "react";
-import { Card } from "@/src/components/ui/Card";
-import { useRouter } from "next/navigation";
-import { useQuery } from "@tanstack/react-query";
-import { Text } from "@/src/components/ui/Text";
-import RecentRecipesSection from "./recent-recipes-section";
+import React from 'react';
+import { Card } from '@/src/components/ui/Card';
+import { useRouter } from 'next/navigation';
+import { useQuery } from '@tanstack/react-query';
+import { Text } from '@/src/components/ui/Text';
+import RecentRecipesSection from './recent-recipes-section';
 
 function MostPopularRecipes() {
   interface PopularRecipe {
@@ -24,8 +24,8 @@ function MostPopularRecipes() {
     isLoading,
     error,
   } = useQuery<PopularRecipe[]>({
-    queryKey: ["popular-recipes"],
-    queryFn: () => fetch("/api/recipes/popular").then((res) => res.json()),
+    queryKey: ['popular-recipes'],
+    queryFn: () => fetch('/api/recipes/popular').then((res) => res.json()),
   });
 
   if (isLoading)
@@ -49,9 +49,7 @@ function MostPopularRecipes() {
   if (error)
     return (
       <section className="wrapper my-16">
-        <Text className="text-center text-destructive">
-          Failed to load popular recipes
-        </Text>
+        <Text className="text-center text-destructive">Failed to load popular recipes</Text>
       </section>
     );
 
@@ -67,17 +65,13 @@ function MostPopularRecipes() {
           <div
             key={recipe.id}
             className="relative cursor-pointer transition-transform duration-200 hover:scale-105"
-            onClick={() =>
-              router.push(
-                `/recipes/category/${encodeURIComponent(recipe.title)}`
-              )
-            }
+            onClick={() => router.push(`/recipes/category/${encodeURIComponent(recipe.title)}`)}
           >
             <Card
               variant="recipe"
               backgroundImage={recipe.image_url}
               title={recipe.title}
-              subtitle={recipe.description?.slice(0, 50) + "..."}
+              subtitle={recipe.description?.slice(0, 50) + '...'}
             />
           </div>
         ))}
@@ -90,7 +84,7 @@ export default function FeaturesSection() {
   return (
     <>
       <MostPopularRecipes />
-      
+
       <section className="wrapper my-20 flex flex-col items-center">
         <Text as="h2" variant="heading" className="text-center mb-4">
           Become a true <span className="text-primary">chef</span> with our recipes.

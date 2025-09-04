@@ -1,19 +1,16 @@
-"use client";
+'use client';
 
-import { Text } from "@/src/components/ui/Text";
-import { FileText, Heart, CheckCircle } from "lucide-react";
-import { authClient } from "@/src/utils/auth-client";
-import { useState, useEffect } from "react";
+import { Text } from '@/src/components/ui/Text';
+import { FileText, Heart, CheckCircle } from 'lucide-react';
+import { authClient } from '@/src/utils/auth-client';
+import { useState, useEffect } from 'react';
 
 export default function SubscriptionStatus() {
   const { data: session, isPending } = authClient.useSession();
   const [currentPlan, setCurrentPlan] = useState<'free' | 'pdf'>('free');
 
-  // In a real app, you'd fetch this from your database
   useEffect(() => {
     if (session?.user?.id) {
-      // Simulate checking user's PDF access from database
-      // For demo purposes, everyone starts as free
       setCurrentPlan('free');
     }
   }, [session]);
@@ -31,9 +28,7 @@ export default function SubscriptionStatus() {
     return (
       <div className="murakamicity-card p-6 border-dashed border-2">
         <div className="text-center">
-          <Text className="text-muted-foreground">
-            Sign in to view your plan
-          </Text>
+          <Text className="text-muted-foreground">Sign in to view your plan</Text>
         </div>
       </div>
     );
@@ -71,8 +66,8 @@ export default function SubscriptionStatus() {
             <Text className="font-medium">PDF Access Enabled</Text>
           </div>
           <Text className="text-muted-foreground text-sm">
-            You have lifetime access to download any recipe as a PDF. 
-            No expiry date, no recurring fees.
+            You have lifetime access to download any recipe as a PDF. No expiry date, no recurring
+            fees.
           </Text>
         </div>
       )}
@@ -80,8 +75,8 @@ export default function SubscriptionStatus() {
       {!isPdfPlan && (
         <div className="bg-muted/50 rounded-lg p-4 mt-4">
           <Text className="text-muted-foreground text-sm">
-            You&apos;re currently on the free plan. Upgrade to get PDF exports 
-            and offline access to all recipes.
+            You&apos;re currently on the free plan. Upgrade to get PDF exports and offline access to
+            all recipes.
           </Text>
         </div>
       )}

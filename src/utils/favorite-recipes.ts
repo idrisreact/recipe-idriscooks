@@ -18,12 +18,7 @@ export async function addToFavorites(userId: string, recipeId: number): Promise<
 export async function removeFromFavorites(userId: string, recipeId: number): Promise<void> {
   await db
     .delete(favoriteRecipes)
-    .where(
-      and(
-        eq(favoriteRecipes.userId, userId),
-        eq(favoriteRecipes.recipeId, recipeId)
-      )
-    );
+    .where(and(eq(favoriteRecipes.userId, userId), eq(favoriteRecipes.recipeId, recipeId)));
 }
 
 export async function getUserFavorites(userId: string): Promise<FavoriteRecipeWithRecipe[]> {
@@ -51,7 +46,7 @@ export async function getUserFavorites(userId: string): Promise<FavoriteRecipeWi
     .innerJoin(recipes, eq(favoriteRecipes.recipeId, recipes.id))
     .where(eq(favoriteRecipes.userId, userId));
 
-  return favorites.map(favorite => ({
+  return favorites.map((favorite) => ({
     ...favorite,
     recipe: {
       ...favorite.recipe,
@@ -66,13 +61,8 @@ export async function isRecipeFavorited(userId: string, recipeId: number): Promi
   const [favorite] = await db
     .select()
     .from(favoriteRecipes)
-    .where(
-      and(
-        eq(favoriteRecipes.userId, userId),
-        eq(favoriteRecipes.recipeId, recipeId)
-      )
-    )
+    .where(and(eq(favoriteRecipes.userId, userId), eq(favoriteRecipes.recipeId, recipeId)))
     .limit(1);
 
   return !!favorite;
-} 
+}

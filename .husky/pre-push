@@ -1,0 +1,2 @@
+# Run Stripe tests before pushing
+npm run test:stripe

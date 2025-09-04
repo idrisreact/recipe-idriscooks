@@ -1,0 +1,5 @@
+# Run lint-staged for faster checks on changed files only
+npx lint-staged
+
+# Run type checking
+npm run type-check

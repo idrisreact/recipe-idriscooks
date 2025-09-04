@@ -1,16 +1,16 @@
-"use client";
-import { Recipe } from "@/src/types/recipes.types";
-import { Session } from "@/src/types";
-import { useRouter } from "next/navigation";
-import { Button } from "@/components/ui/button";
-import { Text } from "@/src/components/ui/Text";
-import { useFavorites } from "@/src/hooks/use-favorites";
-import { ArrowLeft } from "lucide-react";
-import { RecipeHeader } from "@/src/components/recipe/recipe-header";
-import { RecipeContent } from "@/src/components/recipe/recipe-content";
-import { RecipeTags } from "@/src/components/recipe/recipe-tags";
-import { RecipeActions } from "@/src/components/recipe/recipe-actions";
-import { SignInOverlay } from "./sign-in-overlay";
+'use client';
+import { Recipe } from '@/src/types/recipes.types';
+import { Session } from '@/src/types';
+import { useRouter } from 'next/navigation';
+import { Button } from '@/components/ui/button';
+import { Text } from '@/src/components/ui/Text';
+import { useFavorites } from '@/src/hooks/use-favorites';
+import { ArrowLeft } from 'lucide-react';
+import { RecipeHeader } from '@/src/components/recipe/recipe-header';
+import { RecipeContent } from '@/src/components/recipe/recipe-content';
+import { RecipeTags } from '@/src/components/recipe/recipe-tags';
+import { RecipeActions } from '@/src/components/recipe/recipe-actions';
+import { SignInOverlay } from './sign-in-overlay';
 
 interface SingleRecipeViewProps {
   session: Session | null;
@@ -21,10 +21,8 @@ interface SingleRecipeViewProps {
 export function SingleRecipeView({ recipe, canView }: SingleRecipeViewProps) {
   const router = useRouter();
 
-  // Use the custom hooks
   const { addToFavorites, removeFromFavorites, isFavorited } = useFavorites();
 
-  // Toggle favorite
   const toggleFavorite = async (recipeId: number) => {
     if (isFavorited(recipeId)) {
       await removeFromFavorites(recipeId);
@@ -33,7 +31,6 @@ export function SingleRecipeView({ recipe, canView }: SingleRecipeViewProps) {
     }
   };
 
-  // Share recipe
   const shareRecipe = () => {
     if (navigator.share) {
       navigator.share({
@@ -50,11 +47,11 @@ export function SingleRecipeView({ recipe, canView }: SingleRecipeViewProps) {
 
   return (
     <div className="mx-auto lg:w-4xl">
-      {/* Back Button */}
+      {}
       <div className="mb-6">
         <Button
           variant="outline"
-          onClick={() => router.push("/recipes")}
+          onClick={() => router.push('/recipes')}
           className="flex items-center gap-2"
         >
           <ArrowLeft className="w-4 h-4" />
@@ -62,7 +59,7 @@ export function SingleRecipeView({ recipe, canView }: SingleRecipeViewProps) {
         </Button>
       </div>
 
-      {/* Recipe Header */}
+      {}
       <RecipeHeader
         recipe={recipe}
         isFavorited={isFavorited(recipe.id)}
@@ -70,14 +67,12 @@ export function SingleRecipeView({ recipe, canView }: SingleRecipeViewProps) {
         onShare={shareRecipe}
       />
 
-      {/* Recipe Description */}
+      {}
       <div className="mb-8">
-        <Text className="text-lg text-gray-600 leading-relaxed">
-          {recipe.description}
-        </Text>
+        <Text className="text-lg text-gray-600 leading-relaxed">{recipe.description}</Text>
       </div>
 
-      {/* Recipe Content - Only for logged in users */}
+      {}
       <div className="relative">
         {canView ? (
           <>
