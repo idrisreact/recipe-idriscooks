@@ -1,0 +1,21 @@
+#!/usr/bin/env sh
+. "$(dirname -- "$0")/_/husky.sh"
+
+# Validate commit message format (optional - you can customize this)
+commit_regex='^(feat|fix|docs|style|refactor|test|chore|perf|build|ci|revert)(\(.+\))?: .{1,50}'
+
+if ! grep -qE "$commit_regex" "$1"; then
+    echo "❌ Invalid commit message format!"
+    echo ""
+    echo "Commit message should follow conventional commits format:"
+    echo "  feat: add new feature"
+    echo "  fix: bug fix"
+    echo "  docs: documentation changes"
+    echo "  style: code style changes"
+    echo "  refactor: code refactoring"
+    echo "  test: add or update tests"
+    echo "  chore: maintenance tasks"
+    echo ""
+    echo "Example: 'feat: add stripe payment integration'"
+    exit 1
+fi
