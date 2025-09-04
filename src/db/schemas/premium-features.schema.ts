@@ -30,6 +30,8 @@ export const premiumFeatures = pgTable(
       recipeCount?: number;
       amountPaid?: number;
       planType?: string;
+      grantedViaEmail?: boolean;
+      grantedViaAmountFallback?: boolean;
     }>(),
   },
   (table) => ({
