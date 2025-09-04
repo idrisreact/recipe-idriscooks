@@ -1,6 +1,6 @@
-'use client';
+import React from 'react';
 import { Recipe } from '@/src/types/recipes.types';
-import { useEffect, useState } from 'react';
+import { Document, Page, Text, View, StyleSheet, Image } from '@react-pdf/renderer';
 
 const PRIMARY = '#F20094'; // Murakamicity primary color
 const ACCENT = '#FF6B9D'; // Lighter pink accent
@@ -9,41 +9,12 @@ const MUTED = '#6B7280'; // Muted text
 const BG = '#FAFAFA'; // Light background
 const CARD_BG = '#FFFFFF'; // Card background
 
-function usePDFRenderer() {
-  const [pdf, setPdf] = useState<{
-    Document: React.ComponentType<any>; // eslint-disable-line @typescript-eslint/no-explicit-any
-    Page: React.ComponentType<any>; // eslint-disable-line @typescript-eslint/no-explicit-any
-    Text: React.ComponentType<any>; // eslint-disable-line @typescript-eslint/no-explicit-any
-    View: React.ComponentType<any>; // eslint-disable-line @typescript-eslint/no-explicit-any
-    StyleSheet: { create: (styles: any) => any }; // eslint-disable-line @typescript-eslint/no-explicit-any
-    Image: React.ComponentType<any>; // eslint-disable-line @typescript-eslint/no-explicit-any
-  } | null>(null);
-  useEffect(() => {
-    let mounted = true;
-    import('@react-pdf/renderer').then((mod) => {
-      if (mounted) {
-        setPdf({
-          Document: mod.Document,
-          Page: mod.Page,
-          Text: mod.Text,
-          View: mod.View,
-          StyleSheet: mod.StyleSheet,
-          Image: mod.Image,
-        });
-      }
-    });
-    return () => {
-      mounted = false;
-    };
-  }, []);
-  return pdf;
+interface MyDocumentProps {
+  recipes: Recipe[];
+  title: string;
 }
 
-export function MyDocument({ recipes, title }: { recipes: Recipe[]; title: string }) {
-  const pdf = usePDFRenderer();
-  if (!pdf) return null;
-  const { Document, Page, Text, View, StyleSheet, Image } = pdf;
-
+export function MyDocument({ recipes, title }: MyDocumentProps) {
   const styles = StyleSheet.create({
     page: {
       padding: 40,
@@ -52,7 +23,6 @@ export function MyDocument({ recipes, title }: { recipes: Recipe[]; title: strin
       color: TEXT,
     },
     coverPage: {
-      display: 'flex',
       flexDirection: 'column',
       justifyContent: 'center',
       alignItems: 'center',
@@ -60,10 +30,8 @@ export function MyDocument({ recipes, title }: { recipes: Recipe[]; title: strin
     },
     coverTitle: {
       fontSize: 48,
-      fontWeight: 'bold',
       color: PRIMARY,
       marginBottom: 16,
-      letterSpacing: -1,
     },
     coverSubtitle: {
       fontSize: 18,
@@ -73,7 +41,6 @@ export function MyDocument({ recipes, title }: { recipes: Recipe[]; title: strin
     coverStats: {
       fontSize: 14,
       color: PRIMARY,
-      fontWeight: 'bold',
       backgroundColor: CARD_BG,
       padding: 16,
       borderRadius: 8,
@@ -81,7 +48,6 @@ export function MyDocument({ recipes, title }: { recipes: Recipe[]; title: strin
     },
     tocTitle: {
       fontSize: 32,
-      fontWeight: 'bold',
       color: PRIMARY,
       marginBottom: 24,
       borderBottom: `3px solid ${PRIMARY}`,
@@ -99,14 +65,12 @@ export function MyDocument({ recipes, title }: { recipes: Recipe[]; title: strin
     },
     tocItemTitle: {
       fontSize: 14,
-      fontWeight: 'bold',
       color: TEXT,
       flex: 1,
     },
     tocItemPage: {
       fontSize: 12,
       color: PRIMARY,
-      fontWeight: 'bold',
       backgroundColor: BG,
       padding: 4,
       borderRadius: 4,
@@ -122,7 +86,6 @@ export function MyDocument({ recipes, title }: { recipes: Recipe[]; title: strin
     },
     recipeTitle: {
       fontSize: 36,
-      fontWeight: 'bold',
       marginBottom: 8,
       color: 'white',
     },
@@ -148,7 +111,6 @@ export function MyDocument({ recipes, title }: { recipes: Recipe[]; title: strin
     },
     metaValue: {
       fontSize: 14,
-      fontWeight: 'bold',
       color: 'white',
     },
     badges: {
@@ -164,7 +126,6 @@ export function MyDocument({ recipes, title }: { recipes: Recipe[]; title: strin
       borderRadius: 16,
       backgroundColor: ACCENT,
       color: 'white',
-      fontWeight: 'bold',
     },
     contentSection: {
       backgroundColor: CARD_BG,
@@ -175,7 +136,6 @@ export function MyDocument({ recipes, title }: { recipes: Recipe[]; title: strin
     },
     sectionTitle: {
       fontSize: 20,
-      fontWeight: 'bold',
       color: PRIMARY,
       marginBottom: 16,
       borderBottom: `2px solid ${PRIMARY}`,
@@ -198,7 +158,6 @@ export function MyDocument({ recipes, title }: { recipes: Recipe[]; title: strin
     recipeImage: {
       width: '100%',
       height: '100%',
-      objectFit: 'cover',
     },
     ingredient: {
       fontSize: 12,
@@ -218,7 +177,6 @@ export function MyDocument({ recipes, title }: { recipes: Recipe[]; title: strin
     },
     stepNumber: {
       fontSize: 14,
-      fontWeight: 'bold',
       color: PRIMARY,
       marginBottom: 4,
     },
@@ -340,7 +298,7 @@ export function MyDocument({ recipes, title }: { recipes: Recipe[]; title: strin
             {}
             {r.imageUrl && (
               <View style={styles.imgCol}>
-                <Image src={r.imageUrl} alt={r.title} style={styles.recipeImage} />
+                <Image src={r.imageUrl} style={styles.recipeImage} />
               </View>
             )}
           </View>

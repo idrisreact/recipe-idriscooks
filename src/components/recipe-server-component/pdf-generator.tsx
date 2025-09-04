@@ -1,23 +1,11 @@
 'use client';
 import { Recipe } from '@/src/types/recipes.types';
-
 import { Download, CreditCard } from 'lucide-react';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import toast from 'react-hot-toast';
 import { authClient } from '@/src/utils/auth-client';
 import { SignInOverlay } from './sign-in-overlay';
-import { MyDocument } from './my-document';
 import { useSearchParams } from 'next/navigation';
-
-import dynamic from 'next/dynamic';
-
-const PDFDownloadLink = dynamic(
-  () => import('@react-pdf/renderer').then((mod) => ({ default: mod.PDFDownloadLink })),
-  {
-    ssr: false,
-    loading: () => <div className="animate-pulse">Loading PDF generator...</div>,
-  }
-);
 
 interface PDFGeneratorProps {
   recipes: Recipe[];
@@ -41,8 +29,6 @@ export function PDFGenerator({
   const [processingPayment, setProcessingPayment] = useState(false);
   const { data: session } = authClient.useSession();
   const searchParams = useSearchParams();
-  const [shouldAutoDownload, setShouldAutoDownload] = useState(false);
-
   useEffect(() => {
     const checkPDFAccess = async () => {
       if (session?.user?.id) {
@@ -81,16 +67,121 @@ export function PDFGenerator({
     }
   }, [searchParams, checkingAccess, session]);
 
+  const downloadPDF = useCallback(async () => {
+    try {
+      toast.success('PDF download started!');
+
+      const response = await fetch('/api/pdf/generate', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          recipes,
+          title,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to generate PDF');
+      }
+
+      const contentType = response.headers.get('content-type') || '';
+
+      if (contentType.includes('application/pdf')) {
+        // Server returned a PDF directly
+        const blob = await response.blob();
+        const url = window.URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = 'my-favorite-recipes.pdf';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        window.URL.revokeObjectURL(url);
+      } else if (contentType.includes('text/html')) {
+        // Server returned HTML, convert to PDF on client side
+        const htmlContent = await response.text();
+
+        // Create a hidden iframe to render the HTML
+        const iframe = document.createElement('iframe');
+        iframe.style.position = 'absolute';
+        iframe.style.left = '-9999px';
+        iframe.style.width = '794px'; // A4 width in pixels at 96 DPI
+        iframe.style.height = '1123px'; // A4 height in pixels at 96 DPI
+        document.body.appendChild(iframe);
+
+        // Load HTML content into iframe
+        iframe.contentDocument!.open();
+        iframe.contentDocument!.write(htmlContent);
+        iframe.contentDocument!.close();
+
+        // Wait for content to load
+        await new Promise((resolve) => setTimeout(resolve, 1000));
+
+        try {
+          // Use html2canvas and jsPDF to convert to PDF
+          const html2canvas = (await import('html2canvas')).default;
+          const { jsPDF } = await import('jspdf');
+
+          const canvas = await html2canvas(iframe.contentDocument!.body, {
+            scale: 2,
+            useCORS: true,
+            allowTaint: true,
+            backgroundColor: '#ffffff',
+          });
+
+          const imgData = canvas.toDataURL('image/png');
+          const pdf = new jsPDF('p', 'mm', 'a4');
+
+          const imgWidth = 210; // A4 width in mm
+          const pageHeight = 297; // A4 height in mm
+          const imgHeight = (canvas.height * imgWidth) / canvas.width;
+          let heightLeft = imgHeight;
+
+          let position = 0;
+
+          pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+          heightLeft -= pageHeight;
+
+          while (heightLeft >= 0) {
+            position = heightLeft - imgHeight;
+            pdf.addPage();
+            pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+            heightLeft -= pageHeight;
+          }
+
+          pdf.save('my-favorite-recipes.pdf');
+        } catch (pdfError) {
+          console.error('Client-side PDF generation error:', pdfError);
+          toast.error('Failed to generate PDF on client side');
+        }
+
+        // Clean up iframe
+        document.body.removeChild(iframe);
+      } else {
+        throw new Error('Unexpected response type from server');
+      }
+
+      if (onAutoDownloadComplete) {
+        onAutoDownloadComplete();
+      }
+    } catch (error) {
+      console.error('PDF download error:', error);
+      toast.error('Failed to download PDF');
+    }
+  }, [recipes, title, onAutoDownloadComplete]);
+
   useEffect(() => {
     if (autoDownload && hasPDFAccess && !checkingAccess) {
       console.log('Auto-download triggered');
-      setShouldAutoDownload(true);
+      downloadPDF();
     }
-  }, [autoDownload, hasPDFAccess, checkingAccess]);
+  }, [autoDownload, hasPDFAccess, checkingAccess, downloadPDF]);
 
-  const handlePDFClick = (e: React.MouseEvent) => {
+  const handlePDFClick = async (e: React.MouseEvent) => {
     if (hasPDFAccess) {
-      toast.success('PDF download started!');
+      await downloadPDF();
       return;
     }
 
@@ -168,46 +259,23 @@ export function PDFGenerator({
 
   if (hasPDFAccess) {
     return (
-      <PDFDownloadLink
-        document={<MyDocument recipes={recipes} title={title} />}
-        fileName="my-favorite-recipes.pdf"
+      <button
+        onClick={handlePDFClick}
+        disabled={isGenerating || recipes.length === 0}
+        className="murakamicity-button flex items-center gap-2 bg-primary hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed"
       >
-        {({ loading, url }) => {
-          if (shouldAutoDownload && url && !loading) {
-            setShouldAutoDownload(false);
-            const link = document.createElement('a');
-            link.href = url;
-            link.download = 'my-favorite-recipes.pdf';
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-            toast.success('PDF download started!');
-            if (onAutoDownloadComplete) {
-              onAutoDownloadComplete();
-            }
-          }
-
-          return (
-            <button
-              onClick={handlePDFClick}
-              disabled={loading || isGenerating || recipes.length === 0}
-              className="murakamicity-button flex items-center gap-2 bg-primary hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              {loading || isGenerating ? (
-                <>
-                  <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                  Generating PDF...
-                </>
-              ) : (
-                <>
-                  <Download className="w-4 h-4" />
-                  Download PDF ({recipes.length} recipes)
-                </>
-              )}
-            </button>
-          );
-        }}
-      </PDFDownloadLink>
+        {isGenerating ? (
+          <>
+            <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+            Generating PDF...
+          </>
+        ) : (
+          <>
+            <Download className="w-4 h-4" />
+            Download PDF ({recipes.length} recipes)
+          </>
+        )}
+      </button>
     );
   }
 
