@@ -1,9 +1,9 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextResponse } from 'next/server';
 import { db } from '@/src/db';
 import { premiumFeatures } from '@/src/db/schemas/premium-features.schema';
 import { desc } from 'drizzle-orm';
 
-export async function GET(request: NextRequest) {
+export async function GET() {
   try {
     // Get recent premium features grants to see webhook activity
     const recentGrants = await db
@@ -13,7 +13,7 @@ export async function GET(request: NextRequest) {
       .limit(20);
 
     return NextResponse.json({
-      recentGrants: recentGrants.map(grant => ({
+      recentGrants: recentGrants.map((grant) => ({
         id: grant.id,
         userId: grant.userId,
         feature: grant.feature,
