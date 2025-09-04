@@ -1,0 +1,143 @@
+import { Meta } from '@storybook/blocks';
+
+<Meta title="Design System/Overview" />
+
+# Murakamicity Design System
+
+The **Murakamicity** design system is a modern, playful, and sophisticated design language created for the Idris Cooks recipe platform. It combines vibrant colors, clean typography, and intuitive interactions to create an engaging culinary experience.
+
+## Design Philosophy
+
+### Core Principles
+- **Vibrant & Playful**: Using bold colors like our signature pink (`#F20094`) to create energy and excitement
+- **Clean & Modern**: Minimalist approach with plenty of white space and clean lines
+- **Accessible**: Meeting WCAG guidelines with proper contrast ratios and focus states
+- **Consistent**: Unified visual language across all components and interactions
+
+### Color Palette
+
+#### Primary Colors
+- **Primary**: `#F20094` - Our signature pink for buttons, links, and accents
+- **Accent**: `#FF6B9D` - Lighter pink for hover states and decorative elements
+- **Success**: `#22c55e` - Green for success states and confirmations
+- **Warning**: `#f59e0b` - Orange for warnings and cautions
+- **Destructive**: `#ef4444` - Red for errors and destructive actions
+
+#### Neutral Colors
+- **Text**: `#0A0A0A` - Primary text color for maximum readability
+- **Muted**: `#6B7280` - Secondary text and subtle elements
+- **Background**: `#FAFAFA` - Page background
+- **Card**: `#FFFFFF` - Card and component backgrounds
+- **Border**: `#E5E7EB` - Subtle borders and dividers
+
+### Typography
+
+#### Font Family
+- **Primary**: Inter - Clean, modern sans-serif for optimal readability
+- **Fallback**: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto
+
+#### Type Scale
+- **Display**: 48px/52px - Large headlines and hero text
+- **Heading**: 32px/36px - Section headings
+- **Subheading**: 24px/28px - Subsection headings
+- **Large**: 18px/24px - Prominent body text
+- **Base**: 16px/24px - Default body text
+- **Small**: 14px/20px - Captions and metadata
+- **XS**: 12px/16px - Fine print and labels
+
+### Spacing System
+
+Based on a 4px grid system for consistent rhythm:
+- **XS**: 4px
+- **SM**: 8px
+- **MD**: 16px
+- **LG**: 24px
+- **XL**: 32px
+- **2XL**: 48px
+- **3XL**: 64px
+
+### Border Radius
+
+- **SM**: 4px - Small elements like badges
+- **MD**: 8px - Cards and buttons
+- **LG**: 12px - Large containers
+- **XL**: 16px - Hero sections
+- **Full**: 9999px - Fully rounded elements
+
+### Shadows
+
+- **SM**: `0 1px 2px 0 rgb(0 0 0 / 0.05)` - Subtle depth
+- **MD**: `0 4px 6px -1px rgb(0 0 0 / 0.1)` - Card elevation
+- **LG**: `0 10px 15px -3px rgb(0 0 0 / 0.1)` - Modal elevation
+- **XL**: `0 20px 25px -5px rgb(0 0 0 / 0.1)` - High elevation
+
+### Animation
+
+#### Duration
+- **Fast**: 150ms - Micro-interactions
+- **Base**: 300ms - Standard transitions
+- **Slow**: 500ms - Complex animations
+
+#### Easing
+- **Linear**: `linear` - Progress indicators
+- **Ease**: `ease` - General purpose
+- **Ease-in**: `ease-in` - Exit animations
+- **Ease-out**: `ease-out` - Enter animations
+- **Ease-in-out**: `ease-in-out` - Smooth transitions
+
+### Components
+
+#### Murakamicity Button Classes
+- `.murakamicity-button` - Primary button with pink background
+- `.murakamicity-button-outline` - Outline button with pink border
+- `.murakamicity-button-ghost` - Ghost button with subtle hover
+
+#### Murakamicity Card Classes
+- `.murakamicity-card` - Standard card with subtle shadow and hover effects
+
+#### Interactive States
+- **Hover**: Subtle scale (1.02) and increased shadow
+- **Active**: Slight scale down (0.98) for tactile feedback
+- **Focus**: Visible focus ring using primary color
+- **Disabled**: Reduced opacity (0.5) and no pointer events
+
+### Usage Guidelines
+
+#### Do's
+- Use the primary pink color sparingly for maximum impact
+- Maintain consistent spacing using the 4px grid system
+- Provide clear visual hierarchy with typography scales
+- Include hover and focus states for all interactive elements
+
+#### Don'ts
+- Don't overuse the primary color - balance with neutrals
+- Don't use colors outside the defined palette
+- Don't create custom spacing values outside the system
+- Don't skip accessibility considerations
+
+## Implementation
+
+All design tokens are implemented in CSS custom properties and Tailwind CSS utilities, making them easy to use across the entire application.
+
+```css
+:root {
+  --primary: #F20094;
+  --primary-foreground: #FFFFFF;
+  --accent: #FF6B9D;
+  --muted: #6B7280;
+  /* ... additional tokens */
+}
+```
+
+The design system is fully integrated with Tailwind CSS for consistent implementation:
+
+```tsx
+<button className="murakamicity-button">
+  Primary Action
+</button>
+
+<div className="murakamicity-card p-6">
+  <h2 className="text-2xl font-bold text-primary">Card Title</h2>
+  <p className="text-muted-foreground">Card content</p>
+</div>
+```
