@@ -107,8 +107,8 @@ export function PDFGenerator({
         const iframe = document.createElement('iframe');
         iframe.style.position = 'absolute';
         iframe.style.left = '-9999px';
-        iframe.style.width = '794px'; // A4 width in pixels at 96 DPI
-        iframe.style.height = '1123px'; // A4 height in pixels at 96 DPI
+        iframe.style.width = '1200px'; // Wider for better layout
+        iframe.style.height = '1600px'; // Taller for better rendering
         document.body.appendChild(iframe);
 
         // Load HTML content into iframe
@@ -116,39 +116,112 @@ export function PDFGenerator({
         iframe.contentDocument!.write(htmlContent);
         iframe.contentDocument!.close();
 
-        // Wait for content to load
-        await new Promise((resolve) => setTimeout(resolve, 1000));
+        // Wait for content to load (longer for fonts)
+        await new Promise((resolve) => setTimeout(resolve, 2000));
 
         try {
           // Use html2canvas and jsPDF to convert to PDF
           const html2canvas = (await import('html2canvas')).default;
           const { jsPDF } = await import('jspdf');
 
-          const canvas = await html2canvas(iframe.contentDocument!.body, {
-            scale: 2,
-            useCORS: true,
-            allowTaint: true,
-            backgroundColor: '#ffffff',
-          });
-
-          const imgData = canvas.toDataURL('image/png');
+          // Get all recipe cards
+          const recipeCards = iframe.contentDocument!.querySelectorAll('.recipe-card');
           const pdf = new jsPDF('p', 'mm', 'a4');
-
-          const imgWidth = 210; // A4 width in mm
+          const pageWidth = 210; // A4 width in mm
           const pageHeight = 297; // A4 height in mm
-          const imgHeight = (canvas.height * imgWidth) / canvas.width;
-          let heightLeft = imgHeight;
 
-          let position = 0;
+          let isFirstPage = true;
 
-          pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
-          heightLeft -= pageHeight;
+          // Render header once
+          const header = iframe.contentDocument!.querySelector('.header') as HTMLElement;
+          if (header) {
+            const headerCanvas = await html2canvas(header, {
+              scale: 2.5,
+              useCORS: true,
+              allowTaint: true,
+              backgroundColor: '#2C1810',
+              logging: false,
+            });
 
-          while (heightLeft >= 0) {
-            position = heightLeft - imgHeight;
+            const headerImgData = headerCanvas.toDataURL('image/jpeg', 0.95);
+            const headerHeight = (headerCanvas.height * pageWidth) / headerCanvas.width;
+
+            pdf.addImage(headerImgData, 'JPEG', 0, 0, pageWidth, headerHeight, undefined, 'FAST');
+            isFirstPage = false;
+          }
+
+          // Render each recipe card on a new page
+          for (let i = 0; i < recipeCards.length; i++) {
+            const card = recipeCards[i] as HTMLElement;
+
+            if (!isFirstPage || i > 0) {
+              pdf.addPage();
+            }
+
+            const cardCanvas = await html2canvas(card, {
+              scale: 2.5,
+              useCORS: true,
+              allowTaint: true,
+              backgroundColor: '#ffffff',
+              logging: false,
+            });
+
+            const cardImgData = cardCanvas.toDataURL('image/jpeg', 0.95);
+            const cardImgWidth = pageWidth - 20; // 10mm margin on each side
+            const cardImgHeight = (cardCanvas.height * cardImgWidth) / cardCanvas.width;
+
+            // If card is taller than page, split it
+            if (cardImgHeight > pageHeight - 20) {
+              let yOffset = 0;
+              const usableHeight = pageHeight - 20;
+
+              while (yOffset < cardImgHeight) {
+                if (yOffset > 0) pdf.addPage();
+
+                pdf.addImage(
+                  cardImgData,
+                  'JPEG',
+                  10,
+                  10,
+                  cardImgWidth,
+                  cardImgHeight,
+                  undefined,
+                  'FAST'
+                );
+
+                yOffset += usableHeight;
+              }
+            } else {
+              // Card fits on one page
+              pdf.addImage(
+                cardImgData,
+                'JPEG',
+                10,
+                10,
+                cardImgWidth,
+                cardImgHeight,
+                undefined,
+                'FAST'
+              );
+            }
+          }
+
+          // Render footer on last page
+          const footer = iframe.contentDocument!.querySelector('.footer') as HTMLElement;
+          if (footer) {
             pdf.addPage();
-            pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
-            heightLeft -= pageHeight;
+            const footerCanvas = await html2canvas(footer, {
+              scale: 2.5,
+              useCORS: true,
+              allowTaint: true,
+              backgroundColor: '#f8f6f3',
+              logging: false,
+            });
+
+            const footerImgData = footerCanvas.toDataURL('image/jpeg', 0.95);
+            const footerHeight = (footerCanvas.height * pageWidth) / footerCanvas.width;
+
+            pdf.addImage(footerImgData, 'JPEG', 0, 0, pageWidth, footerHeight, undefined, 'FAST');
           }
 
           pdf.save('my-favorite-recipes.pdf');
