@@ -6,289 +6,98 @@ import { headers } from 'next/headers';
 function generateHTML(recipes: Recipe[], title: string): string {
   const recipesHTML = recipes
     .map(
-      (recipe, index) => `
-    <div class="recipe-card" style="
-      background: linear-gradient(135deg, #ffffff 0%, #fafafa 100%);
-      border-radius: 16px;
-      padding: 32px;
-      margin-bottom: 48px;
-      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
-      border: 1px solid rgba(218, 165, 32, 0.1);
-      page-break-inside: avoid;
-      position: relative;
-      overflow: hidden;
-    ">
-      <!-- Decorative accent -->
-      <div style="
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 4px;
-        background: linear-gradient(90deg, #DAA520 0%, #B8860B 50%, #CD853F 100%);
-      "></div>
-      
-      <!-- Recipe Header -->
-      <div style="margin-bottom: 24px;">
-        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px;">
-          <h2 style="
-            color: #2C1810;
-            font-family: 'Georgia', serif;
-            font-size: 28px;
-            font-weight: 700;
-            margin: 0;
-            line-height: 1.2;
-            letter-spacing: -0.5px;
-          ">${recipe.title}</h2>
-          <div style="
-            background: linear-gradient(135deg, #DAA520 0%, #B8860B 100%);
-            color: white;
-            padding: 8px 16px;
-            border-radius: 20px;
-            font-size: 14px;
-            font-weight: 600;
-            box-shadow: 0 2px 8px rgba(218, 165, 32, 0.3);
-          ">Recipe #${index + 1}</div>
-        </div>
-        ${
-          recipe.description
-            ? `
-          <p style="
-            color: #6B5B73;
-            font-size: 16px;
-            line-height: 1.6;
-            margin: 0;
-            font-style: italic;
-            padding-left: 4px;
-            border-left: 3px solid #DAA520;
-            padding-left: 16px;
-            margin-left: 4px;
-          ">${recipe.description}</p>
-        `
-            : ''
-        }
-      </div>
-
-      <!-- Recipe Metrics -->
-      <div style="
-        display: grid;
-        grid-template-columns: repeat(3, 1fr);
-        gap: 16px;
-        margin-bottom: 32px;
-        padding: 20px;
-        background: rgba(218, 165, 32, 0.05);
-        border-radius: 12px;
-        border: 1px solid rgba(218, 165, 32, 0.1);
-      ">
-        <div style="text-align: center;">
-          <div style="
-            color: #DAA520;
-            font-size: 24px;
-            font-weight: 700;
-            margin-bottom: 4px;
-            font-family: 'Georgia', serif;
-          ">${recipe.prepTime}</div>
-          <div style="
-            color: #8B7355;
-            font-size: 12px;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-          ">PREP TIME (MIN)</div>
-        </div>
-        <div style="text-align: center;">
-          <div style="
-            color: #B8860B;
-            font-size: 24px;
-            font-weight: 700;
-            margin-bottom: 4px;
-            font-family: 'Georgia', serif;
-          ">${recipe.cookTime}</div>
-          <div style="
-            color: #8B7355;
-            font-size: 12px;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-          ">COOK TIME (MIN)</div>
-        </div>
-        <div style="text-align: center;">
-          <div style="
-            color: #CD853F;
-            font-size: 24px;
-            font-weight: 700;
-            margin-bottom: 4px;
-            font-family: 'Georgia', serif;
-          ">${recipe.servings}</div>
-          <div style="
-            color: #8B7355;
-            font-size: 12px;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-          ">SERVINGS</div>
-        </div>
-      </div>
-
-      <!-- Content Grid -->
-      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 32px; align-items: start;">
-        
-        <!-- Ingredients Section -->
-        ${
-          recipe.ingredients && recipe.ingredients.length > 0
-            ? `
-          <div>
-            <div style="
-              display: flex;
-              align-items: center;
-              margin-bottom: 20px;
-              padding-bottom: 12px;
-              border-bottom: 2px solid #DAA520;
-            ">
-              <h3 style="
-                color: #2C1810;
-                font-family: 'Georgia', serif;
-                font-size: 20px;
-                font-weight: 600;
-                margin: 0;
-                letter-spacing: -0.3px;
-              ">Ingredients</h3>
+      (recipe) => `
+    <div class="recipe-card">
+      <!-- Recipe Image Header -->
+      <div class="recipe-image-header" style="background-image: url('${recipe.imageUrl || ''}')">
+        <div class="image-overlay"></div>
+        <div class="image-content">
+          <h2 class="recipe-title">${recipe.title}</h2>
+          <div class="recipe-meta-badges">
+            <div class="meta-badge">
+              <span class="badge-label">Main dish</span>
             </div>
-            <div style="
-              background: rgba(218, 165, 32, 0.02);
-              padding: 20px;
-              border-radius: 12px;
-              border-left: 4px solid #DAA520;
-            ">
-              ${recipe.ingredients
-                .map(
-                  (ing) => `
-                <div style="
-                  display: flex;
-                  justify-content: space-between;
-                  align-items: center;
-                  padding: 8px 0;
-                  border-bottom: 1px solid rgba(218, 165, 32, 0.1);
-                  margin-bottom: 8px;
-                ">
-                  <span style="
-                    color: #2C1810;
-                    font-size: 15px;
-                    font-weight: 500;
-                  ">${ing.name}</span>
-                  <span style="
-                    color: #8B7355;
-                    font-size: 14px;
-                    font-weight: 600;
-                    background: rgba(218, 165, 32, 0.1);
-                    padding: 4px 8px;
-                    border-radius: 6px;
-                  ">${ing.quantity} ${ing.unit}</span>
-                </div>
-              `
-                )
-                .join('')}
+            <div class="meta-badge">
+              <span class="badge-label">${recipe.cookTime + recipe.prepTime} min</span>
+            </div>
+            <div class="meta-badge">
+              <span class="badge-label">Serves ${recipe.servings}</span>
             </div>
           </div>
-        `
-            : ''
-        }
-
-        <!-- Instructions Section -->
-        ${
-          recipe.steps && recipe.steps.length > 0
-            ? `
-          <div>
-            <div style="
-              display: flex;
-              align-items: center;
-              margin-bottom: 20px;
-              padding-bottom: 12px;
-              border-bottom: 2px solid #B8860B;
-            ">
-              <h3 style="
-                color: #2C1810;
-                font-family: 'Georgia', serif;
-                font-size: 20px;
-                font-weight: 600;
-                margin: 0;
-                letter-spacing: -0.3px;
-              ">Instructions</h3>
-            </div>
-            <div style="
-              background: rgba(184, 134, 11, 0.02);
-              padding: 20px;
-              border-radius: 12px;
-              border-left: 4px solid #B8860B;
-            ">
-              ${recipe.steps
-                .map(
-                  (step, stepIndex) => `
-                <div style="
-                  display: flex;
-                  gap: 16px;
-                  margin-bottom: 16px;
-                  padding-bottom: 16px;
-                  border-bottom: ${stepIndex < recipe.steps.length - 1 ? '1px solid rgba(184, 134, 11, 0.1)' : 'none'};
-                ">
-                  <div style="
-                    background: linear-gradient(135deg, #B8860B 0%, #DAA520 100%);
-                    color: white;
-                    width: 28px;
-                    height: 28px;
-                    border-radius: 50%;
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                    font-size: 14px;
-                    font-weight: 700;
-                    flex-shrink: 0;
-                    margin-top: 2px;
-                  ">${stepIndex + 1}</div>
-                  <p style="
-                    color: #2C1810;
-                    font-size: 15px;
-                    line-height: 1.6;
-                    margin: 0;
-                    font-weight: 400;
-                  ">${step}</p>
-                </div>
-              `
-                )
-                .join('')}
-            </div>
-          </div>
-        `
-            : ''
-        }
+          ${recipe.description ? `<p class="recipe-description">${recipe.description}</p>` : ''}
+        </div>
       </div>
 
       <!-- Tags Section -->
       ${
         recipe.tags && recipe.tags.length > 0
           ? `
-        <div style="margin-top: 24px; padding-top: 20px; border-top: 1px solid rgba(218, 165, 32, 0.2);">
-          <div style="display: flex; flex-wrap: wrap; gap: 8px; align-items: center;">
-            <span style="
-              color: #8B7355;
-              font-size: 14px;
-              font-weight: 600;
-              margin-right: 8px;
-            ">TAGS:</span>
-            ${recipe.tags
+        <div class="tags-section">
+          ${recipe.tags
+            .map(
+              (tag) => `
+            <span class="tag">${tag}</span>
+          `
+            )
+            .join('')}
+          <span class="tag comfort-tag">#comfort-food</span>
+        </div>
+      `
+          : ''
+      }
+
+      <!-- Recipe Metrics -->
+      <div class="recipe-metrics">
+        <div class="metric">
+          <div class="metric-label">Prep</div>
+          <div class="metric-value">${recipe.prepTime} min</div>
+        </div>
+        <div class="metric">
+          <div class="metric-label">Cook</div>
+          <div class="metric-value">${recipe.cookTime} min</div>
+        </div>
+        <div class="metric">
+          <div class="metric-label">Total</div>
+          <div class="metric-value">${recipe.prepTime + recipe.cookTime} min</div>
+        </div>
+      </div>
+
+      <!-- Ingredients Section -->
+      ${
+        recipe.ingredients && recipe.ingredients.length > 0
+          ? `
+        <div class="ingredients-section">
+          <h3 class="section-title">Ingredients</h3>
+          <div class="ingredients-grid">
+            ${recipe.ingredients
               .map(
-                (tag) => `
-              <span style="
-                background: linear-gradient(135deg, #CD853F 0%, #DAA520 100%);
-                color: white;
-                padding: 6px 12px;
-                border-radius: 16px;
-                font-size: 12px;
-                font-weight: 600;
-                text-transform: uppercase;
-                letter-spacing: 0.5px;
-                box-shadow: 0 2px 4px rgba(205, 133, 63, 0.3);
-              ">${tag}</span>
+                (ing) => `
+              <div class="ingredient-badge">
+                ${ing.quantity} ${ing.unit} ${ing.name}
+              </div>
+            `
+              )
+              .join('')}
+          </div>
+        </div>
+      `
+          : ''
+      }
+
+      <!-- Instructions Section -->
+      ${
+        recipe.steps && recipe.steps.length > 0
+          ? `
+        <div class="instructions-section">
+          <h3 class="section-title">Step-by-step preparation</h3>
+          <div class="instructions-grid">
+            ${recipe.steps
+              .map(
+                (step, stepIndex) => `
+              <div class="instruction-card">
+                <div class="step-header">Step ${stepIndex + 1}</div>
+                <p class="step-text">${step}</p>
+              </div>
             `
               )
               .join('')}
@@ -309,135 +118,298 @@ function generateHTML(recipes: Recipe[], title: string): string {
       <meta charset="UTF-8">
       <title>${title}</title>
       <style>
-        /* Import elegant fonts */
-        @import url('https://fonts.googleapis.com/css2?family=Crimson+Text:ital,wght@0,400;0,600;1,400&family=Inter:wght@300;400;500;600;700&display=swap');
-        
+        /* Import modern fonts */
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+
         * {
           margin: 0;
           padding: 0;
           box-sizing: border-box;
         }
-        
+
         body {
           font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-          line-height: 1.7;
-          color: #2C1810;
-          background: linear-gradient(135deg, #fefefe 0%, #f8f6f3 100%);
+          line-height: 1.6;
+          color: #e5e7eb;
+          background: #1a1a1a;
           margin: 0;
           padding: 40px;
           min-height: 100vh;
         }
-        
+
         .container {
-          max-width: 1000px;
+          max-width: 1200px;
           margin: 0 auto;
-          background: white;
-          border-radius: 24px;
-          box-shadow: 0 20px 60px rgba(0, 0, 0, 0.08);
-          overflow: hidden;
-          border: 1px solid rgba(218, 165, 32, 0.1);
+          background: #1a1a1a;
         }
-        
+
         .header {
-          background: linear-gradient(135deg, #2C1810 0%, #4A3728 100%);
-          padding: 48px 40px;
+          background: linear-gradient(135deg, #1a1a1a 0%, #2a2a2a 100%);
+          padding: 60px 50px;
           text-align: center;
           color: white;
           position: relative;
-          overflow: hidden;
+          margin-bottom: 60px;
+          border-radius: 12px;
         }
-        
-        .header::before {
-          content: '';
-          position: absolute;
-          top: 0;
-          left: 0;
-          right: 0;
-          bottom: 0;
-          background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grain" width="100" height="100" patternUnits="userSpaceOnUse"><circle cx="20" cy="20" r="1" fill="rgba(218,165,32,0.1)"/><circle cx="80" cy="40" r="1" fill="rgba(184,134,11,0.1)"/><circle cx="40" cy="80" r="1" fill="rgba(205,133,63,0.1)"/></pattern></defs><rect width="100" height="100" fill="url(%23grain)"/></svg>') repeat;
-          opacity: 0.3;
-        }
-        
+
         .header-content {
           position: relative;
           z-index: 1;
         }
-        
+
         .main-title {
-          font-family: 'Crimson Text', Georgia, serif;
-          font-size: 42px;
-          font-weight: 600;
-          margin-bottom: 16px;
+          font-size: 48px;
+          font-weight: 800;
+          margin-bottom: 20px;
           letter-spacing: -1px;
           line-height: 1.1;
         }
-        
+
         .subtitle {
           font-size: 18px;
-          opacity: 0.9;
-          font-weight: 300;
-          margin-bottom: 8px;
-          letter-spacing: 0.5px;
-        }
-        
-        .recipe-count {
-          display: inline-flex;
-          align-items: center;
-          background: rgba(218, 165, 32, 0.2);
-          padding: 12px 24px;
-          border-radius: 25px;
-          font-size: 16px;
-          font-weight: 500;
-          margin-top: 20px;
-          backdrop-filter: blur(10px);
-          border: 1px solid rgba(218, 165, 32, 0.3);
-        }
-        
-        .content {
-          padding: 48px 40px;
-        }
-        
-        .footer {
-          background: linear-gradient(135deg, #f8f6f3 0%, #f0ebe5 100%);
-          padding: 32px 40px;
-          text-align: center;
-          border-top: 1px solid rgba(218, 165, 32, 0.1);
-          color: #8B7355;
-          font-size: 16px;
+          opacity: 0.8;
           font-weight: 400;
+          margin-bottom: 12px;
         }
-        
-        .footer-brand {
-          color: #DAA520;
+
+        .recipe-count {
+          display: inline-block;
+          background: rgba(255, 255, 255, 0.1);
+          padding: 12px 24px;
+          border-radius: 8px;
+          font-size: 16px;
           font-weight: 600;
+          margin-top: 24px;
+        }
+
+        .content {
+          padding: 0;
+        }
+
+        /* Recipe Card Styles */
+        .recipe-card {
+          background: #1a1a1a;
+          border-radius: 12px;
+          margin-bottom: 60px;
+          page-break-inside: avoid;
+          page-break-after: auto;
+          break-inside: avoid;
+          overflow: hidden;
+        }
+
+        /* Recipe Image Header */
+        .recipe-image-header {
+          position: relative;
+          height: 400px;
+          background-size: cover;
+          background-position: center;
+          border-radius: 12px 12px 0 0;
+        }
+
+        .image-overlay {
+          position: absolute;
+          inset: 0;
+          background: linear-gradient(to top, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.4) 50%, transparent 100%);
+        }
+
+        .image-content {
+          position: absolute;
+          bottom: 0;
+          left: 0;
+          right: 0;
+          padding: 40px;
+          color: white;
+        }
+
+        .recipe-title {
+          font-size: 48px;
+          font-weight: 800;
+          margin-bottom: 16px;
+          color: white;
+          line-height: 1.1;
+        }
+
+        .recipe-meta-badges {
+          display: flex;
+          gap: 12px;
+          margin-bottom: 16px;
+          flex-wrap: wrap;
+        }
+
+        .meta-badge {
+          background: rgba(255, 255, 255, 0.2);
+          backdrop-filter: blur(10px);
+          padding: 8px 16px;
+          border-radius: 8px;
+          border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .badge-label {
+          font-size: 14px;
+          font-weight: 500;
+          color: white;
+        }
+
+        .recipe-description {
+          font-size: 16px;
+          line-height: 1.6;
+          color: rgba(255, 255, 255, 0.9);
+          margin: 0;
+        }
+
+        /* Tags Section */
+        .tags-section {
+          padding: 24px 40px;
+          display: flex;
+          gap: 12px;
+          flex-wrap: wrap;
+          background: #1a1a1a;
+        }
+
+        .tag {
+          background: #db2777;
+          color: white;
+          padding: 8px 16px;
+          border-radius: 6px;
+          font-size: 14px;
+          font-weight: 600;
+        }
+
+        .comfort-tag {
+          background: #db2777;
+        }
+
+        /* Metrics */
+        .recipe-metrics {
+          display: grid;
+          grid-template-columns: repeat(3, 1fr);
+          gap: 0;
+          margin: 0 40px 40px 40px;
+          background: rgba(255, 255, 255, 0.05);
+          border-radius: 12px;
+          overflow: hidden;
+        }
+
+        .metric {
+          padding: 24px;
+          text-align: center;
+          border-right: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .metric:last-child {
+          border-right: none;
+        }
+
+        .metric-label {
+          color: rgba(255, 255, 255, 0.6);
+          font-size: 14px;
+          font-weight: 600;
+          margin-bottom: 8px;
+        }
+
+        .metric-value {
+          font-size: 28px;
+          font-weight: 700;
+          color: white;
+        }
+
+        /* Section Title */
+        .section-title {
+          color: white;
+          font-size: 32px;
+          font-weight: 700;
+          margin-bottom: 24px;
+          padding: 0 40px;
+        }
+
+        /* Ingredients */
+        .ingredients-section {
+          margin-bottom: 40px;
+        }
+
+        .ingredients-grid {
+          display: grid;
+          grid-template-columns: repeat(3, 1fr);
+          gap: 12px;
+          padding: 0 40px;
+        }
+
+        .ingredient-badge {
+          background: rgba(255, 255, 255, 0.08);
+          color: rgba(255, 255, 255, 0.9);
+          padding: 16px 20px;
+          border-radius: 12px;
+          font-size: 14px;
+          font-weight: 500;
+          text-align: center;
+          border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        /* Instructions */
+        .instructions-section {
+          margin-bottom: 40px;
+        }
+
+        .instructions-grid {
+          display: grid;
+          grid-template-columns: repeat(3, 1fr);
+          gap: 16px;
+          padding: 0 40px 40px 40px;
+        }
+
+        .instruction-card {
+          background: rgba(255, 255, 255, 0.05);
+          border: 1px solid rgba(255, 255, 255, 0.1);
+          border-radius: 12px;
+          padding: 24px;
+        }
+
+        .step-header {
+          font-size: 18px;
+          font-weight: 700;
+          color: white;
+          margin-bottom: 12px;
+        }
+
+        .step-text {
+          color: rgba(255, 255, 255, 0.8);
+          font-size: 14px;
+          line-height: 1.6;
+          margin: 0;
+        }
+
+        /* Footer */
+        .footer {
+          background: rgba(255, 255, 255, 0.05);
+          padding: 40px 50px;
+          text-align: center;
+          color: rgba(255, 255, 255, 0.6);
+          font-size: 16px;
+          margin-top: 60px;
+          border-radius: 12px;
+        }
+
+        .footer-brand {
+          color: #db2777;
+          font-weight: 700;
           text-decoration: none;
         }
-        
+
         .generation-info {
           margin-top: 12px;
           font-size: 14px;
           opacity: 0.8;
         }
-        
+
         @media print {
-          body { 
-            margin: 0; 
+          body {
+            margin: 0;
             padding: 20px;
-            background: white;
+            background: #1a1a1a;
           }
-          .container {
-            box-shadow: none;
-            border: none;
-          }
-          .recipe-card { 
+          .recipe-card {
             page-break-inside: avoid;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-          }
-          .header {
-            background: #2C1810;
-          }
-          .header::before {
-            display: none;
           }
         }
       </style>
@@ -453,11 +425,11 @@ function generateHTML(recipes: Recipe[], title: string): string {
             </div>
           </div>
         </div>
-        
+
         <div class="content">
           ${recipesHTML}
         </div>
-        
+
         <div class="footer">
           <div>
             Crafted with passion by <a href="https://www.idriscooks.com" class="footer-brand">Idris Cooks</a>
