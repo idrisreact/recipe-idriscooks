@@ -1,8 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/src/db';
 import { recipes } from '@/src/db/schemas';
-import { sql, and, desc, asc } from 'drizzle-orm';
+import { sql, and, desc, asc, eq } from 'drizzle-orm';
 import { z } from 'zod';
+import { getClerkUserId } from '@/src/utils/clerk-auth';
 
 // Optimized query parameter schema - handle null values properly
 const QuerySchema = z
@@ -37,11 +38,13 @@ const CreateRecipeSchema = z.object({
   prepTime: z.number().int().nonnegative('Prep time must be non-negative'),
   cookTime: z.number().int().nonnegative('Cook time must be non-negative'),
   ingredients: z
-    .object({
-      name: z.string().min(1),
-      quantity: z.number().positive(),
-      unit: z.string().min(1),
-    })
+    .array(
+      z.object({
+        name: z.string().min(1),
+        quantity: z.number().positive(),
+        unit: z.string().min(1),
+      })
+    )
     .optional(),
   steps: z.array(z.string().min(1)).optional(),
   tags: z.array(z.string().min(1)).optional(),
@@ -61,6 +64,12 @@ export async function GET(request: NextRequest) {
       offset: searchParams.get('offset'),
     });
 
+    // Get the current user ID if authenticated
+    const userId = await getClerkUserId();
+    
+    // Check if user wants to filter by their own recipes
+    const myRecipes = searchParams.get('my') === 'true';
+
     // Handle single recipe by title (early return)
     if (params.title) {
       const recipe = await db
@@ -77,6 +86,11 @@ export async function GET(request: NextRequest) {
 
     // Build dynamic WHERE conditions
     const whereConditions = [];
+
+    // Filter by user if requested and authenticated
+    if (myRecipes && userId) {
+      whereConditions.push(eq(recipes.userId, userId));
+    }
 
     if (params.search) {
       whereConditions.push(sql`LOWER(${recipes.title}) LIKE ${`%${params.search.toLowerCase()}%`}`);
@@ -148,7 +162,13 @@ export async function POST(request: NextRequest) {
 
     const validatedData = CreateRecipeSchema.parse(body);
 
-    const [createdRecipe] = await db.insert(recipes).values(validatedData).returning();
+    // Get the current user ID from Clerk
+    const userId = await getClerkUserId();
+
+    // Create recipe with userId if authenticated
+    const recipeData = userId ? { ...validatedData, userId } : validatedData;
+
+    const [createdRecipe] = await db.insert(recipes).values(recipeData).returning();
 
     return NextResponse.json(
       {

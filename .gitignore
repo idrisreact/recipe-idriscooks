@@ -47,3 +47,5 @@ storybook-static
 
 .claude
 ClAUDE.md
+# clerk configuration (can include secrets)
+/.clerk/

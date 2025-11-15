@@ -8,7 +8,8 @@ export const recipes = pgTable('recipes', {
   servings: integer('servings').notNull(),
   prepTime: integer('prep_time').notNull(),
   cookTime: integer('cook_time').notNull(),
-  ingredients: jsonb('ingredients').$type<{ name: string; quantity: number; unit: string }>(),
+  ingredients: jsonb('ingredients').$type<{ name: string; quantity: number; unit: string }[]>(),
   steps: jsonb('steps').$type<string[]>(),
   tags: jsonb('tags').$type<string[]>(),
+  userId: text('user_id'), // Optional - allows both public and user-owned recipes
 });
