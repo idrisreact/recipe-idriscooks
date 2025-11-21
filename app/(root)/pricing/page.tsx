@@ -1,9 +1,6 @@
 import { auth } from '@clerk/nextjs/server';
 import { redirect } from 'next/navigation';
-import { PricingCard } from '@/src/components/billing/PricingCard';
-import { SUBSCRIPTION_PLANS } from '@/src/lib/clerk-billing';
-import { getUserSubscription } from '@/src/lib/clerk-billing-server';
-import { SubscriptionActions } from '@/src/components/billing/SubscriptionActions';
+import { PricingTable } from '@clerk/nextjs';
 
 export const metadata = {
   title: 'Pricing - Recipe Platform',
@@ -16,8 +13,6 @@ export default async function PricingPage() {
   if (!userId) {
     redirect('/sign-in?redirect_url=/pricing');
   }
-
-  const subscription = await getUserSubscription();
 
   return (
     <div className="wrapper page">
@@ -32,18 +27,10 @@ export default async function PricingPage() {
           </p>
         </div>
 
-        {/* Pricing Cards */}
-        <div className="grid md:grid-cols-3 gap-8 mb-12">
-          {SUBSCRIPTION_PLANS.map((plan) => (
-            <PricingCard
-              key={plan.id}
-              plan={plan}
-              currentPlanId={subscription?.planId}
-            />
-          ))}
+        {/* Clerk Native Pricing Table */}
+        <div className="max-w-4xl mx-auto">
+          <PricingTable />
         </div>
-
-        <SubscriptionActions currentPlanId={subscription?.planId || 'free'} />
 
         {/* FAQ Section */}
         <div className="mt-20 max-w-3xl mx-auto">
