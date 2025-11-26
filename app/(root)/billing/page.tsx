@@ -1,6 +1,6 @@
-import { auth } from '@clerk/nextjs/server';
+import { auth } from '@/src/utils/auth';
+import { headers } from 'next/headers';
 import { redirect } from 'next/navigation';
-import { getPlanById, formatPrice } from '@/src/lib/clerk-billing';
 import { db } from '@/src/db';
 import { userSubscriptions, billingHistory } from '@/src/db/schemas';
 import { eq, desc } from 'drizzle-orm';
@@ -13,7 +13,8 @@ export const metadata = {
 };
 
 export default async function BillingPage() {
-  const { userId } = await auth();
+  const session = await auth.api.getSession({ headers: await headers() });
+  const userId = session?.user?.id;
 
   if (!userId) {
     redirect('/sign-in?redirect_url=/billing');
@@ -26,7 +27,8 @@ export default async function BillingPage() {
     .where(eq(userSubscriptions.userId, userId))
     .limit(1);
 
-  const plan = subscription ? getPlanById(subscription.planId) : getPlanById('free');
+  // Simple plan info - TODO: Integrate with Stripe
+  const plan = subscription ? { name: subscription.planId, price: 0 } : { name: 'free', price: 0 };
 
   // Get billing history
   const history = await db

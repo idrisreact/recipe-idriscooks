@@ -1,6 +1,6 @@
-import { auth } from '@clerk/nextjs/server';
+import { auth } from '@/src/utils/auth';
+import { headers } from 'next/headers';
 import { redirect } from 'next/navigation';
-import { PricingTable } from '@clerk/nextjs';
 
 export const metadata = {
   title: 'Pricing - Recipe Platform',
@@ -8,9 +8,9 @@ export const metadata = {
 };
 
 export default async function PricingPage() {
-  const { userId } = await auth();
+  const session = await auth.api.getSession({ headers: await headers() });
 
-  if (!userId) {
+  if (!session?.user) {
     redirect('/sign-in?redirect_url=/pricing');
   }
 
@@ -27,9 +27,9 @@ export default async function PricingPage() {
           </p>
         </div>
 
-        {/* Clerk Native Pricing Table */}
-        <div className="max-w-4xl mx-auto">
-          <PricingTable />
+        {/* Pricing Plans - TODO: Integrate with Stripe */}
+        <div className="max-w-4xl mx-auto text-center">
+          <p className="text-gray-600">Pricing plans coming soon. All features are currently available to authenticated users.</p>
         </div>
 
         {/* FAQ Section */}

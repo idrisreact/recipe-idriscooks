@@ -3,7 +3,7 @@ import { db } from '@/src/db';
 import { recipes } from '@/src/db/schemas';
 import { sql, and, desc, asc, eq } from 'drizzle-orm';
 import { z } from 'zod';
-import { getClerkUserId } from '@/src/utils/clerk-auth';
+import { auth } from '@/src/utils/auth';
 
 // Optimized query parameter schema - handle null values properly
 const QuerySchema = z
@@ -64,9 +64,12 @@ export async function GET(request: NextRequest) {
       offset: searchParams.get('offset'),
     });
 
-    // Get the current user ID if authenticated
-    const userId = await getClerkUserId();
-    
+    // Get the current user session if authenticated
+    const session = await auth.api.getSession({
+      headers: request.headers,
+    });
+    const userId = session?.user?.id || null;
+
     // Check if user wants to filter by their own recipes
     const myRecipes = searchParams.get('my') === 'true';
 
@@ -162,8 +165,11 @@ export async function POST(request: NextRequest) {
 
     const validatedData = CreateRecipeSchema.parse(body);
 
-    // Get the current user ID from Clerk
-    const userId = await getClerkUserId();
+    // Get the current user session
+    const session = await auth.api.getSession({
+      headers: request.headers,
+    });
+    const userId = session?.user?.id || null;
 
     // Create recipe with userId if authenticated
     const recipeData = userId ? { ...validatedData, userId } : validatedData;

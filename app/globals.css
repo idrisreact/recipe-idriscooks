@@ -4,38 +4,87 @@
 @custom-variant dark (&:is(.dark *));
 
 :root {
-  --background: #000000;
-  --foreground: #ffffff;
-  --radius: 0.25rem;
-  --card: #171717;
-  --card-foreground: #ffffff;
-  --popover: #171717;
-  --popover-foreground: #ffffff;
+  /* Base colors - Enhanced dark theme */
+  --background: #0a0a0a;
+  --background-elevated: #121212;
+  --background-subtle: #0f0f0f;
+  --foreground: #f5f5f5;
+  --foreground-muted: #a0a0a0;
+
+  /* Refined radius system */
+  --radius: 0.75rem;
+
+  /* Card system with depth */
+  --card: #161616;
+  --card-hover: #1a1a1a;
+  --card-foreground: #f5f5f5;
+  --card-border: rgba(255, 255, 255, 0.08);
+
+  /* Popover */
+  --popover: #161616;
+  --popover-foreground: #f5f5f5;
+
+  /* Primary - Sophisticated pink/magenta gradient */
   --primary: #F20094;
+  --primary-dark: #c2007a;
+  --primary-light: #ff33ad;
   --primary-foreground: #ffffff;
-  --secondary: #171717;
-  --secondary-foreground: #ffffff;
-  --muted: #2a2a2a;
-  --muted-foreground: #a3a3a3;
+
+  /* Secondary - Elevated surfaces */
+  --secondary: #1e1e1e;
+  --secondary-foreground: #f5f5f5;
+
+  /* Muted */
+  --muted: #252525;
+  --muted-foreground: #888888;
+
+  /* Accent - Refined primary */
   --accent: #F20094;
   --accent-foreground: #ffffff;
+
+  /* Destructive */
   --destructive: #ef4444;
-  --border: #2a2a2a;
-  --input: #171717;
+
+  /* Borders - Subtle and refined */
+  --border: rgba(255, 255, 255, 0.06);
+  --border-hover: rgba(255, 255, 255, 0.12);
+
+  /* Input */
+  --input: #1a1a1a;
+  --input-border: rgba(255, 255, 255, 0.08);
+
+  /* Ring */
   --ring: #F20094;
+
+  /* Charts */
   --chart-1: #F20094;
   --chart-2: #a855f7;
   --chart-3: #3b82f6;
   --chart-4: #10b981;
   --chart-5: #f59e0b;
-  --sidebar: #000000;
-  --sidebar-foreground: #ffffff;
+
+  /* Sidebar */
+  --sidebar: #0a0a0a;
+  --sidebar-foreground: #f5f5f5;
   --sidebar-primary: #F20094;
   --sidebar-primary-foreground: #ffffff;
-  --sidebar-accent: #171717;
-  --sidebar-accent-foreground: #ffffff;
-  --sidebar-border: #2a2a2a;
+  --sidebar-accent: #1a1a1a;
+  --sidebar-accent-foreground: #f5f5f5;
+  --sidebar-border: rgba(255, 255, 255, 0.06);
   --sidebar-ring: #F20094;
+
+  /* Shadows - Sophisticated depth */
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.3);
+  --shadow-md: 0 4px 12px 0 rgba(0, 0, 0, 0.4);
+  --shadow-lg: 0 10px 40px 0 rgba(0, 0, 0, 0.5);
+  --shadow-xl: 0 20px 60px 0 rgba(0, 0, 0, 0.6);
+
+  /* Gradients */
+  --gradient-primary: linear-gradient(135deg, #F20094 0%, #c2007a 100%);
+  --gradient-accent: linear-gradient(135deg, #F20094 0%, #a855f7 100%);
+  --gradient-mesh: radial-gradient(at 40% 20%, rgba(242, 0, 148, 0.15) 0px, transparent 50%),
+                   radial-gradient(at 80% 0%, rgba(168, 85, 247, 0.1) 0px, transparent 50%),
+                   radial-gradient(at 0% 50%, rgba(242, 0, 148, 0.1) 0px, transparent 50%);
 }
 
 @theme inline {
@@ -86,6 +135,33 @@ body {
   line-height: 1.6;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  scroll-behavior: smooth;
+}
+
+/* Sophisticated scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--background);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--muted);
+  border-radius: 4px;
+  transition: background 0.2s ease;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--muted-foreground);
+}
+
+/* Selection color */
+::selection {
+  background: rgba(242, 0, 148, 0.3);
+  color: var(--foreground);
 }
 
 
@@ -99,49 +175,209 @@ body {
 }
 
 @layer components {
+  /* Container system */
   .wrapper {
-    @apply max-w-[1200px] mx-auto px-4 sm:px-6 lg:px-8;
+    @apply max-w-[1280px] mx-auto px-6 sm:px-8 lg:px-12;
   }
 
   .wrapper-md {
-    @apply max-w-3xl w-full mx-auto px-4 sm:px-6 lg:px-8;
+    @apply max-w-3xl w-full mx-auto px-6 sm:px-8 lg:px-12;
   }
 
   .wrapper-lg {
-    @apply max-w-4xl w-full mx-auto px-4 sm:px-6 lg:px-8;
+    @apply max-w-5xl w-full mx-auto px-6 sm:px-8 lg:px-12;
+  }
+
+  .wrapper-xl {
+    @apply max-w-7xl w-full mx-auto px-6 sm:px-8 lg:px-12;
   }
 
   .page {
-    @apply flex flex-col min-h-screen pt-16 pb-20 gap-12;
+    @apply flex flex-col min-h-screen pt-20 pb-24 gap-16;
   }
 
-  .murakamicity-card {
-    @apply bg-card border border-border rounded-sm p-6 hover:border-primary transition-all duration-300 ease-in-out;
+  /* Sophisticated card system */
+  .luxury-card {
+    @apply bg-[var(--card)] border border-[var(--card-border)] rounded-2xl p-8
+           hover:border-[var(--border-hover)] hover:bg-[var(--card-hover)]
+           transition-all duration-500 ease-out
+           shadow-[var(--shadow-md)] hover:shadow-[var(--shadow-lg)];
   }
 
-  .murakamicity-button {
-    @apply bg-primary hover:bg-primary/90 text-primary-foreground font-medium px-6 py-4 rounded-sm transition-all duration-200 ease-in-out min-h-[44px];
+  .glass-card {
+    @apply bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl p-8
+           hover:bg-white/8 hover:border-white/20
+           transition-all duration-500 ease-out;
   }
 
-  .murakamicity-button-outline {
-    @apply border border-primary text-primary hover:bg-primary hover:text-primary-foreground font-medium px-6 py-4 rounded-sm transition-all duration-200 ease-in-out min-h-[44px];
+  /* Premium button system */
+  .luxury-button {
+    @apply relative overflow-hidden
+           bg-[var(--primary)] hover:bg-[var(--primary-dark)]
+           text-white font-medium px-8 py-4 rounded-full
+           transition-all duration-300 ease-out
+           shadow-[var(--shadow-md)] hover:shadow-[var(--shadow-lg)]
+           hover:scale-[1.02] active:scale-[0.98]
+           min-h-[52px];
   }
 
-  .murakamicity-text-gradient {
-    @apply bg-gradient-to-r from-primary to-purple-400 bg-clip-text text-transparent;
+  .luxury-button-outline {
+    @apply relative overflow-hidden
+           border-2 border-[var(--primary)] text-[var(--primary)]
+           hover:bg-[var(--primary)] hover:text-white
+           font-medium px-8 py-4 rounded-full
+           transition-all duration-300 ease-out
+           hover:scale-[1.02] active:scale-[0.98]
+           min-h-[52px];
   }
 
-  .murakamicity-nav {
-    @apply backdrop-blur-md bg-background/80 border-b border-border sticky top-0 z-50;
+  .luxury-button-ghost {
+    @apply relative overflow-hidden
+           bg-white/5 hover:bg-white/10
+           text-white font-medium px-8 py-4 rounded-full
+           transition-all duration-300 ease-out
+           hover:scale-[1.02] active:scale-[0.98]
+           min-h-[52px];
   }
 
+  /* Text gradients */
+  .text-gradient-primary {
+    @apply bg-gradient-to-r from-[var(--primary)] via-[var(--primary-light)] to-purple-400
+           bg-clip-text text-transparent;
+  }
+
+  .text-gradient-accent {
+    @apply bg-gradient-to-r from-[var(--primary)] to-purple-400
+           bg-clip-text text-transparent;
+  }
+
+  /* Navigation */
+  .luxury-nav {
+    @apply fixed top-0 left-0 right-0 z-50
+           backdrop-blur-2xl bg-[var(--background)]/80
+           border-b border-[var(--border)]
+           transition-all duration-300 ease-out;
+  }
+
+  /* Grid systems */
   .recipe-grid {
-    @apply grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6;
+    @apply grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8;
+  }
+
+  .bento-grid {
+    @apply grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 auto-rows-fr;
+  }
+
+  /* Typography - Bold Editorial Style */
+  .heading-hero {
+    @apply text-6xl sm:text-7xl lg:text-8xl xl:text-9xl font-black tracking-tight leading-[0.9] uppercase;
+  }
+
+  .heading-xl {
+    @apply text-5xl sm:text-6xl lg:text-7xl xl:text-8xl font-black tracking-tight leading-[0.95] uppercase;
+  }
+
+  .heading-lg {
+    @apply text-4xl sm:text-5xl lg:text-6xl xl:text-7xl font-black tracking-tight leading-[1] uppercase;
+  }
+
+  .heading-md {
+    @apply text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight leading-[1.1];
+  }
+
+  .heading-sm {
+    @apply text-2xl sm:text-3xl lg:text-4xl font-bold tracking-tight leading-[1.2];
+  }
+
+  .body-lg {
+    @apply text-xl sm:text-2xl leading-relaxed text-white/80 font-light;
+  }
+
+  .body-md {
+    @apply text-lg sm:text-xl leading-relaxed text-white/70 font-light;
+  }
+
+  .quote-text {
+    @apply text-2xl sm:text-3xl lg:text-4xl font-light italic leading-relaxed text-white;
+  }
+
+  /* Mesh gradient background */
+  .mesh-gradient {
+    background: var(--gradient-mesh);
+  }
+
+  /* Full-screen sections */
+  .section-full {
+    @apply min-h-screen flex items-center justify-center relative;
+  }
+
+  .section-half {
+    @apply min-h-[50vh] flex items-center justify-center relative;
+  }
+
+  /* Video backgrounds */
+  .video-background {
+    @apply absolute inset-0 w-full h-full object-cover;
+  }
+
+  .video-overlay {
+    @apply absolute inset-0 bg-gradient-to-b from-black/60 via-black/40 to-black/80;
+  }
+
+  /* Horizontal scroll container */
+  .horizontal-scroll {
+    @apply flex gap-8 overflow-x-auto snap-x snap-mandatory pb-4;
+    scroll-behavior: smooth;
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+
+  .horizontal-scroll::-webkit-scrollbar {
+    display: none;
+  }
+
+  .horizontal-scroll-item {
+    @apply flex-shrink-0 snap-start;
+  }
+
+  /* Parallax sections */
+  .parallax-slow {
+    transform: translateY(var(--parallax-offset, 0));
+  }
+
+  /* Editorial card */
+  .editorial-card {
+    @apply relative overflow-hidden bg-black border-2 border-white/20
+           hover:border-white/40 transition-all duration-500
+           cursor-pointer;
+  }
+
+  .editorial-card-image {
+    @apply w-full h-full object-cover transition-transform duration-700;
+  }
+
+  .editorial-card:hover .editorial-card-image {
+    @apply scale-110;
+  }
+
+  .editorial-card-content {
+    @apply absolute bottom-0 left-0 right-0 p-8
+           bg-gradient-to-t from-black via-black/80 to-transparent;
+  }
+
+  /* Hide scrollbar utility */
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
   }
 
   @media (max-width: 640px) {
     .recipe-grid {
-      @apply grid grid-cols-1 gap-4;
+      @apply grid grid-cols-1 gap-6;
     }
   }
 }

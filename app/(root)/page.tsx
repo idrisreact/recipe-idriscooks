@@ -1,72 +1,125 @@
+'use client';
+
 import Image from 'next/image';
-import { BouncingText } from '@/src/components/hero-animation-text/hero-animation-text';
-import HeroButtons from '@/src/components/ui/HeroButtons';
+import Link from 'next/link';
 import FeaturesSection from '@/src/components/features-section';
+import { useEffect, useRef } from 'react';
+import { gsap } from 'gsap';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import { ChevronDown, Play, ArrowRight } from 'lucide-react';
+
+if (typeof window !== 'undefined') {
+  gsap.registerPlugin(ScrollTrigger);
+}
 
 export default function Home() {
+  const heroRef = useRef<HTMLDivElement>(null);
+  const headingRef = useRef<HTMLHeadingElement>(null);
+
+  useEffect(() => {
+    // Reset elements to initial state
+    gsap.set(headingRef.current, { opacity: 1, y: 0 });
+    gsap.set(heroRef.current, { opacity: 1, y: 0 });
+
+    // Hero parallax effect
+    const parallaxTween = gsap.to(heroRef.current, {
+      opacity: 0,
+      y: -100,
+      scrollTrigger: {
+        trigger: heroRef.current,
+        start: 'top top',
+        end: 'bottom top',
+        scrub: true,
+      },
+    });
+
+    // Heading reveal
+    const headingTween = gsap.from(headingRef.current, {
+      opacity: 0,
+      y: 100,
+      duration: 1.2,
+      ease: 'power4.out',
+      delay: 0.3,
+    });
+
+    // Cleanup function
+    return () => {
+      parallaxTween.kill();
+      headingTween.kill();
+      ScrollTrigger.getAll().forEach(trigger => trigger.kill());
+      // Reset to visible state on cleanup
+      gsap.set(headingRef.current, { clearProps: 'all' });
+      gsap.set(heroRef.current, { clearProps: 'all' });
+    };
+  }, []);
+
   return (
     <>
-      {}
-      <div className="relative min-h-screen flex items-center justify-center overflow-hidden">
-        {/* Background Image with Gradient Overlay */}
-        <div 
-          className="absolute inset-0 z-0"
-          style={{ 
-            backgroundImage: "url('/images/food background.png')",
-            backgroundSize: 'cover',
-            backgroundPosition: 'center',
-          }}
-        >
-          <div className="absolute inset-0 bg-gradient-to-b from-black/70 via-black/50 to-background z-0" />
+      {/* Hero Section - Bold Editorial with Video Background */}
+      <section ref={heroRef} className="section-full">
+        {/* Video/Image Background */}
+        <div className="absolute inset-0 z-0">
+          <Image
+            src="/images/food background.png"
+            alt="Culinary Excellence"
+            fill
+            className="video-background"
+            priority
+            quality={95}
+          />
+          <div className="video-overlay" />
         </div>
 
-        {/* Content */}
-        <div className="wrapper relative z-10 flex flex-col items-center text-center pt-20 pb-32">
-          <div className="animate-in fade-in zoom-in duration-1000 slide-in-from-bottom-10">
-            <Image
-              src="/images/idriscooks-logo.png"
-              alt="idris-cooks-logo"
-              width={240}
-              height={240}
-              className="w-40 h-40 sm:w-56 sm:h-56 md:w-64 md:h-64 mb-8 mx-auto drop-shadow-2xl"
-              quality={90}
-              priority
-            />
-          </div>
-          
-          <BouncingText>
-            <span className="block text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold tracking-tight text-white mb-6 max-w-5xl mx-auto leading-tight">
-              Elevate Your Kitchen <br className="hidden sm:block" />
-              <span className="text-primary">
-                Masterpiece
-              </span>
-            </span>
-          </BouncingText>
+        {/* Hero Content */}
+        <div className="wrapper relative z-10 text-center">
+          <h1 ref={headingRef} className="heading-hero text-white mb-8 max-w-6xl mx-auto">
+            Culinary
+            <br />
+            <span className="text-gradient-primary">Innovation</span>
+            <br />
+            Starts Here
+          </h1>
 
-          <p className="text-lg sm:text-xl md:text-2xl text-gray-200 max-w-2xl mx-auto mb-10 font-light leading-relaxed">
-            Where every meal becomes an unforgettable experience. Discover recipes, learn techniques, and cook with passion.
+          <p className="body-lg max-w-3xl mx-auto mb-12">
+            "Innovation, to me, is about pushing boundaries and creating
+            experiences that transform the way we taste, feel, and connect with food."
           </p>
 
-          <div className="w-full max-w-md mx-auto">
-            <HeroButtons />
+          <div className="flex flex-col sm:flex-row gap-6 justify-center items-center">
+            <Link href="/recipes">
+              <button className="group relative px-10 py-5 bg-white text-black font-bold text-lg uppercase tracking-wide hover:bg-[var(--primary)] hover:text-white transition-all duration-300 flex items-center gap-3">
+                Explore Recipes
+                <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+              </button>
+            </Link>
+
+            <button className="group flex items-center gap-3 text-white font-medium text-lg uppercase tracking-wide hover:text-[var(--primary)] transition-colors">
+              <div className="w-12 h-12 rounded-full border-2 border-white group-hover:border-[var(--primary)] flex items-center justify-center transition-colors">
+                <Play className="w-5 h-5 ml-1" />
+              </div>
+              Watch Story
+            </button>
           </div>
         </div>
 
         {/* Scroll Indicator */}
-        <div className="absolute bottom-10 left-1/2 transform -translate-x-1/2 animate-bounce z-10">
-          <svg 
-            className="w-6 h-6 text-white/70"
-            fill="none" 
-            strokeLinecap="round" 
-            strokeLinejoin="round" 
-            strokeWidth="2" 
-            viewBox="0 0 24 24" 
-            stroke="currentColor"
-          >
-            <path d="M19 14l-7 7m0 0l-7-7m7 7V3"></path>
-          </svg>
+        <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 z-10 flex flex-col items-center gap-2 animate-bounce">
+          <ChevronDown className="w-6 h-6 text-white/70" />
         </div>
-      </div>
+      </section>
+
+      {/* Quote Section - Full Width */}
+      <section className="section-half bg-black border-y-2 border-white/10">
+        <div className="wrapper text-center">
+          <p className="quote-text max-w-5xl mx-auto">
+            "Every recipe tells a story. Every dish is an opportunity to innovate,
+            to surprise, and to bring people together around what matters most."
+          </p>
+          <p className="text-white/50 mt-8 uppercase tracking-widest text-sm">
+            — Chef's Philosophy
+          </p>
+        </div>
+      </section>
 
       <FeaturesSection />
     </>

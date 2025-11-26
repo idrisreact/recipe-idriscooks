@@ -1,12 +1,15 @@
 'use client';
 
 import React from 'react';
+import Link from 'next/link';
 import { Card } from '@/src/components/ui/Card';
 import { useRouter } from 'next/navigation';
 import { useQuery } from '@tanstack/react-query';
 import { Text } from '@/src/components/ui/Text';
 import RecentRecipesSection from './recent-recipes-section';
 import { ChefHat, Utensils, Clock, Users, ArrowRight } from 'lucide-react';
+import { motion } from 'framer-motion';
+import { fadeInUp, staggerContainer, cardHoverSubtle, fadeInScale } from '@/src/utils/animations';
 
 function MostPopularRecipes() {
   interface PopularRecipe {
@@ -31,18 +34,18 @@ function MostPopularRecipes() {
 
   if (isLoading)
     return (
-      <section className="wrapper my-20">
-        <div className="flex flex-col items-center mb-12">
-          <Text as="h2" variant="heading" className="text-center mb-4">
-            Most Popular Recipes
-          </Text>
-          <div className="h-1 w-20 bg-primary rounded-full"></div>
+      <section className="wrapper my-24">
+        <div className="text-center mb-16">
+          <div className="inline-block px-4 py-2 rounded-full bg-white/5 border border-white/10 backdrop-blur-sm mb-6">
+            <span className="text-sm font-medium text-white/90">Popular Recipes</span>
+          </div>
+          <h2 className="heading-lg mb-4">Most Popular Recipes</h2>
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
           {[...Array(4)].map((_, i) => (
-            <div key={i} className="bg-card rounded-lg overflow-hidden shadow-lg border border-border/50 animate-pulse">
-              <div className="h-48 bg-muted"></div>
-              <div className="p-4 space-y-3">
+            <div key={i} className="luxury-card animate-pulse">
+              <div className="h-56 bg-muted rounded-xl mb-4"></div>
+              <div className="space-y-3">
                 <div className="h-6 bg-muted rounded w-3/4"></div>
                 <div className="h-4 bg-muted rounded w-full"></div>
                 <div className="h-4 bg-muted rounded w-2/3"></div>
@@ -62,35 +65,93 @@ function MostPopularRecipes() {
 
   if (!recipes?.length) return null;
 
+  // Transform recipes for horizontal carousel
+  const carouselRecipes = recipes.map(recipe => ({
+    id: recipe.id,
+    title: recipe.title,
+    description: recipe.description,
+    imageUrl: recipe.image_url,
+    category: recipe.tags && recipe.tags[0] ? recipe.tags[0] : undefined,
+  }));
+
   return (
-    <section className="wrapper my-20">
-      <div className="flex flex-col items-center mb-12">
-        <Text as="h2" variant="heading" className="text-center mb-4">
-          Most Popular Recipes
-        </Text>
-        <div className="h-1 w-20 bg-primary rounded-full"></div>
-        <p className="text-muted-foreground mt-4 text-center max-w-2xl">
-          Discover the dishes that our community loves the most. Tried, tested, and tasted by thousands.
-        </p>
-      </div>
-      
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
-        {recipes.map((recipe) => (
-          <div
-            key={recipe.id}
-            className="group relative cursor-pointer transition-all duration-300 hover:-translate-y-2 hover:shadow-xl rounded-lg overflow-hidden"
-            onClick={() => router.push(`/recipes/category/${encodeURIComponent(recipe.title)}`)}
-          >
-            <Card
-              variant="recipe"
-              backgroundImage={recipe.image_url}
-              title={recipe.title}
-              subtitle={recipe.description?.slice(0, 60) + (recipe.description?.length > 60 ? '...' : '')}
-              className="h-full border-none"
-            />
-            <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors duration-300 pointer-events-none" />
+    <section className="py-24 bg-black">
+      <div className="wrapper mb-16">
+        <div className="max-w-4xl">
+          <div className="inline-block px-3 py-1 bg-white/10 border border-white/20 text-xs uppercase tracking-widest text-white mb-6">
+            Featured
           </div>
-        ))}
+          <h2 className="heading-xl mb-6">
+            Most Popular
+            <br />
+            <span className="text-gradient-primary">Recipes</span>
+          </h2>
+          <p className="body-lg">
+            Discover the dishes that our community loves the most. Tried, tested,
+            and celebrated by thousands of food enthusiasts worldwide.
+          </p>
+        </div>
+      </div>
+
+      {/* Horizontal Scroll Container */}
+      <div className="wrapper-xl">
+        <div className="horizontal-scroll">
+          {recipes.map((recipe, index) => (
+            <div
+              key={recipe.id}
+              className="horizontal-scroll-item w-[85vw] sm:w-[70vw] md:w-[50vw] lg:w-[35vw] xl:w-[28vw] cursor-pointer"
+              onClick={() => router.push(`/recipes/category/${encodeURIComponent(recipe.title)}`)}
+            >
+              <div className="editorial-card h-[600px] group">
+                {/* Recipe Image */}
+                <div
+                  className="editorial-card-image"
+                  style={{ backgroundImage: `url(${recipe.image_url})`, backgroundSize: 'cover', backgroundPosition: 'center' }}
+                />
+
+                {/* Content Overlay */}
+                <div className="editorial-card-content">
+                  {recipe.tags && recipe.tags[0] && (
+                    <span className="inline-block px-3 py-1 bg-white/10 backdrop-blur-sm border border-white/20 text-xs uppercase tracking-wider text-white mb-4">
+                      {recipe.tags[0]}
+                    </span>
+                  )}
+                  <h3 className="text-3xl sm:text-4xl font-black text-white mb-3 uppercase tracking-tight leading-tight">
+                    {recipe.title}
+                  </h3>
+                  <p className="text-white/70 line-clamp-2 mb-4 text-lg">{recipe.description}</p>
+
+                  <div className="flex items-center gap-2 text-white group-hover:text-[var(--primary)] transition-colors">
+                    <span className="text-sm uppercase tracking-wide font-bold">View Recipe</span>
+                    <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                  </div>
+
+                  {/* Favorite Count */}
+                  <div className="mt-6 flex items-center gap-4 text-white/60">
+                    <div className="flex items-center gap-2">
+                      <span className="text-xl">♥</span>
+                      <span className="font-medium">{recipe.favoriteCount}</span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Number Badge */}
+                <div className="absolute top-8 left-8 w-16 h-16 bg-black/50 backdrop-blur-md border-2 border-white/30 flex items-center justify-center">
+                  <span className="text-3xl font-black text-white">
+                    {String(index + 1).padStart(2, '0')}
+                  </span>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Scroll Hint */}
+      <div className="wrapper mt-12 text-center">
+        <p className="text-white/40 uppercase tracking-widest text-xs">
+          ← Scroll to explore more →
+        </p>
       </div>
     </section>
   );
@@ -99,47 +160,71 @@ function MostPopularRecipes() {
 function WhyChooseUs() {
   const features = [
     {
-      icon: <ChefHat className="w-8 h-8 text-primary" />,
-      title: "Expert Chefs",
-      description: "Learn from the best with recipes curated by professional chefs."
+      title: "Expert",
+      subtitle: "Chefs",
+      description: "Learn from world-class culinary professionals",
+      number: "01"
     },
     {
-      icon: <Utensils className="w-8 h-8 text-primary" />,
-      title: "Quality Ingredients",
-      description: "We focus on using fresh, high-quality ingredients for every dish."
+      title: "Fresh",
+      subtitle: "Ingredients",
+      description: "Premium quality, locally-sourced produce",
+      number: "02"
     },
     {
-      icon: <Clock className="w-8 h-8 text-primary" />,
-      title: "Quick & Easy",
-      description: "Find recipes that fit your schedule, from 15-minute meals to slow-cooked feasts."
+      title: "Quick",
+      subtitle: "Recipes",
+      description: "From 15-minute meals to slow-cooked perfection",
+      number: "03"
     },
     {
-      icon: <Users className="w-8 h-8 text-primary" />,
-      title: "Community",
-      description: "Join a vibrant community of food lovers and share your culinary journey."
+      title: "Global",
+      subtitle: "Community",
+      description: "Join thousands of passionate food lovers",
+      number: "04"
     }
   ];
 
   return (
-    <section className="bg-muted/30 py-20">
+    <section className="py-32 relative overflow-hidden bg-black">
       <div className="wrapper">
-        <div className="text-center mb-16">
-          <Text as="h2" variant="heading" className="mb-4">Why Choose Idris Cooks?</Text>
-          <p className="text-muted-foreground max-w-2xl mx-auto">
-            We're more than just a recipe site. We're your partner in the kitchen.
+        <div className="text-center mb-20">
+          <h2 className="heading-xl mb-6">
+            Why Choose
+            <br />
+            <span className="text-gradient-primary">Idris Cooks</span>
+          </h2>
+          <p className="body-lg max-w-3xl mx-auto">
+            Innovation meets tradition in every recipe. Experience culinary excellence
+            crafted by experts, designed for you.
           </p>
         </div>
-        
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-1 border-2 border-white/10">
           {features.map((feature, index) => (
-            <div key={index} className="bg-card p-6 rounded-xl border border-border/50 hover:border-primary/50 transition-colors duration-300 flex flex-col items-center text-center">
-              <div className="bg-primary/10 p-4 rounded-full mb-6">
-                {feature.icon}
+            <div
+              key={index}
+              className="group relative bg-black border-r-2 border-white/10 last:border-r-0 hover:bg-white/5 transition-all duration-500 p-10"
+            >
+              {/* Number */}
+              <div className="text-8xl font-black text-white/5 group-hover:text-white/10 transition-all mb-6">
+                {feature.number}
               </div>
-              <h3 className="text-xl font-semibold mb-3">{feature.title}</h3>
-              <p className="text-muted-foreground text-sm leading-relaxed">
+
+              {/* Title */}
+              <h3 className="text-4xl font-black uppercase text-white mb-2 leading-tight">
+                {feature.title}
+                <br />
+                <span className="text-[var(--primary)]">{feature.subtitle}</span>
+              </h3>
+
+              {/* Description */}
+              <p className="text-white/60 mt-4 leading-relaxed">
                 {feature.description}
               </p>
+
+              {/* Hover accent */}
+              <div className="absolute bottom-0 left-0 right-0 h-1 bg-[var(--primary)] scale-x-0 group-hover:scale-x-100 transition-transform duration-500 origin-left" />
             </div>
           ))}
         </div>
@@ -152,24 +237,45 @@ export default function FeaturesSection() {
   return (
     <>
       <WhyChooseUs />
-      
+
       <MostPopularRecipes />
 
-      <section className="wrapper my-24 relative overflow-hidden rounded-3xl bg-primary/5 border border-primary/10">
-        <div className="absolute top-0 right-0 -mt-20 -mr-20 w-80 h-80 bg-primary/10 rounded-full blur-3xl"></div>
-        <div className="absolute bottom-0 left-0 -mb-20 -ml-20 w-80 h-80 bg-purple-500/10 rounded-full blur-3xl"></div>
-        
-        <div className="relative z-10 flex flex-col items-center text-center py-20 px-6">
-          <ChefHat className="w-16 h-16 text-primary mb-6 opacity-80" />
-          <Text as="h2" variant="heading" className="mb-6 max-w-3xl">
-            Become a true <span className="text-primary">chef</span> with our recipes.
-          </Text>
-          <Text variant="large" className="text-muted-foreground mb-10 max-w-2xl">
-            Unlock your culinary potential. From basics to gourmet, we have everything you need to succeed in the kitchen.
-          </Text>
-          <button className="bg-primary hover:bg-primary/90 text-white font-medium px-8 py-3 rounded-full transition-all duration-300 flex items-center gap-2 shadow-lg shadow-primary/25">
-            Start Cooking Now <ArrowRight className="w-4 h-4" />
-          </button>
+      {/* CTA Section - Bold Editorial */}
+      <section className="section-full bg-black border-y-2 border-white/10">
+        <div className="wrapper text-center">
+          <div className="max-w-5xl mx-auto">
+            <div className="inline-block px-3 py-1 bg-[var(--primary)]/20 border border-[var(--primary)]/40 text-xs uppercase tracking-widest text-[var(--primary)] mb-8">
+              Ready to Cook?
+            </div>
+
+            <h2 className="heading-hero mb-8">
+              Start Your
+              <br />
+              <span className="text-gradient-primary">Culinary</span>
+              <br />
+              Journey
+            </h2>
+
+            <p className="quote-text max-w-4xl mx-auto mb-16">
+              "The kitchen is where innovation happens. Where ingredients become art.
+              Where passion meets precision."
+            </p>
+
+            <div className="flex flex-col sm:flex-row gap-6 justify-center">
+              <Link href="/recipes">
+                <button className="group px-12 py-6 bg-white text-black font-black text-xl uppercase tracking-wide hover:bg-[var(--primary)] hover:text-white transition-all duration-300 flex items-center gap-3">
+                  Get Started
+                  <ArrowRight className="w-6 h-6 group-hover:translate-x-2 transition-transform" />
+                </button>
+              </Link>
+
+              <Link href="/about">
+                <button className="group px-12 py-6 border-2 border-white text-white font-black text-xl uppercase tracking-wide hover:bg-white hover:text-black transition-all duration-300">
+                  Learn More
+                </button>
+              </Link>
+            </div>
+          </div>
         </div>
       </section>
 

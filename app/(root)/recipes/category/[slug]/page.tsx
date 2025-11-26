@@ -1,6 +1,7 @@
 import { Metadata } from 'next';
 import { RecipeDetailedView } from '@/src/components/recipe-server-component/recipe-detailed-view';
-import { auth as clerkAuth } from '@clerk/nextjs/server';
+import { auth } from '@/src/utils/auth';
+import { headers } from 'next/headers';
 import { notFound, redirect } from 'next/navigation';
 import { db } from '@/src/db';
 import { recipes as recipesTable } from '@/src/db/schemas';
@@ -40,24 +41,21 @@ export default async function RecipePage({ params }: PageProps) {
   const { slug } = await params;
   const decoded = decodeURIComponent(slug);
 
-  // Check Clerk authentication
-  const { userId, has } = await clerkAuth();
+  // Check better-auth authentication
+  const session = await auth.api.getSession({ headers: await headers() });
+  const userId = session?.user?.id;
 
   if (!userId) {
     redirect('/sign-in?redirect_url=' + encodeURIComponent(`/recipes/category/${slug}`));
   }
 
-  // Check if user has unlimited recipe views (Pro or Premium plan)
-  // First check by plan directly, then by feature
-  const hasPro = has({ plan: 'pro' });
-  const hasPremium = has({ plan: 'premium' });
-  const hasUnlimitedViews = hasPro || hasPremium || has({ feature: 'unlimited-recipe-views' });
+  // For now, treat all authenticated users as having unlimited views
+  // TODO: Implement proper subscription checking with better-auth
+  const hasUnlimitedViews = true;
 
   // Debug logging
   console.log('🔍 Debug - User access check:', {
     userId,
-    hasPro,
-    hasPremium,
     hasUnlimitedViews,
     checkingPlan: true
   });

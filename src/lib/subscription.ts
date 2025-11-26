@@ -2,12 +2,11 @@
  * Subscription utilities for checking user access and enforcing limits
  */
 
-import { auth } from '@clerk/nextjs/server';
+import { auth } from '@/src/utils/auth';
+import { headers } from 'next/headers';
 import { db } from '@/src/db';
 import { userSubscriptions, userUsage } from '@/src/db/schemas';
 import { eq, and, sql } from 'drizzle-orm';
-import { getPlanById } from './clerk-billing';
-import { getDbUserIdForClerkUser } from './sync-clerk-user';
 
 export type SubscriptionStatus = 'active' | 'canceled' | 'past_due' | 'incomplete' | 'trialing';
 
@@ -32,10 +31,18 @@ export interface UserSubscriptionInfo {
 }
 
 /**
+ * Get database user ID for the current session
+ */
+async function getDbUserId(): Promise<string | null> {
+  const session = await auth.api.getSession({ headers: await headers() });
+  return session?.user?.id || null;
+}
+
+/**
  * Get the current user's subscription information
  */
 export async function getUserSubscriptionInfo(): Promise<UserSubscriptionInfo | null> {
-  const dbUserId = await getDbUserIdForClerkUser();
+  const dbUserId = await getDbUserId();
 
   if (!dbUserId) {
     return null;
