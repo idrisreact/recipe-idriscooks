@@ -3,6 +3,7 @@ import { headers } from 'next/headers';
 import { redirect } from 'next/navigation';
 import { db } from '@/src/db';
 import { userSubscriptions, billingHistory } from '@/src/db/schemas';
+import { getPlanById } from '@/src/lib/subscription';
 import { eq, desc } from 'drizzle-orm';
 import { CreditCard, Calendar, Download, Settings } from 'lucide-react';
 import Link from 'next/link';
@@ -11,6 +12,13 @@ export const metadata = {
   title: 'Billing - Recipe Platform',
   description: 'Manage your subscription and billing',
 };
+
+function formatPrice(price: number) {
+  return new Intl.NumberFormat('en-US', {
+    style: 'currency',
+    currency: 'USD',
+  }).format(price);
+}
 
 export default async function BillingPage() {
   const session = await auth.api.getSession({ headers: await headers() });
@@ -28,7 +36,8 @@ export default async function BillingPage() {
     .limit(1);
 
   // Simple plan info - TODO: Integrate with Stripe
-  const plan = subscription ? { name: subscription.planId, price: 0 } : { name: 'free', price: 0 };
+  const planId = subscription?.planId || 'free';
+  const plan = getPlanById(planId);
 
   // Get billing history
   const history = await db
@@ -137,21 +146,17 @@ export default async function BillingPage() {
                 <tbody>
                   {history.map((item) => (
                     <tr key={item.id} className="border-b last:border-b-0">
-                      <td className="py-4">
-                        {new Date(item.billingDate).toLocaleDateString()}
-                      </td>
+                      <td className="py-4">{new Date(item.billingDate).toLocaleDateString()}</td>
                       <td className="py-4">{item.description || 'Subscription payment'}</td>
-                      <td className="py-4">
-                        {formatPrice(parseFloat(item.amount))}
-                      </td>
+                      <td className="py-4">{formatPrice(parseFloat(item.amount))}</td>
                       <td className="py-4">
                         <span
                           className={`px-2 py-1 rounded text-sm ${
                             item.status === 'succeeded'
                               ? 'bg-green-100 text-green-800'
                               : item.status === 'failed'
-                              ? 'bg-red-100 text-red-800'
-                              : 'bg-gray-100 text-gray-800'
+                                ? 'bg-red-100 text-red-800'
+                                : 'bg-gray-100 text-gray-800'
                           }`}
                         >
                           {item.status}
@@ -184,10 +189,7 @@ export default async function BillingPage() {
         {subscription && subscription.stripeCustomerId && (
           <div className="mt-8 text-center">
             <form action="/api/billing/portal" method="POST">
-              <button
-                type="submit"
-                className="text-gray-600 hover:text-gray-900 underline"
-              >
+              <button type="submit" className="text-gray-600 hover:text-gray-900 underline">
                 Manage subscription in Stripe
               </button>
             </form>

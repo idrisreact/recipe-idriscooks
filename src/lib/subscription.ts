@@ -10,6 +10,73 @@ import { eq, and } from 'drizzle-orm';
 
 export type SubscriptionStatus = 'active' | 'canceled' | 'past_due' | 'incomplete' | 'trialing';
 
+export interface Plan {
+  id: string;
+  name: string;
+  description: string;
+  price: number;
+  features: string[];
+  limits: UserSubscriptionInfo['limits'];
+}
+
+export const PLANS: Record<string, Plan> = {
+  free: {
+    id: 'free',
+    name: 'Free',
+    description: 'Perfect for getting started',
+    price: 0,
+    features: ['Access to basic recipes', 'Create up to 3 recipes', 'Save 5 favorites'],
+    limits: {
+      monthlyRecipeViews: 3,
+      totalFavorites: 5,
+      totalCollections: 1,
+      pdfExportsPerMonth: 0,
+    },
+  },
+  pro: {
+    id: 'pro',
+    name: 'Pro',
+    description: 'For serious home cooks',
+    price: 9.99,
+    features: [
+      'Unlimited recipe views',
+      'Create unlimited recipes',
+      'Save unlimited favorites',
+      'Nutrition information',
+      'Advanced search',
+    ],
+    limits: {
+      monthlyRecipeViews: -1,
+      totalFavorites: -1,
+      totalCollections: 10,
+      pdfExportsPerMonth: 5,
+    },
+  },
+  premium: {
+    id: 'premium',
+    name: 'Premium',
+    description: 'The ultimate cooking experience',
+    price: 19.99,
+    features: [
+      'Everything in Pro',
+      'PDF exports',
+      'Priority support',
+      'Share recipes with friends',
+      'Exclusive chef content',
+    ],
+    limits: {
+      monthlyRecipeViews: -1,
+      totalFavorites: -1,
+      totalCollections: -1,
+      pdfExportsPerMonth: -1,
+    },
+  },
+};
+
+export function getPlanById(planId: string): Plan {
+  return PLANS[planId] || PLANS.free;
+}
+
 export interface UserSubscriptionInfo {
   planId: string;
   status: SubscriptionStatus;
@@ -125,7 +192,7 @@ export async function hasReachedLimit(
  * Get current month's usage for the user
  */
 export async function getUserUsage() {
-  const dbUserId = await getDbUserIdForClerkUser();
+  const dbUserId = await getDbUserId();
 
   if (!dbUserId) {
     return null;
@@ -155,7 +222,7 @@ export async function incrementUsage(
   resource: 'recipeViews' | 'favoritesCount' | 'collectionsCount' | 'pdfExports' | 'recipesShared'
 ) {
   // Get the database user ID mapped from Clerk user
-  const dbUserId = await getDbUserIdForClerkUser();
+  const dbUserId = await getDbUserId();
 
   if (!dbUserId) {
     return;

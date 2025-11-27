@@ -7,12 +7,12 @@ import { Variants } from 'framer-motion';
 
 // Easing curves - Premium feel
 export const easings = {
-  smooth: [0.43, 0.13, 0.23, 0.96],
-  snappy: [0.22, 1, 0.36, 1],
-  gentle: [0.25, 0.46, 0.45, 0.94],
-  spring: { type: 'spring', stiffness: 300, damping: 30 },
-  springGentle: { type: 'spring', stiffness: 200, damping: 25 },
-  springBouncy: { type: 'spring', stiffness: 400, damping: 20 },
+  smooth: [0.43, 0.13, 0.23, 0.96] as const,
+  snappy: [0.22, 1, 0.36, 1] as const,
+  gentle: [0.25, 0.46, 0.45, 0.94] as const,
+  spring: { type: 'spring', stiffness: 300, damping: 30 } as const,
+  springGentle: { type: 'spring', stiffness: 200, damping: 25 } as const,
+  springBouncy: { type: 'spring', stiffness: 400, damping: 20 } as const,
 };
 
 // Fade animations
@@ -20,7 +20,7 @@ export const fadeIn: Variants = {
   hidden: { opacity: 0 },
   visible: {
     opacity: 1,
-    transition: { duration: 0.6, ease: easings.gentle }
+    transition: { duration: 0.6, ease: easings.gentle },
   },
 };
 
@@ -29,7 +29,7 @@ export const fadeInUp: Variants = {
   visible: {
     opacity: 1,
     y: 0,
-    transition: { duration: 0.7, ease: easings.smooth }
+    transition: { duration: 0.7, ease: easings.smooth },
   },
 };
 
@@ -38,7 +38,7 @@ export const fadeInDown: Variants = {
   visible: {
     opacity: 1,
     y: 0,
-    transition: { duration: 0.7, ease: easings.smooth }
+    transition: { duration: 0.7, ease: easings.smooth },
   },
 };
 
@@ -47,7 +47,7 @@ export const fadeInScale: Variants = {
   visible: {
     opacity: 1,
     scale: 1,
-    transition: { duration: 0.6, ease: easings.gentle }
+    transition: { duration: 0.6, ease: easings.gentle },
   },
 };
 
@@ -91,7 +91,7 @@ export const slideInLeft: Variants = {
   visible: {
     opacity: 1,
     x: 0,
-    transition: { duration: 0.7, ease: easings.smooth }
+    transition: { duration: 0.7, ease: easings.smooth },
   },
 };
 
@@ -100,7 +100,7 @@ export const slideInRight: Variants = {
   visible: {
     opacity: 1,
     x: 0,
-    transition: { duration: 0.7, ease: easings.smooth }
+    transition: { duration: 0.7, ease: easings.smooth },
   },
 };
 
@@ -110,7 +110,7 @@ export const cardHover: Variants = {
   hover: {
     scale: 1.02,
     y: -8,
-    transition: { duration: 0.3, ease: easings.snappy }
+    transition: { duration: 0.3, ease: easings.snappy },
   },
 };
 
@@ -119,7 +119,7 @@ export const cardHoverSubtle: Variants = {
   hover: {
     scale: 1.01,
     y: -4,
-    transition: { duration: 0.3, ease: easings.gentle }
+    transition: { duration: 0.3, ease: easings.gentle },
   },
 };
 
@@ -129,7 +129,7 @@ export const scaleIn: Variants = {
   visible: {
     scale: 1,
     opacity: 1,
-    transition: { duration: 0.5, ease: easings.snappy }
+    transition: { duration: 0.5, ease: easings.snappy },
   },
 };
 
@@ -137,7 +137,7 @@ export const scaleUp: Variants = {
   rest: { scale: 1 },
   hover: {
     scale: 1.05,
-    transition: { duration: 0.3, ease: easings.gentle }
+    transition: { duration: 0.3, ease: easings.gentle },
   },
 };
 
@@ -152,7 +152,7 @@ export const textReveal: Variants = {
     opacity: 1,
     y: 0,
     clipPath: 'inset(0 0 0% 0)',
-    transition: { duration: 0.8, ease: easings.smooth }
+    transition: { duration: 0.8, ease: easings.smooth },
   },
 };
 
@@ -186,7 +186,7 @@ export const blurIn: Variants = {
   visible: {
     opacity: 1,
     filter: 'blur(0px)',
-    transition: { duration: 0.7, ease: easings.gentle }
+    transition: { duration: 0.7, ease: easings.gentle },
   },
 };
 
@@ -196,12 +196,12 @@ export const navAnimation: Variants = {
   visible: {
     y: 0,
     opacity: 1,
-    transition: { duration: 0.6, ease: easings.smooth }
+    transition: { duration: 0.6, ease: easings.smooth },
   },
   exit: {
     y: -100,
     opacity: 0,
-    transition: { duration: 0.4, ease: easings.smooth }
+    transition: { duration: 0.4, ease: easings.smooth },
   },
 };
 
@@ -211,12 +211,12 @@ export const pageTransition = {
   animate: {
     opacity: 1,
     y: 0,
-    transition: { duration: 0.6, ease: easings.gentle }
+    transition: { duration: 0.6, ease: easings.gentle },
   },
   exit: {
     opacity: 0,
     y: -20,
-    transition: { duration: 0.4, ease: easings.gentle }
+    transition: { duration: 0.4, ease: easings.gentle },
   },
 };
 
