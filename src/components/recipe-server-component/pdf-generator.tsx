@@ -124,8 +124,8 @@ export function PDFGenerator({
           const html2canvas = (await import('html2canvas')).default;
           const { jsPDF } = await import('jspdf');
 
-          // Get all recipe cards
-          const recipeCards = iframe.contentDocument!.querySelectorAll('.recipe-card');
+          // Get all recipe pages
+          const recipePages = iframe.contentDocument!.querySelectorAll('.recipe-page');
           const pdf = new jsPDF('p', 'mm', 'a4');
           const pageWidth = 210; // A4 width in mm
           const pageHeight = 297; // A4 height in mm
@@ -139,7 +139,7 @@ export function PDFGenerator({
               scale: 2.5,
               useCORS: true,
               allowTaint: true,
-              backgroundColor: '#2C1810',
+              backgroundColor: '#ffffff',
               logging: false,
             });
 
@@ -150,9 +150,9 @@ export function PDFGenerator({
             isFirstPage = false;
           }
 
-          // Render each recipe card on a new page
-          for (let i = 0; i < recipeCards.length; i++) {
-            const card = recipeCards[i] as HTMLElement;
+          // Render each recipe page on a new page
+          for (let i = 0; i < recipePages.length; i++) {
+            const card = recipePages[i] as HTMLElement;
 
             if (!isFirstPage || i > 0) {
               pdf.addPage();
@@ -214,7 +214,7 @@ export function PDFGenerator({
               scale: 2.5,
               useCORS: true,
               allowTaint: true,
-              backgroundColor: '#f8f6f3',
+              backgroundColor: '#ffffff',
               logging: false,
             });
 

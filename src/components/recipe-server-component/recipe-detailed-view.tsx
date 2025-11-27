@@ -2,16 +2,21 @@
 
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
-import { ArrowLeft, Heart, Share2 } from 'lucide-react';
+import { useRef, useState } from 'react';
+import { toPng } from 'html-to-image';
+import jsPDF from 'jspdf';
+import { ArrowLeft, Heart, Share2, Download, Lock, ChefHat } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Text } from '@/src/components/ui/Text';
 import { Recipe } from '@/src/types/recipes.types';
 import { useFavorites } from '@/src/hooks/use-favorites';
 import { SignInOverlay } from './sign-in-overlay';
+import toast from 'react-hot-toast';
 
 type Props = {
   recipe: Recipe;
   canView: boolean;
+  hasPro?: boolean;
 };
 
 function formatMinutes(total: number): string {
@@ -21,9 +26,11 @@ function formatMinutes(total: number): string {
   return m ? `${h} hr ${m} min` : `${h} hr`;
 }
 
-export function RecipeDetailedView({ recipe, canView }: Props) {
+export function RecipeDetailedView({ recipe, canView, hasPro = false }: Props) {
   const router = useRouter();
   const { addToFavorites, removeFromFavorites, isFavorited } = useFavorites();
+  const contentRef = useRef<HTMLDivElement>(null);
+  const [isDownloading, setIsDownloading] = useState(false);
 
   const totalTime = (recipe.prepTime ?? 0) + (recipe.cookTime ?? 0);
   const favorited = isFavorited(recipe.id);
@@ -39,6 +46,63 @@ export function RecipeDetailedView({ recipe, canView }: Props) {
       navigator.share({ title: recipe.title, text: recipe.description, url });
     } else {
       navigator.clipboard.writeText(`${recipe.title} - ${url}`);
+      toast.success('Link copied to clipboard!');
+    }
+  };
+
+  const handleDownloadPDF = async () => {
+    if (!hasPro) {
+      toast.error('Upgrade to Pro to download recipes!');
+      router.push('/pricing');
+      return;
+    }
+
+    if (!contentRef.current) return;
+
+    try {
+      setIsDownloading(true);
+      const toastId = toast.loading('Generating PDF...');
+
+      // Use html-to-image to generate PNG
+      const dataUrl = await toPng(contentRef.current, {
+        cacheBust: true,
+        pixelRatio: 2,
+        backgroundColor: '#ffffff', // Ensure white background
+      });
+
+      const pdf = new jsPDF({
+        orientation: 'portrait',
+        unit: 'mm',
+        format: 'a4',
+      });
+
+      const imgWidth = 210;
+      const pageHeight = 297;
+
+      // Calculate image dimensions
+      const imgProps = pdf.getImageProperties(dataUrl);
+      const imgHeight = (imgProps.height * imgWidth) / imgProps.width;
+
+      let heightLeft = imgHeight;
+      let position = 0;
+
+      pdf.addImage(dataUrl, 'PNG', 0, position, imgWidth, imgHeight);
+      heightLeft -= pageHeight;
+
+      while (heightLeft >= 0) {
+        position = heightLeft - imgHeight;
+        pdf.addPage();
+        pdf.addImage(dataUrl, 'PNG', 0, position, imgWidth, imgHeight);
+        heightLeft -= pageHeight;
+      }
+
+      pdf.save(`${recipe.title.replace(/\s+/g, '-').toLowerCase()}.pdf`);
+      toast.success('PDF downloaded successfully!', { id: toastId });
+    } catch (error) {
+      console.error('Error generating PDF:', error);
+      toast.error('Failed to generate PDF');
+    } finally {
+      setIsDownloading(false);
     }
   };
 
@@ -57,6 +121,31 @@ export function RecipeDetailedView({ recipe, canView }: Props) {
         <div className="hidden md:flex items-center gap-2">
           <Button
             variant="outline"
+            onClick={() => router.push(`/cook/${recipe.id}`)}
+            className="murakamicity-button-outline gap-2 bg-[var(--primary)] text-white hover:bg-[var(--primary-dark)] border-none"
+          >
+            <ChefHat className="h-4 w-4" /> Cook with Me
+          </Button>
+          <Button
+            variant="outline"
+            onClick={handleDownloadPDF}
+            disabled={isDownloading}
+            className="murakamicity-button-outline gap-2 relative group"
+          >
+            {hasPro ? (
+              <Download className="h-4 w-4" />
+            ) : (
+              <Lock className="h-4 w-4 text-muted-foreground" />
+            )}
+            {isDownloading ? 'Generating...' : 'Download PDF'}
+            {!hasPro && (
+              <span className="absolute -top-8 left-1/2 -translate-x-1/2 bg-black text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none">
+                Pro Feature
+              </span>
+            )}
+          </Button>
+          <Button
+            variant="outline"
             onClick={toggleFavorite}
             className="murakamicity-button-outline gap-2"
           >
@@ -72,7 +161,7 @@ export function RecipeDetailedView({ recipe, canView }: Props) {
       {}
       <div className="grid grid-cols-1 xl:grid-cols-[1fr_360px] gap-6">
         {}
-        <div className="murakamicity-card">
+        <div className="murakamicity-card" ref={contentRef}>
           <div className="p-4 md:p-6 grid grid-cols-1 lg:grid-cols-[1fr_1fr] gap-6">
             {}
             <div className="relative h-[200px] sm:h-[240px] w-full overflow-hidden rounded-sm lg:h-[320px] order-1">
@@ -173,7 +262,20 @@ export function RecipeDetailedView({ recipe, canView }: Props) {
           </div>
 
           {}
-          <div className="flex md:hidden gap-2 p-4 border-t border-border">
+          <div className="flex md:hidden flex-col gap-2 p-4 border-t border-border">
+            <Button
+              variant="outline"
+              onClick={handleDownloadPDF}
+              disabled={isDownloading}
+              className="murakamicity-button-outline gap-2 w-full text-sm"
+            >
+              {hasPro ? (
+                <Download className="h-4 w-4" />
+              ) : (
+                <Lock className="h-4 w-4 text-muted-foreground" />
+              )}
+              {isDownloading ? 'Generating...' : 'Download PDF'}
+            </Button>
             <Button
               variant="outline"
               onClick={toggleFavorite}
