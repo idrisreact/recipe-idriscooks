@@ -46,7 +46,7 @@ export default function Home() {
     return () => {
       parallaxTween.kill();
       headingTween.kill();
-      ScrollTrigger.getAll().forEach(trigger => trigger.kill());
+      ScrollTrigger.getAll().forEach((trigger) => trigger.kill());
       // Reset to visible state on cleanup
       gsap.set(headingRef.current, { clearProps: 'all' });
       gsap.set(heroRef.current, { clearProps: 'all' });
@@ -81,8 +81,8 @@ export default function Home() {
           </h1>
 
           <p className="body-lg max-w-3xl mx-auto mb-12">
-            "Innovation, to me, is about pushing boundaries and creating
-            experiences that transform the way we taste, feel, and connect with food."
+            &ldquo;Innovation, to me, is about pushing boundaries and creating experiences that
+            transform the way we taste, feel, and connect with food.&rdquo;
           </p>
 
           <div className="flex flex-col sm:flex-row gap-6 justify-center items-center">
@@ -112,11 +112,11 @@ export default function Home() {
       <section className="section-half bg-black border-y-2 border-white/10">
         <div className="wrapper text-center">
           <p className="quote-text max-w-5xl mx-auto">
-            "Every recipe tells a story. Every dish is an opportunity to innovate,
-            to surprise, and to bring people together around what matters most."
+            &ldquo;Every recipe tells a story. Every dish is an opportunity to innovate, to
+            surprise, and to bring people together around what matters most.&rdquo;
           </p>
           <p className="text-white/50 mt-8 uppercase tracking-widest text-sm">
-            — Chef's Philosophy
+            &mdash; Chef&apos;s Philosophy
           </p>
         </div>
       </section>

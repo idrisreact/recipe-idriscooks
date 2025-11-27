@@ -2,14 +2,11 @@
 
 import React from 'react';
 import Link from 'next/link';
-import { Card } from '@/src/components/ui/Card';
 import { useRouter } from 'next/navigation';
 import { useQuery } from '@tanstack/react-query';
 import { Text } from '@/src/components/ui/Text';
 import RecentRecipesSection from './recent-recipes-section';
-import { ChefHat, Utensils, Clock, Users, ArrowRight } from 'lucide-react';
-import { motion } from 'framer-motion';
-import { fadeInUp, staggerContainer, cardHoverSubtle, fadeInScale } from '@/src/utils/animations';
+import { ArrowRight } from 'lucide-react';
 
 function MostPopularRecipes() {
   interface PopularRecipe {
@@ -65,15 +62,6 @@ function MostPopularRecipes() {
 
   if (!recipes?.length) return null;
 
-  // Transform recipes for horizontal carousel
-  const carouselRecipes = recipes.map(recipe => ({
-    id: recipe.id,
-    title: recipe.title,
-    description: recipe.description,
-    imageUrl: recipe.image_url,
-    category: recipe.tags && recipe.tags[0] ? recipe.tags[0] : undefined,
-  }));
-
   return (
     <section className="py-24 bg-black">
       <div className="wrapper mb-16">
@@ -87,8 +75,8 @@ function MostPopularRecipes() {
             <span className="text-gradient-primary">Recipes</span>
           </h2>
           <p className="body-lg">
-            Discover the dishes that our community loves the most. Tried, tested,
-            and celebrated by thousands of food enthusiasts worldwide.
+            Discover the dishes that our community loves the most. Tried, tested, and celebrated by
+            thousands of food enthusiasts worldwide.
           </p>
         </div>
       </div>
@@ -106,7 +94,11 @@ function MostPopularRecipes() {
                 {/* Recipe Image */}
                 <div
                   className="editorial-card-image"
-                  style={{ backgroundImage: `url(${recipe.image_url})`, backgroundSize: 'cover', backgroundPosition: 'center' }}
+                  style={{
+                    backgroundImage: `url(${recipe.image_url})`,
+                    backgroundSize: 'cover',
+                    backgroundPosition: 'center',
+                  }}
                 />
 
                 {/* Content Overlay */}
@@ -160,29 +152,29 @@ function MostPopularRecipes() {
 function WhyChooseUs() {
   const features = [
     {
-      title: "Expert",
-      subtitle: "Chefs",
-      description: "Learn from world-class culinary professionals",
-      number: "01"
+      title: 'Expert',
+      subtitle: 'Chefs',
+      description: 'Learn from world-class culinary professionals',
+      number: '01',
     },
     {
-      title: "Fresh",
-      subtitle: "Ingredients",
-      description: "Premium quality, locally-sourced produce",
-      number: "02"
+      title: 'Fresh',
+      subtitle: 'Ingredients',
+      description: 'Premium quality, locally-sourced produce',
+      number: '02',
     },
     {
-      title: "Quick",
-      subtitle: "Recipes",
-      description: "From 15-minute meals to slow-cooked perfection",
-      number: "03"
+      title: 'Quick',
+      subtitle: 'Recipes',
+      description: 'From 15-minute meals to slow-cooked perfection',
+      number: '03',
     },
     {
-      title: "Global",
-      subtitle: "Community",
-      description: "Join thousands of passionate food lovers",
-      number: "04"
-    }
+      title: 'Global',
+      subtitle: 'Community',
+      description: 'Join thousands of passionate food lovers',
+      number: '04',
+    },
   ];
 
   return (
@@ -195,8 +187,8 @@ function WhyChooseUs() {
             <span className="text-gradient-primary">Idris Cooks</span>
           </h2>
           <p className="body-lg max-w-3xl mx-auto">
-            Innovation meets tradition in every recipe. Experience culinary excellence
-            crafted by experts, designed for you.
+            Innovation meets tradition in every recipe. Experience culinary excellence crafted by
+            experts, designed for you.
           </p>
         </div>
 
@@ -219,9 +211,7 @@ function WhyChooseUs() {
               </h3>
 
               {/* Description */}
-              <p className="text-white/60 mt-4 leading-relaxed">
-                {feature.description}
-              </p>
+              <p className="text-white/60 mt-4 leading-relaxed">{feature.description}</p>
 
               {/* Hover accent */}
               <div className="absolute bottom-0 left-0 right-0 h-1 bg-[var(--primary)] scale-x-0 group-hover:scale-x-100 transition-transform duration-500 origin-left" />
@@ -257,8 +247,8 @@ export default function FeaturesSection() {
             </h2>
 
             <p className="quote-text max-w-4xl mx-auto mb-16">
-              "The kitchen is where innovation happens. Where ingredients become art.
-              Where passion meets precision."
+              &ldquo;The kitchen is where innovation happens. Where ingredients become art. Where
+              passion meets precision.&rdquo;
             </p>
 
             <div className="flex flex-col sm:flex-row gap-6 justify-center">

@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useRef, useState } from 'react';
 import { toPng } from 'html-to-image';
 import jsPDF from 'jspdf';
-import { ArrowLeft, Heart, Share2, Download, Lock } from 'lucide-react';
+import { ArrowLeft, Heart, Share2, Download, Lock, ChefHat } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Text } from '@/src/components/ui/Text';
 import { Recipe } from '@/src/types/recipes.types';
@@ -67,7 +67,7 @@ export function RecipeDetailedView({ recipe, canView, hasPro = false }: Props) {
       const dataUrl = await toPng(contentRef.current, {
         cacheBust: true,
         pixelRatio: 2,
-        backgroundColor: '#ffffff' // Ensure white background
+        backgroundColor: '#ffffff', // Ensure white background
       });
 
       const pdf = new jsPDF({
@@ -78,11 +78,11 @@ export function RecipeDetailedView({ recipe, canView, hasPro = false }: Props) {
 
       const imgWidth = 210;
       const pageHeight = 297;
-      
+
       // Calculate image dimensions
       const imgProps = pdf.getImageProperties(dataUrl);
       const imgHeight = (imgProps.height * imgWidth) / imgProps.width;
-      
+
       let heightLeft = imgHeight;
       let position = 0;
 
@@ -119,6 +119,13 @@ export function RecipeDetailedView({ recipe, canView, hasPro = false }: Props) {
         </Button>
 
         <div className="hidden md:flex items-center gap-2">
+          <Button
+            variant="outline"
+            onClick={() => router.push(`/cook/${recipe.id}`)}
+            className="murakamicity-button-outline gap-2 bg-[var(--primary)] text-white hover:bg-[var(--primary-dark)] border-none"
+          >
+            <ChefHat className="h-4 w-4" /> Cook with Me
+          </Button>
           <Button
             variant="outline"
             onClick={handleDownloadPDF}
@@ -256,7 +263,7 @@ export function RecipeDetailedView({ recipe, canView, hasPro = false }: Props) {
 
           {}
           <div className="flex md:hidden flex-col gap-2 p-4 border-t border-border">
-             <Button
+            <Button
               variant="outline"
               onClick={handleDownloadPDF}
               disabled={isDownloading}

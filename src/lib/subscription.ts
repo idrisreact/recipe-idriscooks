@@ -6,7 +6,7 @@ import { auth } from '@/src/utils/auth';
 import { headers } from 'next/headers';
 import { db } from '@/src/db';
 import { userSubscriptions, userUsage } from '@/src/db/schemas';
-import { eq, and, sql } from 'drizzle-orm';
+import { eq, and } from 'drizzle-orm';
 
 export type SubscriptionStatus = 'active' | 'canceled' | 'past_due' | 'incomplete' | 'trialing';
 
@@ -86,7 +86,9 @@ export async function getUserSubscriptionInfo(): Promise<UserSubscriptionInfo | 
 /**
  * Check if user can access a specific feature
  */
-export async function canAccessFeature(feature: keyof UserSubscriptionInfo['features']): Promise<boolean> {
+export async function canAccessFeature(
+  feature: keyof UserSubscriptionInfo['features']
+): Promise<boolean> {
   const subscription = await getUserSubscriptionInfo();
 
   if (!subscription) {
@@ -198,7 +200,13 @@ export async function incrementUsage(
  * Check if user can perform an action based on their subscription
  */
 export async function canPerformAction(
-  action: 'viewRecipe' | 'exportPdf' | 'createRecipe' | 'shareRecipe' | 'addFavorite' | 'createCollection'
+  action:
+    | 'viewRecipe'
+    | 'exportPdf'
+    | 'createRecipe'
+    | 'shareRecipe'
+    | 'addFavorite'
+    | 'createCollection'
 ): Promise<{ allowed: boolean; reason?: string }> {
   const subscription = await getUserSubscriptionInfo();
 
@@ -214,7 +222,10 @@ export async function canPerformAction(
 
   switch (action) {
     case 'viewRecipe':
-      if (subscription.limits.monthlyRecipeViews === -1 || !subscription.limits.monthlyRecipeViews) {
+      if (
+        subscription.limits.monthlyRecipeViews === -1 ||
+        !subscription.limits.monthlyRecipeViews
+      ) {
         return { allowed: true };
       }
       if (usage.recipeViews >= subscription.limits.monthlyRecipeViews) {
@@ -232,7 +243,10 @@ export async function canPerformAction(
           reason: 'PDF export is not available in your plan. Upgrade to Pro or Premium!',
         };
       }
-      if (subscription.limits.pdfExportsPerMonth === -1 || !subscription.limits.pdfExportsPerMonth) {
+      if (
+        subscription.limits.pdfExportsPerMonth === -1 ||
+        !subscription.limits.pdfExportsPerMonth
+      ) {
         return { allowed: true };
       }
       if (usage.pdfExports >= subscription.limits.pdfExportsPerMonth) {
