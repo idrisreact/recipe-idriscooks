@@ -87,7 +87,7 @@ export const Recipes = ({ session }: Props) => {
   const visibleRecipes = session ? recipes : recipes.slice(0, 3);
 
   return (
-    <div className="w-full px-2 sm:px-4 md:mx-auto md:max-w-4xl">
+    <div className="w-full">
       <RecipeWelcomeHeader session={session} onSignIn={signIn} />
 
       <RecipeFilters
@@ -117,12 +117,12 @@ export const Recipes = ({ session }: Props) => {
       ) : visibleRecipes.length === 0 ? (
         <RecipeEmptyState searchTerm={search} />
       ) : (
-        <div className={`flex gap-5 ${viewMode === 'list' ? 'flex-col' : 'flex-wrap'}`}>
+        <div className={`flex gap-8 ${viewMode === 'list' ? 'flex-col' : 'flex-wrap'}`}>
           {visibleRecipes.map((recipe) => (
             <div
               key={recipe.id}
               className={`w-full ${
-                viewMode === 'list' ? '' : 'md:w-[calc(50%-10px)] lg:w-[calc(33.333%-13.33px)]'
+                viewMode === 'list' ? '' : 'md:w-[calc(50%-16px)] lg:w-[calc(33.333%-21.33px)]'
               }`}
             >
               <RecipeCard
@@ -142,12 +142,12 @@ export const Recipes = ({ session }: Props) => {
       )}
 
       {!session && recipes.length > 3 && (
-        <div className="mt-8 text-center">
-          <Text className="text-gray-700 mb-2 block">
+        <div className="mt-16 text-center">
+          <Text className="text-gray-400 mb-4 block text-xl">
             Sign in to view all {recipes.length} recipes!
           </Text>
-          <Button onClick={signIn} className="bg-blue-600 hover:bg-blue-700 text-white">
-            Sign In
+          <Button onClick={signIn} className="luxury-button">
+            Sign In to Explore
           </Button>
         </div>
       )}

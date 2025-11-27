@@ -67,7 +67,8 @@ export function RecipeCard({
         variant="recipe"
         backgroundImage={recipe.imageUrl}
         title={recipe.title}
-        subtitle={recipe.description.slice(0, 50) + "..."}
+        subtitle={recipe.description}
+        author={recipe.author}
         onClick={() => onNavigate(recipe)}
         actions={actions}
         metadata={metadata}
