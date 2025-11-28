@@ -21,13 +21,15 @@ export default async function DashboardPage({
     redirect('/sign-in?redirect_url=/dashboard');
   }
 
-  const userRecipes = await db.select().from(recipes)
+  const userRecipes = await db
+    .select()
+    .from(recipes)
     .where(eq(recipes.userId, session.user.id))
     .orderBy(desc(recipes.id));
 
   const params = await searchParams;
   const editId = params.editId ? parseInt(params.editId as string) : undefined;
-  
+
   let initialData = undefined;
   if (editId) {
     const recipeToEdit = userRecipes.find((r) => r.id === editId);
@@ -36,7 +38,11 @@ export default async function DashboardPage({
         ...recipeToEdit,
         steps: (recipeToEdit.steps as string[]).map((s) => ({ value: s })),
         tags: (recipeToEdit.tags as string[]) || [],
-        ingredients: recipeToEdit.ingredients as any, // Type assertion needed due to jsonb
+        ingredients: recipeToEdit.ingredients as unknown as {
+          name: string;
+          quantity: number;
+          unit: string;
+        }[],
       };
     }
   }
@@ -44,7 +50,7 @@ export default async function DashboardPage({
   return (
     <div className="container mx-auto py-10 px-8">
       <h1 className="text-3xl font-bold mb-8">Chef Dashboard</h1>
-      
+
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         {/* Form Section */}
         <div className="lg:col-span-2">
@@ -54,10 +60,7 @@ export default async function DashboardPage({
                 {editId ? 'Edit Recipe' : 'Create New Recipe'}
               </h2>
               {editId && (
-                <Link 
-                  href="/dashboard"
-                  className="text-sm text-gray-500 hover:text-gray-700"
-                >
+                <Link href="/dashboard" className="text-sm text-gray-500 hover:text-gray-700">
                   Cancel Edit
                 </Link>
               )}
@@ -75,7 +78,10 @@ export default async function DashboardPage({
                 <p className="text-gray-500 text-sm">No recipes yet. Create one!</p>
               ) : (
                 userRecipes.map((recipe) => (
-                  <div key={recipe.id} className="border border-gray-200 rounded-lg p-4 hover:shadow-sm transition-shadow">
+                  <div
+                    key={recipe.id}
+                    className="border border-gray-200 rounded-lg p-4 hover:shadow-sm transition-shadow"
+                  >
                     <h3 className="font-medium text-gray-900 truncate">{recipe.title}</h3>
                     <p className="text-xs text-gray-500 mt-1 truncate">{recipe.description}</p>
                     <div className="flex justify-end gap-2 mt-3">
@@ -85,11 +91,13 @@ export default async function DashboardPage({
                       >
                         <Pencil className="w-4 h-4" />
                       </Link>
-                      <form action={async () => {
-                        'use server';
-                        await deleteRecipe(recipe.id);
-                      }}>
-                        <button 
+                      <form
+                        action={async () => {
+                          'use server';
+                          await deleteRecipe(recipe.id);
+                        }}
+                      >
+                        <button
                           type="submit"
                           className="p-2 text-red-600 hover:bg-red-50 rounded-full"
                         >

@@ -11,6 +11,7 @@ import { Text } from '@/src/components/ui/Text';
 import { Recipe } from '@/src/types/recipes.types';
 import { useFavorites } from '@/src/hooks/use-favorites';
 import { SignInOverlay } from './sign-in-overlay';
+import AddToShoppingListButton from '@/src/components/shopping-list/add-to-shopping-list-button';
 import toast from 'react-hot-toast';
 
 type Props = {
@@ -126,6 +127,11 @@ export function RecipeDetailedView({ recipe, canView, hasPro = false }: Props) {
           >
             <ChefHat className="h-4 w-4" /> Cook with Me
           </Button>
+          <AddToShoppingListButton
+            recipeId={recipe.id}
+            recipeName={recipe.title}
+            variant="secondary"
+          />
           <Button
             variant="outline"
             onClick={handleDownloadPDF}

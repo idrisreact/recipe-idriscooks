@@ -18,14 +18,18 @@ const recipeSchema = z.object({
   servings: z.number().min(1, 'Must serve at least 1 person'),
   prepTime: z.number().min(1, 'Prep time must be at least 1 minute'),
   cookTime: z.number().min(0, 'Cook time cannot be negative'),
-  ingredients: z.array(
-    z.object({
-      name: z.string().min(1, 'Ingredient name is required'),
-      quantity: z.number().min(0, 'Quantity cannot be negative'),
-      unit: z.string().min(1, 'Unit is required'),
-    })
-  ).min(1, 'Add at least one ingredient'),
-  steps: z.array(z.object({ value: z.string().min(5, 'Step description is too short') })).min(1, 'Add at least one step'),
+  ingredients: z
+    .array(
+      z.object({
+        name: z.string().min(1, 'Ingredient name is required'),
+        quantity: z.number().min(0, 'Quantity cannot be negative'),
+        unit: z.string().min(1, 'Unit is required'),
+      })
+    )
+    .min(1, 'Add at least one ingredient'),
+  steps: z
+    .array(z.object({ value: z.string().min(5, 'Step description is too short') }))
+    .min(1, 'Add at least one step'),
   tags: z.array(z.string()).optional(),
 });
 
@@ -67,12 +71,20 @@ export default function RecipeForm({ initialData, recipeId }: RecipeFormProps) {
     }
   }, [initialData, reset]);
 
-  const { fields: ingredientFields, append: appendIngredient, remove: removeIngredient } = useFieldArray({
+  const {
+    fields: ingredientFields,
+    append: appendIngredient,
+    remove: removeIngredient,
+  } = useFieldArray({
     control,
     name: 'ingredients',
   });
 
-  const { fields: stepFields, append: appendStep, remove: removeStep } = useFieldArray({
+  const {
+    fields: stepFields,
+    append: appendStep,
+    remove: removeStep,
+  } = useFieldArray({
     control,
     name: 'steps',
   });
@@ -105,7 +117,7 @@ export default function RecipeForm({ initialData, recipeId }: RecipeFormProps) {
         ...data,
         steps: data.steps.map((s) => s.value),
       };
-      
+
       if (recipeId) {
         await updateRecipe(recipeId, submissionData);
         toast.success('Recipe updated successfully!');
@@ -113,7 +125,7 @@ export default function RecipeForm({ initialData, recipeId }: RecipeFormProps) {
         await createRecipe(submissionData);
         toast.success('Recipe created successfully!');
       }
-      
+
       router.push('/dashboard');
       router.refresh();
     } catch (error) {
@@ -158,7 +170,9 @@ export default function RecipeForm({ initialData, recipeId }: RecipeFormProps) {
                 toast.error(`Upload failed: ${error.message}`);
               }}
             />
-            {errors.imageUrl && <p className="text-red-500 text-sm mt-2">{errors.imageUrl.message}</p>}
+            {errors.imageUrl && (
+              <p className="text-red-500 text-sm mt-2">{errors.imageUrl.message}</p>
+            )}
           </div>
         )}
       </div>
@@ -183,7 +197,9 @@ export default function RecipeForm({ initialData, recipeId }: RecipeFormProps) {
             className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-2 border text-gray-900"
             placeholder="A brief description of your dish..."
           />
-          {errors.description && <p className="text-red-500 text-sm mt-1">{errors.description.message}</p>}
+          {errors.description && (
+            <p className="text-red-500 text-sm mt-1">{errors.description.message}</p>
+          )}
         </div>
 
         <div className="grid grid-cols-3 gap-4">
@@ -194,7 +210,9 @@ export default function RecipeForm({ initialData, recipeId }: RecipeFormProps) {
               {...register('servings', { valueAsNumber: true })}
               className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-2 border text-gray-900"
             />
-            {errors.servings && <p className="text-red-500 text-sm mt-1">{errors.servings.message}</p>}
+            {errors.servings && (
+              <p className="text-red-500 text-sm mt-1">{errors.servings.message}</p>
+            )}
           </div>
           <div>
             <label className="block text-sm font-medium text-gray-700">Prep Time (min)</label>
@@ -203,7 +221,9 @@ export default function RecipeForm({ initialData, recipeId }: RecipeFormProps) {
               {...register('prepTime', { valueAsNumber: true })}
               className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-2 border text-gray-900"
             />
-            {errors.prepTime && <p className="text-red-500 text-sm mt-1">{errors.prepTime.message}</p>}
+            {errors.prepTime && (
+              <p className="text-red-500 text-sm mt-1">{errors.prepTime.message}</p>
+            )}
           </div>
           <div>
             <label className="block text-sm font-medium text-gray-700">Cook Time (min)</label>
@@ -212,7 +232,9 @@ export default function RecipeForm({ initialData, recipeId }: RecipeFormProps) {
               {...register('cookTime', { valueAsNumber: true })}
               className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-2 border text-gray-900"
             />
-            {errors.cookTime && <p className="text-red-500 text-sm mt-1">{errors.cookTime.message}</p>}
+            {errors.cookTime && (
+              <p className="text-red-500 text-sm mt-1">{errors.cookTime.message}</p>
+            )}
           </div>
         </div>
       </div>
@@ -221,7 +243,7 @@ export default function RecipeForm({ initialData, recipeId }: RecipeFormProps) {
       <div>
         <label className="block text-sm font-medium text-gray-700 mb-2">Ingredients</label>
         <div className="space-y-2">
-          {ingredientFields.map((field, index) => (
+          {ingredientFields.map((field: { id: string }, index: number) => (
             <div key={field.id} className="flex gap-2 items-start">
               <div className="flex-1">
                 <input
@@ -230,7 +252,9 @@ export default function RecipeForm({ initialData, recipeId }: RecipeFormProps) {
                   className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-2 border text-gray-900"
                 />
                 {errors.ingredients?.[index]?.name && (
-                  <p className="text-red-500 text-xs mt-1">{errors.ingredients[index]?.name?.message}</p>
+                  <p className="text-red-500 text-xs mt-1">
+                    {errors.ingredients[index]?.name?.message}
+                  </p>
                 )}
               </div>
               <div className="w-20">
@@ -266,14 +290,16 @@ export default function RecipeForm({ initialData, recipeId }: RecipeFormProps) {
         >
           <Plus className="w-4 h-4 mr-1" /> Add Ingredient
         </button>
-        {errors.ingredients && <p className="text-red-500 text-sm mt-1">{errors.ingredients.message}</p>}
+        {errors.ingredients && (
+          <p className="text-red-500 text-sm mt-1">{errors.ingredients.message}</p>
+        )}
       </div>
 
       {/* Steps */}
       <div>
         <label className="block text-sm font-medium text-gray-700 mb-2">Instructions</label>
         <div className="space-y-2">
-          {stepFields.map((field, index) => (
+          {stepFields.map((field: { id: string }, index: number) => (
             <div key={field.id} className="flex gap-2 items-start">
               <span className="mt-2 text-sm text-gray-500 w-6">{index + 1}.</span>
               <div className="flex-1">
@@ -352,8 +378,10 @@ export default function RecipeForm({ initialData, recipeId }: RecipeFormProps) {
               <Loader2 className="w-4 h-4 mr-2 animate-spin" />
               {recipeId ? 'Updating Recipe...' : 'Creating Recipe...'}
             </>
+          ) : recipeId ? (
+            'Update Recipe'
           ) : (
-            recipeId ? 'Update Recipe' : 'Create Recipe'
+            'Create Recipe'
           )}
         </button>
       </div>
