@@ -24,13 +24,13 @@ export async function POST(request: NextRequest) {
       line_items: [
         {
           price_data: {
-            currency: 'usd',
+            currency: 'gbp',
             product_data: {
               name: `PDF Recipe Collection`,
               description: `Download ${recipeCount} favorite recipe${recipeCount > 1 ? 's' : ''} as a beautifully formatted PDF`,
               images: [`${process.env.NEXT_PUBLIC_BASE_URL}/images/pdf-preview.png`],
             },
-            unit_amount: calculatePrice(recipeCount), // Price in cents
+            unit_amount: calculatePrice(recipeCount), // Price in pence
           },
           quantity: 1,
         },

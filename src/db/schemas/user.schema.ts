@@ -11,6 +11,7 @@ export const user = pgTable(
     image: text('image'),
     createdAt: timestamp('created_at').notNull().defaultNow(),
     updatedAt: timestamp('updated_at').notNull().defaultNow(),
+    role: text('role').default('user').notNull(),
   },
   (table) => ({
     emailIdx: index('user_email_idx').on(table.email),

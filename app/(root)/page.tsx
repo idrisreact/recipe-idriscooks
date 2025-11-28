@@ -17,16 +17,20 @@ export default function Home() {
   const headingRef = useRef<HTMLHeadingElement>(null);
 
   useEffect(() => {
+    // Capture current ref values for cleanup
+    const headingElement = headingRef.current;
+    const heroElement = heroRef.current;
+
     // Reset elements to initial state
-    gsap.set(headingRef.current, { opacity: 1, y: 0 });
-    gsap.set(heroRef.current, { opacity: 1, y: 0 });
+    gsap.set(headingElement, { opacity: 1, y: 0 });
+    gsap.set(heroElement, { opacity: 1, y: 0 });
 
     // Hero parallax effect
-    const parallaxTween = gsap.to(heroRef.current, {
+    const parallaxTween = gsap.to(heroElement, {
       opacity: 0,
       y: -100,
       scrollTrigger: {
-        trigger: heroRef.current,
+        trigger: heroElement,
         start: 'top top',
         end: 'bottom top',
         scrub: true,
@@ -34,7 +38,7 @@ export default function Home() {
     });
 
     // Heading reveal
-    const headingTween = gsap.from(headingRef.current, {
+    const headingTween = gsap.from(headingElement, {
       opacity: 0,
       y: 100,
       duration: 1.2,
@@ -48,8 +52,12 @@ export default function Home() {
       headingTween.kill();
       ScrollTrigger.getAll().forEach((trigger) => trigger.kill());
       // Reset to visible state on cleanup
-      gsap.set(headingRef.current, { clearProps: 'all' });
-      gsap.set(heroRef.current, { clearProps: 'all' });
+      if (headingElement) {
+        gsap.set(headingElement, { clearProps: 'all' });
+      }
+      if (heroElement) {
+        gsap.set(heroElement, { clearProps: 'all' });
+      }
     };
   }, []);
 

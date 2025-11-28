@@ -9,6 +9,7 @@ import { eq, desc } from 'drizzle-orm';
 import Link from 'next/link';
 import { deleteRecipe } from './actions';
 import { Pencil, Trash2 } from 'lucide-react';
+import { isAdmin } from '@/src/utils/roles';
 
 export default async function DashboardPage({
   searchParams,
@@ -19,6 +20,13 @@ export default async function DashboardPage({
 
   if (!session?.user) {
     redirect('/sign-in?redirect_url=/dashboard');
+  }
+
+  // Check if user is admin
+  const userIsAdmin = await isAdmin(session.user.id);
+
+  if (!userIsAdmin) {
+    redirect('/?error=unauthorized');
   }
 
   const userRecipes = await db
