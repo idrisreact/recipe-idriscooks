@@ -164,6 +164,7 @@ export const NoPadding: Story = {
     padding: 'none',
     children: (
       <div className="p-0">
+        {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
           src="https://images.unsplash.com/photo-1567620905732-2d1ec7ab7445?w=400&h=200&fit=crop"
           alt="Pancakes"

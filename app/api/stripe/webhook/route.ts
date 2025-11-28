@@ -30,7 +30,7 @@ export async function POST(request: NextRequest) {
           mode: session.mode,
           amountTotal: session.amount_total,
           customerEmail: session.customer_email,
-          metadata: session.metadata
+          metadata: session.metadata,
         });
 
         // Only process paid sessions
@@ -44,13 +44,54 @@ export async function POST(request: NextRequest) {
             userId,
             type,
             customerEmail,
-            recipeCount
+            recipeCount,
           });
 
+          // Handle recipe access payments
+          if (type === 'recipe_access' && userId && userId !== 'guest') {
+            console.log('Webhook: Granting recipe access to user:', userId);
+
+            try {
+              const result = await db
+                .insert(premiumFeatures)
+                .values({
+                  userId: userId,
+                  feature: 'recipe_access',
+                  grantedAt: new Date(),
+                  expiresAt: null, // Lifetime access
+                  metadata: {
+                    sessionId: session.id,
+                    amountPaid: session.amount_total ?? 0,
+                    planType: 'one_time_recipe_access',
+                  },
+                })
+                .onConflictDoUpdate({
+                  target: [premiumFeatures.userId, premiumFeatures.feature],
+                  set: {
+                    grantedAt: new Date(),
+                    metadata: {
+                      sessionId: session.id,
+                      amountPaid: session.amount_total ?? 0,
+                      planType: 'one_time_recipe_access',
+                    },
+                  },
+                });
+
+              console.log(
+                'Webhook: Recipe access granted successfully to user:',
+                userId,
+                'Result:',
+                result
+              );
+            } catch (dbError) {
+              console.error('Webhook: Database error granting recipe access:', dbError);
+              throw dbError;
+            }
+          }
           // Handle PDF download payments with valid user ID
-          if (type === 'pdf_download' && userId && userId !== 'guest') {
+          else if (type === 'pdf_download' && userId && userId !== 'guest') {
             console.log('Webhook: Granting PDF access to authenticated user:', userId);
-            
+
             try {
               const result = await db
                 .insert(premiumFeatures)
@@ -63,7 +104,7 @@ export async function POST(request: NextRequest) {
                     sessionId: session.id,
                     amountPaid: session.amount_total ?? 0,
                     recipeCount: recipeCount ? parseInt(recipeCount) : 1,
-                    planType: 'pdf_download'
+                    planType: 'pdf_download',
                   },
                 })
                 .onConflictDoUpdate({
@@ -74,12 +115,17 @@ export async function POST(request: NextRequest) {
                       sessionId: session.id,
                       amountPaid: session.amount_total ?? 0,
                       recipeCount: recipeCount ? parseInt(recipeCount) : 1,
-                      planType: 'pdf_download'
+                      planType: 'pdf_download',
                     },
                   },
                 });
 
-              console.log('Webhook: PDF access granted successfully to user:', userId, 'Result:', result);
+              console.log(
+                'Webhook: PDF access granted successfully to user:',
+                userId,
+                'Result:',
+                result
+              );
             } catch (dbError) {
               console.error('Webhook: Database error granting PDF access:', dbError);
               throw dbError;
@@ -88,7 +134,7 @@ export async function POST(request: NextRequest) {
           // Handle PDF download payments with guest user (use email fallback)
           else if (type === 'pdf_download' && (userId === 'guest' || !userId) && customerEmail) {
             console.log('Webhook: Attempting email fallback for PDF access:', customerEmail);
-            
+
             try {
               const userRecord = await db
                 .select()
@@ -96,11 +142,17 @@ export async function POST(request: NextRequest) {
                 .where(eq(user.email, customerEmail))
                 .limit(1);
 
-              console.log('Webhook: User lookup result:', userRecord.length > 0 ? 'User found' : 'User not found');
+              console.log(
+                'Webhook: User lookup result:',
+                userRecord.length > 0 ? 'User found' : 'User not found'
+              );
 
               if (userRecord.length > 0) {
                 const foundUserId = userRecord[0].id;
-                console.log('Webhook: Granting PDF access via email fallback to user:', foundUserId);
+                console.log(
+                  'Webhook: Granting PDF access via email fallback to user:',
+                  foundUserId
+                );
 
                 const result = await db
                   .insert(premiumFeatures)
@@ -114,7 +166,7 @@ export async function POST(request: NextRequest) {
                       amountPaid: session.amount_total ?? 0,
                       recipeCount: recipeCount ? parseInt(recipeCount) : 1,
                       planType: 'pdf_download',
-                      grantedViaEmail: true
+                      grantedViaEmail: true,
                     },
                   })
                   .onConflictDoUpdate({
@@ -126,12 +178,17 @@ export async function POST(request: NextRequest) {
                         amountPaid: session.amount_total ?? 0,
                         recipeCount: recipeCount ? parseInt(recipeCount) : 1,
                         planType: 'pdf_download',
-                        grantedViaEmail: true
+                        grantedViaEmail: true,
                       },
                     },
                   });
 
-                console.log('Webhook: PDF access granted via email fallback to:', customerEmail, 'Result:', result);
+                console.log(
+                  'Webhook: PDF access granted via email fallback to:',
+                  customerEmail,
+                  'Result:',
+                  result
+                );
               } else {
                 console.warn('Webhook: User not found for email fallback:', customerEmail);
               }
@@ -139,10 +196,19 @@ export async function POST(request: NextRequest) {
               console.error('Webhook: Failed to grant access via email fallback:', error);
             }
           }
-          // Handle other PDF download scenarios by amount
-          else if (!type && customerEmail && [299, 499, 799, 999].includes(session.amount_total || 0)) {
-            console.log('Webhook: Attempting amount-based PDF access fallback for:', customerEmail, 'Amount:', session.amount_total);
-            
+          // Handle other PDF download scenarios by amount (USD cents or GBP pence)
+          else if (
+            !type &&
+            customerEmail &&
+            [299, 499, 799, 999, 1000].includes(session.amount_total || 0)
+          ) {
+            console.log(
+              'Webhook: Attempting amount-based PDF access fallback for:',
+              customerEmail,
+              'Amount:',
+              session.amount_total
+            );
+
             try {
               const userRecord = await db
                 .select()
@@ -152,7 +218,10 @@ export async function POST(request: NextRequest) {
 
               if (userRecord.length > 0) {
                 const foundUserId = userRecord[0].id;
-                console.log('Webhook: Granting PDF access via amount fallback to user:', foundUserId);
+                console.log(
+                  'Webhook: Granting PDF access via amount fallback to user:',
+                  foundUserId
+                );
 
                 const result = await db
                   .insert(premiumFeatures)
@@ -165,7 +234,7 @@ export async function POST(request: NextRequest) {
                       sessionId: session.id,
                       amountPaid: session.amount_total ?? 0,
                       planType: 'pdf_download',
-                      grantedViaAmountFallback: true
+                      grantedViaAmountFallback: true,
                     },
                   })
                   .onConflictDoUpdate({
@@ -176,12 +245,17 @@ export async function POST(request: NextRequest) {
                         sessionId: session.id,
                         amountPaid: session.amount_total ?? 0,
                         planType: 'pdf_download',
-                        grantedViaAmountFallback: true
+                        grantedViaAmountFallback: true,
                       },
                     },
                   });
 
-                console.log('Webhook: PDF access granted via amount fallback to:', customerEmail, 'Result:', result);
+                console.log(
+                  'Webhook: PDF access granted via amount fallback to:',
+                  customerEmail,
+                  'Result:',
+                  result
+                );
               } else {
                 console.warn('Webhook: User not found for amount fallback:', customerEmail);
               }
@@ -193,7 +267,7 @@ export async function POST(request: NextRequest) {
               type,
               userId,
               customerEmail,
-              amountTotal: session.amount_total
+              amountTotal: session.amount_total,
             });
           }
         } else {
@@ -213,11 +287,11 @@ export async function POST(request: NextRequest) {
         console.log(`Webhook: Unhandled event type: ${event.type}`);
     }
 
-    return NextResponse.json({ 
-      received: true, 
+    return NextResponse.json({
+      received: true,
       processed: true,
       eventType: event.type,
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
     });
   } catch (error) {
     console.error('Webhook: Error processing webhook:', error);

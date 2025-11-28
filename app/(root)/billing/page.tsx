@@ -50,14 +50,14 @@ export default async function BillingPage() {
   return (
     <div className="wrapper page">
       <div className="max-w-5xl mx-auto px-4 py-16">
-        <h1 className="text-4xl font-bold mb-8">Billing & Subscription</h1>
+        <h1 className="text-4xl font-bold text-gray-900 mb-8">Billing & Subscription</h1>
 
         {/* Current Plan */}
         <div className="bg-white rounded-lg shadow-md p-6 mb-8">
           <div className="flex items-start justify-between mb-4">
             <div>
-              <h2 className="text-2xl font-bold mb-2">{plan?.name || 'Free'} Plan</h2>
-              <p className="text-gray-600">{plan?.description}</p>
+              <h2 className="text-2xl font-bold text-gray-900 mb-2">{plan?.name || 'Free'} Plan</h2>
+              <p className="text-gray-700">{plan?.description}</p>
             </div>
             <Link
               href="/pricing"
@@ -70,17 +70,19 @@ export default async function BillingPage() {
           {subscription && (
             <div className="grid md:grid-cols-2 gap-4 mt-6 pt-6 border-t">
               <div className="flex items-center gap-3">
-                <CreditCard className="w-5 h-5 text-gray-400" />
+                <CreditCard className="w-5 h-5 text-gray-500" />
                 <div>
-                  <p className="text-sm text-gray-600">Amount</p>
-                  <p className="font-semibold">{formatPrice(plan?.price || 0)}/month</p>
+                  <p className="text-sm text-gray-700">Amount</p>
+                  <p className="font-semibold text-gray-900">
+                    {formatPrice(plan?.price || 0)}/month
+                  </p>
                 </div>
               </div>
               <div className="flex items-center gap-3">
-                <Calendar className="w-5 h-5 text-gray-400" />
+                <Calendar className="w-5 h-5 text-gray-500" />
                 <div>
-                  <p className="text-sm text-gray-600">Next Billing Date</p>
-                  <p className="font-semibold">
+                  <p className="text-sm text-gray-700">Next Billing Date</p>
+                  <p className="font-semibold text-gray-900">
                     {subscription.currentPeriodEnd
                       ? new Date(subscription.currentPeriodEnd).toLocaleDateString()
                       : 'N/A'}
@@ -88,10 +90,10 @@ export default async function BillingPage() {
                 </div>
               </div>
               <div className="flex items-center gap-3">
-                <Settings className="w-5 h-5 text-gray-400" />
+                <Settings className="w-5 h-5 text-gray-500" />
                 <div>
-                  <p className="text-sm text-gray-600">Status</p>
-                  <p className="font-semibold capitalize">{subscription.status}</p>
+                  <p className="text-sm text-gray-700">Status</p>
+                  <p className="font-semibold text-gray-900 capitalize">{subscription.status}</p>
                 </div>
               </div>
             </div>
@@ -113,12 +115,12 @@ export default async function BillingPage() {
         {/* Plan Features */}
         {plan && (
           <div className="bg-white rounded-lg shadow-md p-6 mb-8">
-            <h2 className="text-xl font-bold mb-4">Your Plan Includes</h2>
+            <h2 className="text-xl font-bold text-gray-900 mb-4">Your Plan Includes</h2>
             <ul className="grid md:grid-cols-2 gap-3">
               {plan.features.map((feature, index) => (
                 <li key={index} className="flex items-center gap-2">
                   <div className="w-2 h-2 bg-[#6c47ff] rounded-full" />
-                  <span>{feature}</span>
+                  <span className="text-gray-800">{feature}</span>
                 </li>
               ))}
             </ul>
@@ -127,31 +129,37 @@ export default async function BillingPage() {
 
         {/* Billing History */}
         <div className="bg-white rounded-lg shadow-md p-6">
-          <h2 className="text-xl font-bold mb-4">Billing History</h2>
+          <h2 className="text-xl font-bold text-gray-900 mb-4">Billing History</h2>
 
           {history.length === 0 ? (
-            <p className="text-gray-600 text-center py-8">No billing history yet</p>
+            <p className="text-gray-700 text-center py-8">No billing history yet</p>
           ) : (
             <div className="overflow-x-auto">
               <table className="w-full">
                 <thead className="border-b">
                   <tr className="text-left">
-                    <th className="pb-3 font-semibold">Date</th>
-                    <th className="pb-3 font-semibold">Description</th>
-                    <th className="pb-3 font-semibold">Amount</th>
-                    <th className="pb-3 font-semibold">Status</th>
-                    <th className="pb-3 font-semibold">Invoice</th>
+                    <th className="pb-3 font-semibold text-gray-900">Date</th>
+                    <th className="pb-3 font-semibold text-gray-900">Description</th>
+                    <th className="pb-3 font-semibold text-gray-900">Amount</th>
+                    <th className="pb-3 font-semibold text-gray-900">Status</th>
+                    <th className="pb-3 font-semibold text-gray-900">Invoice</th>
                   </tr>
                 </thead>
                 <tbody>
                   {history.map((item) => (
                     <tr key={item.id} className="border-b last:border-b-0">
-                      <td className="py-4">{new Date(item.billingDate).toLocaleDateString()}</td>
-                      <td className="py-4">{item.description || 'Subscription payment'}</td>
-                      <td className="py-4">{formatPrice(parseFloat(item.amount))}</td>
+                      <td className="py-4 text-gray-800">
+                        {new Date(item.billingDate).toLocaleDateString()}
+                      </td>
+                      <td className="py-4 text-gray-800">
+                        {item.description || 'Subscription payment'}
+                      </td>
+                      <td className="py-4 text-gray-900 font-medium">
+                        {formatPrice(parseFloat(item.amount))}
+                      </td>
                       <td className="py-4">
                         <span
-                          className={`px-2 py-1 rounded text-sm ${
+                          className={`px-2 py-1 rounded text-sm font-medium ${
                             item.status === 'succeeded'
                               ? 'bg-green-100 text-green-800'
                               : item.status === 'failed'
@@ -168,13 +176,13 @@ export default async function BillingPage() {
                             href={item.invoiceUrl}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="text-[#6c47ff] hover:underline flex items-center gap-1"
+                            className="text-[#6c47ff] hover:text-[#5a3dd4] hover:underline flex items-center gap-1 font-medium"
                           >
                             <Download className="w-4 h-4" />
                             Download
                           </a>
                         ) : (
-                          <span className="text-gray-400">N/A</span>
+                          <span className="text-gray-500">N/A</span>
                         )}
                       </td>
                     </tr>
@@ -189,7 +197,10 @@ export default async function BillingPage() {
         {subscription && subscription.stripeCustomerId && (
           <div className="mt-8 text-center">
             <form action="/api/billing/portal" method="POST">
-              <button type="submit" className="text-gray-600 hover:text-gray-900 underline">
+              <button
+                type="submit"
+                className="text-gray-700 hover:text-gray-900 underline font-medium"
+              >
                 Manage subscription in Stripe
               </button>
             </form>
