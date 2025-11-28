@@ -2,7 +2,7 @@
 
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
-import { useRef, useState } from 'react';
+import { useRef, useState, useMemo } from 'react';
 import { toPng } from 'html-to-image';
 import jsPDF from 'jspdf';
 import { ArrowLeft, Heart, Share2, Download, Lock, ChefHat } from 'lucide-react';
@@ -12,6 +12,8 @@ import { Recipe } from '@/src/types/recipes.types';
 import { useFavorites } from '@/src/hooks/use-favorites';
 import { SignInOverlay } from './sign-in-overlay';
 import AddToShoppingListButton from '@/src/components/shopping-list/add-to-shopping-list-button';
+import { CookingModeButton } from '@/src/components/recipe-step-cards/cooking-mode-button';
+import { convertInstructionsToSteps } from '@/src/components/recipe-step-cards/utils';
 import toast from 'react-hot-toast';
 
 type Props = {
@@ -35,6 +37,11 @@ export function RecipeDetailedView({ recipe, canView, hasPro = false }: Props) {
 
   const totalTime = (recipe.prepTime ?? 0) + (recipe.cookTime ?? 0);
   const favorited = isFavorited(recipe.id);
+
+  // Convert recipe steps to cooking mode format
+  const cookingSteps = useMemo(() => {
+    return convertInstructionsToSteps(recipe.steps || [], recipe.imageUrl);
+  }, [recipe.steps, recipe.imageUrl]);
 
   const toggleFavorite = async () => {
     if (favorited) await removeFromFavorites(recipe.id);
@@ -269,6 +276,10 @@ export function RecipeDetailedView({ recipe, canView, hasPro = false }: Props) {
 
           {}
           <div className="flex md:hidden flex-col gap-2 p-4 border-t border-border">
+            <CookingModeButton
+              steps={cookingSteps}
+              className="murakamicity-button-outline gap-2 bg-[var(--primary)] text-white hover:bg-[var(--primary-dark)] border-none w-full text-sm px-6 py-3 rounded-lg font-semibold"
+            />
             <Button
               variant="outline"
               onClick={handleDownloadPDF}
