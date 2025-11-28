@@ -124,7 +124,10 @@ function PaymentSuccessContent() {
               </div>
               <div className="flex justify-between">
                 <span className="text-muted-foreground">Amount:</span>
-                <span>${(sessionData.amount_total / 100).toFixed(2)}</span>
+                <span>
+                  {sessionData.currency.toUpperCase() === 'GBP' ? '£' : '$'}
+                  {(sessionData.amount_total / 100).toFixed(2)}
+                </span>
               </div>
               <div className="flex justify-between">
                 <span className="text-muted-foreground">Payment ID:</span>
@@ -171,6 +174,16 @@ function PaymentSuccessContent() {
             {session?.user && <p>• Your purchase is saved to your account for future access</p>}
             <p>• Need help? Contact us at support@idriscooks.com</p>
           </div>
+        </div>
+
+        {/* Refund Policy Link */}
+        <div className="mt-6 text-center">
+          <Text variant="small" className="text-muted-foreground">
+            Have questions about refunds?{' '}
+            <a href="/refund-policy" className="text-primary underline hover:text-primary/80">
+              View our Refund Policy
+            </a>
+          </Text>
         </div>
       </div>
     </div>

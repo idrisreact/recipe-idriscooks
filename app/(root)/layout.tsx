@@ -7,6 +7,7 @@ import {
   SignedOut,
   UserButton,
 } from '@/src/components/auth/auth-components';
+import { Footer } from '@/src/components/layout/Footer';
 import Link from 'next/link';
 import { CreditCard, Crown, ChefHat } from 'lucide-react';
 import { motion, useScroll, useTransform } from 'framer-motion';
@@ -22,11 +23,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     ['rgba(10, 10, 10, 0.6)', 'rgba(10, 10, 10, 0.95)']
   );
 
-  const navBlur = useTransform(
-    scrollY,
-    [0, 100],
-    ['blur(8px)', 'blur(20px)']
-  );
+  const navBlur = useTransform(scrollY, [0, 100], ['blur(8px)', 'blur(20px)']);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -109,13 +106,24 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       {/* Spacer to prevent content from hiding under fixed header */}
       <div className="h-20" />
 
-      {children}
+      <div className="min-h-screen flex flex-col">
+        <main className="flex-1">{children}</main>
+        <Footer />
+      </div>
     </>
   );
 }
 
 // NavLink component for navigation items
-function NavLink({ href, icon, children }: { href: string; icon: React.ReactNode; children: React.ReactNode }) {
+function NavLink({
+  href,
+  icon,
+  children,
+}: {
+  href: string;
+  icon: React.ReactNode;
+  children: React.ReactNode;
+}) {
   return (
     <Link href={href}>
       <motion.div
