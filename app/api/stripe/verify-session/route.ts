@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import Stripe from 'stripe';
+import { rateLimit } from '@/src/lib/rate-limit';
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
   apiVersion: '2025-08-27.basil',
@@ -7,6 +8,12 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
 
 export async function POST(request: NextRequest) {
   try {
+    // Apply rate limiting (5 requests per minute for payment endpoints)
+    const rateLimitResponse = await rateLimit(request, 'payment');
+    if (rateLimitResponse) {
+      return rateLimitResponse;
+    }
+
     const { sessionId } = await request.json();
 
     if (!sessionId) {
