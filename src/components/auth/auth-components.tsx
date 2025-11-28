@@ -5,6 +5,7 @@ import { authClient } from '@/src/utils/auth-client';
 import { useRouter } from 'next/navigation';
 import { User } from 'lucide-react';
 import { motion } from 'framer-motion';
+import Image from 'next/image';
 
 export function useAuth() {
   const session = authClient.useSession();
@@ -68,9 +69,11 @@ export function UserButton() {
         className="w-10 h-10 rounded-full ring-2 ring-white/10 hover:ring-white/20 transition-all overflow-hidden bg-gradient-to-br from-[var(--primary)] to-[var(--primary-dark)] flex items-center justify-center"
       >
         {session.user.image ? (
-          <img
+          <Image
             src={session.user.image}
             alt={session.user.name || 'User'}
+            width={40}
+            height={40}
             className="w-full h-full object-cover"
           />
         ) : (

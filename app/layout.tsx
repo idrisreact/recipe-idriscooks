@@ -6,6 +6,8 @@ import { Toaster } from 'react-hot-toast';
 import LogRocket from 'logrocket';
 import { Analytics } from '@vercel/analytics/next';
 
+import IntroLoader from '@/src/components/intro-loader';
+
 const montserrat = Montserrat({
   variable: '--font-montserrat',
   subsets: ['latin'],
@@ -30,6 +32,7 @@ export default function RootLayout({
   return (
     <html lang="en" className="dark">
       <body className={`${montserrat.variable} font-montserrat antialiased`}>
+        <IntroLoader />
         <ReactQueryProvider>
           {children}
           <Toaster

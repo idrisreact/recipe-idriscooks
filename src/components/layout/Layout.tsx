@@ -6,6 +6,7 @@ import { authClient } from '@/src/utils/auth-client';
 import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { HamburgerMenuIcon } from '@radix-ui/react-icons';
+import { ShoppingCart } from 'lucide-react';
 import { Text } from '../ui/Text';
 import { SignInModal } from '../auth/sign-in-modal/SignInModal';
 import SubscriptionBadge from '../subscription/subscription-badge';
@@ -18,6 +19,7 @@ const primaryLinks = [
   { href: '/', label: 'Home' },
   { href: '/recipes', label: 'Recipes' },
   { href: '/favorites', label: 'Favorites', auth: true },
+  { href: '/shopping-list', label: 'Shopping List', auth: true },
   { href: '/subscription', label: 'Subscription', auth: true },
   { href: '/about', label: 'About' },
   { href: '/contact', label: 'Contact' },
@@ -74,6 +76,17 @@ export function LayoutHeader({ children }: LayoutHeaderProps) {
               </Text>
             )}
             <SubscriptionBadge />
+            {session && (
+              <Button
+                variant="outline"
+                size="icon"
+                onClick={() => router.push('/shopping-list')}
+                className="relative"
+                aria-label="Shopping List"
+              >
+                <ShoppingCart className="h-4 w-4" />
+              </Button>
+            )}
             {}
             {session ? (
               <Button

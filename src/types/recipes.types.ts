@@ -15,6 +15,10 @@ export interface Recipe {
   ingredients: Ingredient[];
   steps: string[];
   tags: string[];
+  author?: {
+    name: string;
+    image?: string;
+  };
 }
 
 export interface RecipesData {
