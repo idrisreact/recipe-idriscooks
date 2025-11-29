@@ -1,0 +1,163 @@
+# Page snapshot
+
+```yaml
+- generic [active] [ref=e1]:
+  - banner [ref=e2]:
+    - generic [ref=e4]:
+      - generic [ref=e5]:
+        - link "Idris Cooks Logo Idris Cooks" [ref=e6] [cursor=pointer]:
+          - /url: /
+          - img "Idris Cooks Logo" [ref=e8] [cursor=pointer]
+          - generic [ref=e9] [cursor=pointer]: Idris Cooks
+        - navigation [ref=e10]:
+          - link "Recipes" [ref=e11] [cursor=pointer]:
+            - /url: /recipes
+            - generic [ref=e12] [cursor=pointer]:
+              - img [ref=e13] [cursor=pointer]
+              - text: Recipes
+          - link "About" [ref=e16] [cursor=pointer]:
+            - /url: /about
+            - generic [ref=e17] [cursor=pointer]:
+              - img [ref=e18] [cursor=pointer]
+              - text: About
+      - generic [ref=e21]:
+        - button "Sign In" [ref=e23]
+        - button "Get Started" [ref=e25]
+  - generic [ref=e27]:
+    - main [ref=e28]:
+      - main [ref=e29]:
+        - generic [ref=e30]:
+          - img "Idris Taiwo Chef" [ref=e32]
+          - generic [ref=e35]:
+            - generic [ref=e36]: The Story
+            - heading "IDRIS TAIWO" [level=1] [ref=e37]:
+              - text: IDRIS
+              - text: TAIWO
+            - paragraph [ref=e38]: Culinary Artist & Content Creator
+          - generic [ref=e39]: Scroll to Explore
+        - generic [ref=e42]:
+          - img "Idris Cartoon" [ref=e45]
+          - generic [ref=e47]:
+            - heading "More than just cooking. It's an experience." [level=2] [ref=e48]:
+              - text: More than just
+              - generic [ref=e49]: cooking
+              - text: .
+              - text: It's an experience.
+            - generic [ref=e50]:
+              - paragraph [ref=e51]: Welcome to my kitchen! I'm passionate about making cooking fun, accessible, and delicious for everyone. Whether you're a beginner or a seasoned chef, you'll find inspiration, tips, and a world of flavors here.
+              - paragraph [ref=e52]: My journey started with a simple curiosity and has grown into a global community of food lovers. I believe that food is the ultimate connector—bridging cultures, generations, and hearts.
+            - img "Signature" [ref=e54]
+        - generic [ref=e57]:
+          - generic [ref=e58]:
+            - img [ref=e60]
+            - heading "17K+" [level=3] [ref=e65]
+            - paragraph [ref=e66]: Followers
+          - generic [ref=e67]:
+            - img [ref=e69]
+            - heading "100+" [level=3] [ref=e72]
+            - paragraph [ref=e73]: Recipes
+          - generic [ref=e74]:
+            - img [ref=e76]
+            - heading "8+" [level=3] [ref=e79]
+            - paragraph [ref=e80]: Years Cooking
+        - generic [ref=e81]:
+          - generic [ref=e82]:
+            - generic [ref=e83]: Philosophy
+            - heading "The Art of Modern Cooking" [level=2] [ref=e84]:
+              - text: The Art of
+              - text: Modern Cooking
+          - generic [ref=e85]:
+            - generic [ref=e87]:
+              - generic [ref=e88]: "01"
+              - heading "Simplicity" [level=3] [ref=e89]
+              - paragraph [ref=e90]: Great food doesn't have to be complicated. We focus on quality ingredients and precise techniques.
+            - generic [ref=e92]:
+              - generic [ref=e93]: "02"
+              - heading "Innovation" [level=3] [ref=e94]
+              - paragraph [ref=e95]: Pushing boundaries while respecting tradition. Every recipe is a new experiment.
+            - generic [ref=e97]:
+              - generic [ref=e98]: "03"
+              - heading "Community" [level=3] [ref=e99]
+              - paragraph [ref=e100]: Food brings us together. We build connections through shared culinary experiences.
+        - generic [ref=e104]:
+          - heading "READY TO START COOKING?" [level=2] [ref=e105]:
+            - text: READY TO
+            - generic [ref=e106]: START COOKING?
+          - link "Browse Recipes Browse Recipes" [ref=e107] [cursor=pointer]:
+            - /url: /recipes
+            - button "Browse Recipes Browse Recipes" [ref=e108]:
+              - generic [ref=e109]:
+                - text: Browse Recipes
+                - img [ref=e110]
+              - generic [ref=e113]:
+                - text: Browse Recipes
+                - img [ref=e114]
+    - contentinfo [ref=e117]:
+      - generic [ref=e118]:
+        - generic [ref=e119]:
+          - generic [ref=e120]:
+            - link "Idris Cooks" [ref=e121] [cursor=pointer]:
+              - /url: /
+              - img [ref=e122] [cursor=pointer]
+              - generic [ref=e125] [cursor=pointer]: Idris Cooks
+            - paragraph [ref=e126]: Discover, save, and share amazing recipes from around the world.
+          - generic [ref=e127]:
+            - heading "Product" [level=4] [ref=e128]
+            - list [ref=e129]:
+              - listitem [ref=e130]:
+                - link "Recipes" [ref=e131] [cursor=pointer]:
+                  - /url: /recipes
+              - listitem [ref=e132]:
+                - link "Favorites" [ref=e133] [cursor=pointer]:
+                  - /url: /favorites
+              - listitem [ref=e134]:
+                - link "Pricing" [ref=e135] [cursor=pointer]:
+                  - /url: /pricing
+          - generic [ref=e136]:
+            - heading "Legal" [level=4] [ref=e137]
+            - list [ref=e138]:
+              - listitem [ref=e139]:
+                - link "Refund Policy" [ref=e140] [cursor=pointer]:
+                  - /url: /refund-policy
+              - listitem [ref=e141]:
+                - link "Terms of Service" [ref=e142] [cursor=pointer]:
+                  - /url: /terms
+              - listitem [ref=e143]:
+                - link "Privacy Policy" [ref=e144] [cursor=pointer]:
+                  - /url: /privacy
+          - generic [ref=e145]:
+            - heading "Contact" [level=4] [ref=e146]
+            - list [ref=e147]:
+              - listitem [ref=e148]:
+                - link "Support" [ref=e149] [cursor=pointer]:
+                  - /url: mailto:support@idriscooks.com
+                  - img [ref=e150] [cursor=pointer]
+                  - text: Support
+        - generic [ref=e153]:
+          - paragraph [ref=e154]: © 2025 Idris Cooks. All rights reserved.
+          - generic [ref=e155]:
+            - link "Refunds" [ref=e156] [cursor=pointer]:
+              - /url: /refund-policy
+            - link "Terms" [ref=e157] [cursor=pointer]:
+              - /url: /terms
+            - link "Privacy" [ref=e158] [cursor=pointer]:
+              - /url: /privacy
+  - generic [ref=e161]:
+    - button "Close cookie banner" [ref=e162]:
+      - img [ref=e163]
+    - generic [ref=e166]:
+      - generic [ref=e168]:
+        - generic [ref=e169]: 🍪
+        - generic [ref=e170]:
+          - heading "We value your privacy" [level=3] [ref=e171]
+          - paragraph [ref=e172]:
+            - text: We use cookies to enhance your browsing experience, serve personalized content, and analyze our traffic. By clicking "Accept All", you consent to our use of cookies.
+            - link "Read our Privacy Policy" [ref=e173] [cursor=pointer]:
+              - /url: /privacy
+      - generic [ref=e174]:
+        - button "Decline" [ref=e175]
+        - button "Accept All" [ref=e176]
+  - alert [ref=e177]
+  - button "Open Next.js Dev Tools" [ref=e183] [cursor=pointer]:
+    - img [ref=e184] [cursor=pointer]
+```

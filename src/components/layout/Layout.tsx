@@ -5,11 +5,11 @@ import { useState } from 'react';
 import { authClient } from '@/src/utils/auth-client';
 import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
-import { HamburgerMenuIcon } from '@radix-ui/react-icons';
 import { ShoppingCart } from 'lucide-react';
 import { Text } from '../ui/Text';
 import { SignInModal } from '../auth/sign-in-modal/SignInModal';
 import SubscriptionBadge from '../subscription/subscription-badge';
+import { motion, AnimatePresence } from 'framer-motion';
 
 interface LayoutHeaderProps {
   children: React.ReactNode;
@@ -45,7 +45,7 @@ export function LayoutHeader({ children }: LayoutHeaderProps) {
           {}
           <Link href="/" aria-label="Idris Cooks Logo" className="flex items-center">
             <Image
-              src="/images/idriscooks-logo.png"
+              src="/images/idris-cooks-logo-v1.JPG"
               alt="Idris Cooks"
               width={50}
               height={50}
@@ -118,81 +118,141 @@ export function LayoutHeader({ children }: LayoutHeaderProps) {
               </>
             )}
             {}
-            <Button
-              className="md:hidden border-border hover:border-primary focus:ring-primary focus:ring-offset-background"
-              variant="outline"
-              size="icon"
+            <button
+              className="md:hidden w-12 h-12 flex flex-col items-center justify-center gap-[6px] relative z-[60] bg-white/10 rounded-lg border border-white/20 hover:bg-white/20 transition-all"
               onClick={() => setShowMenu((v) => !v)}
               aria-label={showMenu ? 'Close menu' : 'Open menu'}
               aria-expanded={showMenu}
               aria-controls="mobile-menu"
             >
-              <HamburgerMenuIcon />
-            </Button>
+              <motion.span
+                animate={{
+                  rotate: showMenu ? 45 : 0,
+                  y: showMenu ? 8 : 0,
+                }}
+                transition={{ duration: 0.3, ease: [0.25, 0.1, 0.25, 1] }}
+                className="w-6 h-[2px] bg-white block rounded-full"
+              />
+              <motion.span
+                animate={{
+                  opacity: showMenu ? 0 : 1,
+                }}
+                transition={{ duration: 0.2 }}
+                className="w-6 h-[2px] bg-white block rounded-full"
+              />
+              <motion.span
+                animate={{
+                  rotate: showMenu ? -45 : 0,
+                  y: showMenu ? -8 : 0,
+                }}
+                transition={{ duration: 0.3, ease: [0.25, 0.1, 0.25, 1] }}
+                className="w-6 h-[2px] bg-white block rounded-full"
+              />
+            </button>
           </div>
         </div>
 
         {}
-        {showMenu && (
-          <div
-            id="mobile-menu"
-            className="absolute top-full left-0 right-0 bg-background/95 backdrop-blur-md border-t border-border shadow-2xl z-50 md:hidden"
-            onClick={() => setShowMenu(false)}
-          >
-            <nav
-              className="flex flex-col space-y-1 p-6"
-              role="navigation"
-              aria-label="Mobile navigation"
+        <AnimatePresence>
+          {showMenu && (
+            <motion.div
+              id="mobile-menu"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.3 }}
+              className="fixed inset-0 bg-black/95 backdrop-blur-2xl z-50 md:hidden overflow-hidden"
+              onClick={() => setShowMenu(false)}
             >
-              {}
-              {primaryLinks.map(({ href, label, auth }) =>
-                auth && !session ? null : (
-                  <Link
-                    key={href}
-                    href={href}
-                    className="block text-base font-medium py-3 px-2 hover:text-primary transition-colors duration-200 rounded-sm"
-                    onClick={() => setShowMenu(false)}
-                  >
-                    {label}
-                  </Link>
-                )
-              )}
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ delay: 0.1, duration: 0.3 }}
+                className="absolute inset-0"
+                style={{
+                  backgroundImage:
+                    'radial-gradient(circle at 20% 50%, rgba(242, 0, 148, 0.15) 0%, transparent 50%), radial-gradient(circle at 80% 80%, rgba(168, 85, 247, 0.1) 0%, transparent 50%)',
+                }}
+              />
 
-              <hr className="my-4 border-border" />
-
-              {}
-              {!session ? (
-                <div className="space-y-3">
-                  <button
-                    onClick={() => {
-                      setShowSignInModal(true);
-                      setShowMenu(false);
-                    }}
-                    className="w-full text-left murakamicity-button-outline py-3 px-4 text-center font-medium"
-                  >
-                    Sign In
-                  </button>
-                  <button
-                    onClick={() => {
-                      router.push('/sign-up');
-                      setShowMenu(false);
-                    }}
-                    className="w-full text-left murakamicity-button py-3 px-4 text-center font-medium"
-                  >
-                    Sign Up
-                  </button>
+              <nav
+                className="relative h-full flex flex-col items-center justify-center px-8"
+                role="navigation"
+                aria-label="Mobile navigation"
+                onClick={(e) => e.stopPropagation()}
+              >
+                <div className="flex flex-col items-center space-y-2 mb-16">
+                  {primaryLinks
+                    .filter(({ auth }) => !auth || session)
+                    .map(({ href, label }, index) => (
+                      <motion.div
+                        key={href}
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: -20 }}
+                        transition={{
+                          delay: index * 0.1,
+                          duration: 0.5,
+                          ease: [0.25, 0.1, 0.25, 1],
+                        }}
+                      >
+                        <Link
+                          href={href}
+                          className="block text-5xl sm:text-6xl font-black text-white hover:text-transparent hover:bg-clip-text hover:bg-gradient-to-r hover:from-[var(--primary)] hover:to-purple-400 transition-all duration-300 uppercase tracking-tight"
+                          onClick={() => setShowMenu(false)}
+                        >
+                          {label}
+                        </Link>
+                      </motion.div>
+                    ))}
                 </div>
-              ) : (
-                <button
-                  onClick={signOut}
-                  className="w-full text-left murakamicity-button-outline py-3 px-4 text-center font-medium"
+
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -20 }}
+                  transition={{
+                    delay: primaryLinks.length * 0.1,
+                    duration: 0.5,
+                    ease: [0.25, 0.1, 0.25, 1],
+                  }}
+                  className="flex flex-col gap-4 w-full max-w-sm"
                 >
-                  Sign Out
-                </button>
-              )}
-            </nav>
-          </div>
-        )}
+                  {!session ? (
+                    <>
+                      <button
+                        onClick={() => {
+                          setShowSignInModal(true);
+                          setShowMenu(false);
+                        }}
+                        className="w-full bg-white text-black font-bold py-4 px-8 text-lg uppercase tracking-wide hover:bg-[var(--primary)] hover:text-white transition-all duration-300"
+                      >
+                        Sign In
+                      </button>
+                      <button
+                        onClick={() => {
+                          router.push('/sign-up');
+                          setShowMenu(false);
+                        }}
+                        className="w-full bg-[var(--primary)] text-white font-bold py-4 px-8 text-lg uppercase tracking-wide hover:bg-[var(--primary-dark)] transition-all duration-300"
+                      >
+                        Sign Up
+                      </button>
+                    </>
+                  ) : (
+                    <button
+                      onClick={signOut}
+                      className="w-full bg-white/10 border-2 border-white text-white font-bold py-4 px-8 text-lg uppercase tracking-wide hover:bg-white hover:text-black transition-all duration-300"
+                    >
+                      Sign Out
+                    </button>
+                  )}
+                </motion.div>
+              </nav>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
 
       <main>{children}</main>

@@ -6,7 +6,7 @@ test.describe('Favorites Page - Authentication Testing', () => {
   });
 
   test('Unauthenticated users see sign-in prompt', async ({ page }) => {
-    await page.goto('http://localhost:3002/favorites');
+    await page.goto('/favorites');
     
     // Wait for the page to load
     await page.waitForSelector('.wrapper.page', { timeout: 10000 });
@@ -23,7 +23,7 @@ test.describe('Favorites Page - Authentication Testing', () => {
   });
 
   test('Sign In modal opens from favorites page', async ({ page }) => {
-    await page.goto('http://localhost:3002/favorites');
+    await page.goto('/favorites');
     
     // Click sign in button
     const signInButton = page.getByRole('main').getByRole('button', { name: 'Sign In' });
@@ -35,7 +35,7 @@ test.describe('Favorites Page - Authentication Testing', () => {
   });
 
   test('Browse Recipes button navigates correctly', async ({ page }) => {
-    await page.goto('http://localhost:3002/favorites');
+    await page.goto('/favorites');
     
     // Click browse recipes button
     const browseButton = page.getByRole('button', { name: 'Browse Recipes' });
@@ -46,19 +46,19 @@ test.describe('Favorites Page - Authentication Testing', () => {
   });
 
   test('Page styling matches murakamicity theme', async ({ page }) => {
-    await page.goto('http://localhost:3002/favorites');
-    
+    await page.goto('/favorites');
+
     // Check dark theme is applied
     const body = page.locator('body');
     const backgroundColor = await body.evaluate(el => getComputedStyle(el).backgroundColor);
-    expect(backgroundColor).toContain('0, 0, 0');
+    expect(backgroundColor).toContain('10, 10, 10');
     
     // Check that the sign-in UI is styled correctly
     await expect(page.locator('text=Sign in to view your favorites')).toBeVisible();
   });
 
   test('Loading state displays correctly', async ({ page }) => {
-    await page.goto('http://localhost:3002/favorites');
+    await page.goto('/favorites');
     
     // Should show loading state briefly (if session is pending)
     const loadingText = page.locator('text=Loading...');
@@ -67,7 +67,7 @@ test.describe('Favorites Page - Authentication Testing', () => {
 
   test('Mobile responsiveness on favorites page', async ({ page }) => {
     await page.setViewportSize({ width: 375, height: 667 });
-    await page.goto('http://localhost:3002/favorites');
+    await page.goto('/favorites');
     
     // Check mobile layout
     await expect(page.locator('.wrapper.page')).toBeVisible();

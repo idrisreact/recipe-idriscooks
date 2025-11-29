@@ -93,15 +93,15 @@ export default function Home() {
             transform the way we taste, feel, and connect with food.&rdquo;
           </p>
 
-          <div className="flex flex-col sm:flex-row gap-6 justify-center items-center">
-            <Link href="/recipes">
-              <button className="group relative px-10 py-5 bg-white text-black font-bold text-lg uppercase tracking-wide hover:bg-[var(--primary)] hover:text-white transition-all duration-300 flex items-center gap-3">
+          <div className="flex flex-col sm:flex-row gap-6 justify-center items-center w-full">
+            <Link href="/recipes" className="w-full sm:w-auto flex justify-center">
+              <button className="group relative px-10 py-5 bg-white text-black font-bold text-lg uppercase tracking-wide hover:bg-[var(--primary)] hover:text-white transition-all duration-300 flex items-center gap-3 w-full sm:w-auto justify-center">
                 Explore Recipes
                 <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
               </button>
             </Link>
 
-            <button className="group flex items-center gap-3 text-white font-medium text-lg uppercase tracking-wide hover:text-[var(--primary)] transition-colors">
+            <button className="group flex items-center justify-center gap-3 text-white font-medium text-lg uppercase tracking-wide hover:text-[var(--primary)] transition-colors w-full sm:w-auto">
               <div className="w-12 h-12 rounded-full border-2 border-white group-hover:border-[var(--primary)] flex items-center justify-center transition-colors">
                 <Play className="w-5 h-5 ml-1" />
               </div>
@@ -124,7 +124,7 @@ export default function Home() {
             surprise, and to bring people together around what matters most.&rdquo;
           </p>
           <p className="text-white/50 mt-8 uppercase tracking-widest text-sm">
-            &mdash; Chef&apos;s Philosophy
+            &mdash; Idriscooks&apos;s Philosophy
           </p>
         </div>
       </section>
