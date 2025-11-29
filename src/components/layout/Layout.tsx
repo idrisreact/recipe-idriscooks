@@ -45,7 +45,7 @@ export function LayoutHeader({ children }: LayoutHeaderProps) {
           {}
           <Link href="/" aria-label="Idris Cooks Logo" className="flex items-center">
             <Image
-              src="/images/idriscooks-logo.png"
+              src="/images/idris-cooks-logo-v1.JPG"
               alt="Idris Cooks"
               width={50}
               height={50}
