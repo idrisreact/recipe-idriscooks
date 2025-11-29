@@ -124,7 +124,7 @@ export default function Home() {
             surprise, and to bring people together around what matters most.&rdquo;
           </p>
           <p className="text-white/50 mt-8 uppercase tracking-widest text-sm">
-            &mdash; Chef&apos;s Philosophy
+            &mdash; Idriscooks&apos;s Philosophy
           </p>
         </div>
       </section>
