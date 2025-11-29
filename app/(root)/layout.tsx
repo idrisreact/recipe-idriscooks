@@ -10,7 +10,8 @@ import {
 import { Footer } from '@/src/components/layout/Footer';
 import { CookieConsent } from '@/src/components/layout/CookieConsent';
 import Link from 'next/link';
-import { CreditCard, Crown, ChefHat } from 'lucide-react';
+import { CreditCard, Crown } from 'lucide-react';
+import Image from 'next/image';
 import { motion, useScroll, useTransform } from 'framer-motion';
 import { useEffect, useState } from 'react';
 
@@ -54,8 +55,14 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                 <motion.div
                   whileHover={{ rotate: 10, scale: 1.1 }}
                   transition={{ type: 'spring', stiffness: 300, damping: 20 }}
+                  className="relative w-10 h-10 rounded-full overflow-hidden border-2 border-[var(--primary)]"
                 >
-                  <ChefHat className="w-7 h-7 text-[var(--primary)]" />
+                  <Image
+                    src="/images/idris-cooks-logo-v1.JPG"
+                    alt="Idris Cooks Logo"
+                    fill
+                    className="object-cover"
+                  />
                 </motion.div>
                 <span className="font-bold text-xl tracking-tight bg-gradient-to-r from-white to-white/80 bg-clip-text text-transparent">
                   Idris Cooks
