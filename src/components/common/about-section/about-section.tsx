@@ -2,8 +2,8 @@
 
 import React, { useRef } from 'react';
 import Image from 'next/image';
-import { motion, useScroll, useTransform, useSpring, useInView } from 'framer-motion';
-import { ArrowRight, ChefHat, Award, Users, Clock } from 'lucide-react';
+import { motion, useScroll, useTransform, useInView } from 'framer-motion';
+import { ArrowRight, ChefHat, Users, Clock, LucideIcon } from 'lucide-react';
 import Link from 'next/link';
 
 // --- Components ---
@@ -41,7 +41,9 @@ const Hero = () => {
             The Story
           </span>
           <h1 className="text-6xl md:text-8xl lg:text-9xl font-black text-white tracking-tighter mb-6 mix-blend-overlay">
-            IDRIS<br />TAIWO
+            IDRIS
+            <br />
+            TAIWO
           </h1>
           <p className="text-xl md:text-2xl text-white/80 max-w-2xl mx-auto font-light leading-relaxed">
             Culinary Artist & Content Creator
@@ -62,7 +64,7 @@ const Hero = () => {
 
 const Bio = () => {
   const ref = useRef(null);
-  const isInView = useInView(ref, { once: true, margin: "-10%" });
+  const isInView = useInView(ref, { once: true, margin: '-10%' });
 
   return (
     <section className="py-32 bg-black text-white relative overflow-hidden">
@@ -94,9 +96,10 @@ const Bio = () => {
               className="text-4xl md:text-5xl font-bold leading-tight"
             >
               More than just <span className="text-gradient-primary">cooking</span>.
-              <br />It's an experience.
+              <br />
+              It&apos;s an experience.
             </motion.h2>
-            
+
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={isInView ? { opacity: 1, y: 0 } : {}}
@@ -104,13 +107,13 @@ const Bio = () => {
               className="space-y-6 text-lg text-white/60 leading-relaxed"
             >
               <p>
-                Welcome to my kitchen! I'm passionate about making cooking fun, accessible, and
-                delicious for everyone. Whether you're a beginner or a seasoned chef, you'll
-                find inspiration, tips, and a world of flavors here.
+                Welcome to my kitchen! I&apos;m passionate about making cooking fun, accessible, and
+                delicious for everyone. Whether you&apos;re a beginner or a seasoned chef,
+                you&apos;ll find inspiration, tips, and a world of flavors here.
               </p>
               <p>
-                My journey started with a simple curiosity and has grown into a global community
-                of food lovers. I believe that food is the ultimate connector—bridging cultures,
+                My journey started with a simple curiosity and has grown into a global community of
+                food lovers. I believe that food is the ultimate connector—bridging cultures,
                 generations, and hearts.
               </p>
             </motion.div>
@@ -120,11 +123,11 @@ const Bio = () => {
               animate={isInView ? { opacity: 1, y: 0 } : {}}
               transition={{ duration: 0.8, delay: 0.8 }}
             >
-              <Image 
-                src="/images/idris-cooks-logo-v1.JPG" 
-                alt="Signature" 
-                width={120} 
-                height={60} 
+              <Image
+                src="/images/idris-cooks-logo-v1.JPG"
+                alt="Signature"
+                width={120}
+                height={60}
                 className="opacity-80 invert"
               />
             </motion.div>
@@ -135,10 +138,18 @@ const Bio = () => {
   );
 };
 
-const StatItem = ({ value, label, icon: Icon }: { value: string; label: string; icon: any }) => {
+const StatItem = ({
+  value,
+  label,
+  icon: Icon,
+}: {
+  value: string;
+  label: string;
+  icon: LucideIcon;
+}) => {
   const ref = useRef(null);
   const isInView = useInView(ref, { once: true });
-  
+
   return (
     <motion.div
       ref={ref}
@@ -170,7 +181,15 @@ const Stats = () => {
   );
 };
 
-const PhilosophyItem = ({ number, title, desc }: { number: string; title: string; desc: string }) => {
+const PhilosophyItem = ({
+  number,
+  title,
+  desc,
+}: {
+  number: string;
+  title: string;
+  desc: string;
+}) => {
   return (
     <div className="group relative border-t border-white/20 py-12 transition-colors hover:bg-white/5">
       <div className="wrapper flex flex-col md:flex-row gap-8 md:items-baseline">
@@ -190,27 +209,30 @@ const Philosophy = () => {
   return (
     <section className="py-32 bg-black">
       <div className="wrapper mb-20">
-        <span className="text-[var(--primary)] uppercase tracking-widest text-sm font-bold">Philosophy</span>
+        <span className="text-[var(--primary)] uppercase tracking-widest text-sm font-bold">
+          Philosophy
+        </span>
         <h2 className="text-4xl md:text-6xl font-bold text-white mt-4">
-          The Art of <br />Modern Cooking
+          The Art of <br />
+          Modern Cooking
         </h2>
       </div>
-      
+
       <div className="border-b border-white/20">
-        <PhilosophyItem 
-          number="1" 
-          title="Simplicity" 
-          desc="Great food doesn't have to be complicated. We focus on quality ingredients and precise techniques." 
+        <PhilosophyItem
+          number="1"
+          title="Simplicity"
+          desc="Great food doesn't have to be complicated. We focus on quality ingredients and precise techniques."
         />
-        <PhilosophyItem 
-          number="2" 
-          title="Innovation" 
-          desc="Pushing boundaries while respecting tradition. Every recipe is a new experiment." 
+        <PhilosophyItem
+          number="2"
+          title="Innovation"
+          desc="Pushing boundaries while respecting tradition. Every recipe is a new experiment."
         />
-        <PhilosophyItem 
-          number="3" 
-          title="Community" 
-          desc="Food brings us together. We build connections through shared culinary experiences." 
+        <PhilosophyItem
+          number="3"
+          title="Community"
+          desc="Food brings us together. We build connections through shared culinary experiences."
         />
       </div>
     </section>
@@ -222,7 +244,7 @@ const CTA = () => {
     <section className="py-40 bg-black text-center relative overflow-hidden">
       <div className="absolute inset-0 bg-[url('/images/food-background.png')] opacity-20 bg-cover bg-center" />
       <div className="absolute inset-0 bg-gradient-to-t from-black via-black/80 to-transparent" />
-      
+
       <div className="wrapper relative z-10">
         <h2 className="text-5xl md:text-8xl font-black text-white mb-12 tracking-tight">
           READY TO <br />
@@ -230,7 +252,7 @@ const CTA = () => {
             START COOKING?
           </span>
         </h2>
-        
+
         <Link href="/recipes">
           <button className="group relative px-12 py-6 bg-white text-black rounded-full text-xl font-bold overflow-hidden transition-all hover:scale-105">
             <span className="relative z-10 flex items-center gap-3">
