@@ -6,7 +6,7 @@ test.describe('Subscription Page - Simplified 2-Plan Design', () => {
   });
 
   test('Subscription page loads with proper dark theme styling', async ({ page }) => {
-    await page.goto('http://localhost:3000/subscription');
+    await page.goto('//subscription');
     
     // Wait for the page to load
     await page.waitForSelector('.wrapper.page', { timeout: 10000 });
@@ -24,7 +24,7 @@ test.describe('Subscription Page - Simplified 2-Plan Design', () => {
   });
 
   test('Shows both Free and PDF Access plans', async ({ page }) => {
-    await page.goto('http://localhost:3000/subscription');
+    await page.goto('//subscription');
     
     // Wait for plans to load
     await page.waitForSelector('.murakamicity-card', { timeout: 10000 });
@@ -44,7 +44,7 @@ test.describe('Subscription Page - Simplified 2-Plan Design', () => {
   });
 
   test('Current plan status displays correctly', async ({ page }) => {
-    await page.goto('http://localhost:3000/subscription');
+    await page.goto('//subscription');
     
     // Wait for status section to load
     await page.waitForSelector('h2:has-text("Current Plan")', { timeout: 10000 });
@@ -64,7 +64,7 @@ test.describe('Subscription Page - Simplified 2-Plan Design', () => {
   });
 
   test('Features comparison table works correctly', async ({ page }) => {
-    await page.goto('http://localhost:3000/subscription');
+    await page.goto('//subscription');
     
     // Wait for features table to load
     await page.waitForSelector('h2:has-text("What\'s Included")', { timeout: 10000 });
@@ -89,7 +89,7 @@ test.describe('Subscription Page - Simplified 2-Plan Design', () => {
   });
 
   test('PDF Access plan has proper highlighting', async ({ page }) => {
-    await page.goto('http://localhost:3000/subscription');
+    await page.goto('//subscription');
     
     // Wait for plans to load
     await page.waitForSelector('.murakamicity-card', { timeout: 10000 });
@@ -110,7 +110,7 @@ test.describe('Subscription Page - Simplified 2-Plan Design', () => {
   });
 
   test('Plan buttons have correct styling and behavior', async ({ page }) => {
-    await page.goto('http://localhost:3000/subscription');
+    await page.goto('//subscription');
     
     // Wait for plans to load
     await page.waitForSelector('.murakamicity-card', { timeout: 10000 });
@@ -140,7 +140,7 @@ test.describe('Subscription Page - Simplified 2-Plan Design', () => {
   });
 
   test('About PDF Access section displays correctly', async ({ page }) => {
-    await page.goto('http://localhost:3000/subscription');
+    await page.goto('//subscription');
     
     // Scroll to bottom to ensure section is visible
     await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
@@ -158,7 +158,7 @@ test.describe('Subscription Page - Simplified 2-Plan Design', () => {
 
   test('Mobile responsiveness works correctly', async ({ page }) => {
     await page.setViewportSize({ width: 375, height: 667 });
-    await page.goto('http://localhost:3000/subscription');
+    await page.goto('//subscription');
     
     // Check mobile layout
     await page.waitForSelector('h1:has-text("Choose Your Plan")', { timeout: 10000 });
@@ -183,7 +183,7 @@ test.describe('Subscription Page - Simplified 2-Plan Design', () => {
   });
 
   test('Page uses consistent murakamicity styling', async ({ page }) => {
-    await page.goto('http://localhost:3000/subscription');
+    await page.goto('//subscription');
     
     await page.waitForSelector('.wrapper.page', { timeout: 10000 });
     

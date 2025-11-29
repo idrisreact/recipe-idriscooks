@@ -6,7 +6,7 @@ test.describe('About Page - Enhanced Design and Animations', () => {
   });
 
   test('About page loads with proper dark theme styling', async ({ page }) => {
-    await page.goto('http://localhost:3000/about');
+    await page.goto('/about');
     
     // Wait for the page to load
     await page.waitForSelector('section', { timeout: 10000 });
@@ -14,7 +14,7 @@ test.describe('About Page - Enhanced Design and Animations', () => {
     // Check dark theme is applied
     const body = page.locator('body');
     const backgroundColor = await body.evaluate(el => getComputedStyle(el).backgroundColor);
-    expect(backgroundColor).toContain('0, 0, 0');
+    expect(backgroundColor).toContain('10, 10, 10');
     
     // Check main heading is visible
     await expect(page.locator('h1:has-text("Idris Taiwo")')).toBeVisible();
@@ -29,19 +29,25 @@ test.describe('About Page - Enhanced Design and Animations', () => {
   });
 
   test('Journey section displays with proper cards', async ({ page }) => {
-    await page.goto('http://localhost:3000/about');
-    
+    await page.goto('/about');
+
     // Wait for journey section to load
     await page.waitForSelector('h2:has-text("My Journey")', { timeout: 10000 });
-    
+
     // Check journey heading
     await expect(page.locator('h2:has-text("My Journey")')).toBeVisible();
-    
-    // Check for journey steps
-    await expect(page.locator('text=Started Cooking at 13')).toBeVisible();
-    await expect(page.locator('text=Paused During University')).toBeVisible();
-    await expect(page.locator('text=First TikTok Video')).toBeVisible();
-    await expect(page.locator('text=Now: 17,000+ Followers')).toBeVisible();
+
+    // Scroll to trigger GSAP animations for all steps
+    await page.evaluate(() => window.scrollTo(0, window.innerHeight));
+    await page.waitForTimeout(1000);
+    await page.evaluate(() => window.scrollBy(0, window.innerHeight * 0.5));
+    await page.waitForTimeout(2000);
+
+    // Check for journey steps (after scroll animation)
+    await expect(page.locator('text=Started Cooking at 13')).toBeVisible({ timeout: 5000 });
+    await expect(page.locator('text=Paused During University')).toBeVisible({ timeout: 5000 });
+    await expect(page.locator('text=First TikTok Video')).toBeVisible({ timeout: 5000 });
+    await expect(page.locator('text=Now: 17,000+ Followers')).toBeVisible({ timeout: 5000 });
     
     // Check for murakamicity cards
     const cards = page.locator('.murakamicity-card');
@@ -50,7 +56,7 @@ test.describe('About Page - Enhanced Design and Animations', () => {
   });
 
   test('Call to action section works correctly', async ({ page }) => {
-    await page.goto('http://localhost:3000/about');
+    await page.goto('/about');
     
     // Scroll to bottom to ensure CTA is visible
     await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
@@ -79,7 +85,7 @@ test.describe('About Page - Enhanced Design and Animations', () => {
   });
 
   test('GSAP animations are properly configured', async ({ page }) => {
-    await page.goto('http://localhost:3000/about');
+    await page.goto('/about');
     
     // Check that journey steps are initially hidden (opacity-0)
     await page.waitForSelector('h2:has-text("My Journey")', { timeout: 10000 });
@@ -101,7 +107,7 @@ test.describe('About Page - Enhanced Design and Animations', () => {
 
   test('Mobile responsiveness works correctly', async ({ page }) => {
     await page.setViewportSize({ width: 375, height: 667 });
-    await page.goto('http://localhost:3000/about');
+    await page.goto('/about');
     
     // Check mobile layout
     await page.waitForSelector('h1:has-text("Idris Taiwo")', { timeout: 10000 });
@@ -120,7 +126,7 @@ test.describe('About Page - Enhanced Design and Animations', () => {
   });
 
   test('Journey steps alternate layout correctly', async ({ page }) => {
-    await page.goto('http://localhost:3000/about');
+    await page.goto('/about');
     
     await page.waitForSelector('h2:has-text("My Journey")', { timeout: 10000 });
     
@@ -146,19 +152,25 @@ test.describe('About Page - Enhanced Design and Animations', () => {
   });
 
   test('Step numbers and progress indicators display correctly', async ({ page }) => {
-    await page.goto('http://localhost:3000/about');
-    
+    await page.goto('/about');
+
     await page.waitForSelector('h2:has-text("My Journey")', { timeout: 10000 });
-    
+
+    // Scroll to trigger GSAP animations for all steps
+    await page.evaluate(() => window.scrollTo(0, window.innerHeight));
+    await page.waitForTimeout(1000);
+    await page.evaluate(() => window.scrollBy(0, window.innerHeight * 0.5));
+    await page.waitForTimeout(2000);
+
     // Check for step number circles with primary background
     const stepNumbers = page.locator('.bg-primary').filter({ hasText: /^[1-4]$/ });
     const stepCount = await stepNumbers.count();
     expect(stepCount).toBeGreaterThanOrEqual(4);
-    
+
     // Check that step numbers are visible and properly styled
     for (let i = 0; i < Math.min(stepCount, 4); i++) {
       const step = stepNumbers.nth(i);
-      await expect(step).toBeVisible();
+      await expect(step).toBeVisible({ timeout: 10000 });
       
       const stepClass = await step.getAttribute('class');
       expect(stepClass).toContain('bg-primary');

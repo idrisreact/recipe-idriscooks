@@ -7,7 +7,7 @@ test.describe('Recipe Pages - Comprehensive Testing', () => {
   });
 
   test('Homepage loads and displays correctly', async ({ page }) => {
-    await page.goto('http://localhost:3000');
+    await page.goto('/');
     
     // Check basic page structure
     await expect(page.locator('body')).toHaveClass(/font-montserrat/);
@@ -23,7 +23,7 @@ test.describe('Recipe Pages - Comprehensive Testing', () => {
   });
 
   test('Recipes listing page functionality', async ({ page }) => {
-    await page.goto('http://localhost:3000/recipes');
+    await page.goto('//recipes');
     
     // Wait for the page to load
     await page.waitForSelector('[data-testid="recipe-card"], .recipe-grid, article', { timeout: 10000 });
@@ -39,7 +39,7 @@ test.describe('Recipe Pages - Comprehensive Testing', () => {
   });
 
   test('Navigation menu works properly', async ({ page }) => {
-    await page.goto('http://localhost:3000');
+    await page.goto('/');
     
     // Test desktop navigation
     if (await page.locator('nav').isVisible()) {
@@ -58,7 +58,7 @@ test.describe('Recipe Pages - Comprehensive Testing', () => {
   });
 
   test('Mobile responsiveness - Recipe cards', async ({ page }) => {
-    await page.goto('http://localhost:3000/recipes');
+    await page.goto('//recipes');
     
     // Test different mobile viewport sizes
     const viewports = [
@@ -85,7 +85,7 @@ test.describe('Recipe Pages - Comprehensive Testing', () => {
   });
 
   test('Recipe category pages load correctly', async ({ page }) => {
-    await page.goto('http://localhost:3000/recipes');
+    await page.goto('//recipes');
     await page.waitForSelector('article, [data-testid="recipe-card"]', { timeout: 10000 });
     
     // Find first recipe link
@@ -107,7 +107,7 @@ test.describe('Recipe Pages - Comprehensive Testing', () => {
   });
 
   test('Search functionality (if present)', async ({ page }) => {
-    await page.goto('http://localhost:3000/recipes');
+    await page.goto('//recipes');
     
     // Look for search input
     const searchInput = page.locator('input[type="search"], input[placeholder*="search" i]');
@@ -123,7 +123,7 @@ test.describe('Recipe Pages - Comprehensive Testing', () => {
   });
 
   test('Accessibility compliance', async ({ page }) => {
-    await page.goto('http://localhost:3000');
+    await page.goto('/');
     
     // Check for proper heading hierarchy
     const h1Count = await page.locator('h1').count();
@@ -148,7 +148,7 @@ test.describe('Recipe Pages - Comprehensive Testing', () => {
   });
 
   test('Color contrast and theme application', async ({ page }) => {
-    await page.goto('http://localhost:3000');
+    await page.goto('/');
     
     // Check that dark theme is properly applied
     const body = page.locator('body');
@@ -161,7 +161,7 @@ test.describe('Recipe Pages - Comprehensive Testing', () => {
   });
 
   test('Interactive elements work properly', async ({ page }) => {
-    await page.goto('http://localhost:3000');
+    await page.goto('/');
     
     // Test hero buttons
     const exploreButton = page.getByText('Explore Recipes');
@@ -172,7 +172,7 @@ test.describe('Recipe Pages - Comprehensive Testing', () => {
     }
     
     // Test navigation to recipes page
-    await page.goto('http://localhost:3000/recipes');
+    await page.goto('//recipes');
     await page.waitForLoadState('domcontentloaded');
     
     // Check for interactive recipe cards
@@ -197,7 +197,7 @@ test.describe('Recipe Pages - Comprehensive Testing', () => {
       });
     });
     
-    await page.goto('http://localhost:3000/recipes');
+    await page.goto('//recipes');
     await page.waitForLoadState('networkidle');
     
     // Check for any failed requests

@@ -2,7 +2,7 @@ import { Metadata } from 'next';
 import { RecipeDetailedView } from '@/src/components/recipe-server-component/recipe-detailed-view';
 import { auth } from '@/src/utils/auth';
 import { headers } from 'next/headers';
-import { notFound, redirect } from 'next/navigation';
+import { notFound } from 'next/navigation';
 import { db } from '@/src/db';
 import { recipes as recipesTable } from '@/src/db/schemas';
 import { eq } from 'drizzle-orm';
@@ -47,12 +47,8 @@ export default async function RecipePage({ params }: PageProps) {
   const session = await auth.api.getSession({ headers: await headers() });
   const userId = session?.user?.id;
 
-  if (!userId) {
-    redirect('/sign-in?redirect_url=' + encodeURIComponent(`/recipes/category/${slug}`));
-  }
-
-  // Check if user has paid for recipe access
-  const hasUnlimitedViews = await checkRecipeAccess(userId);
+  // Check if user has paid for recipe access (only if logged in)
+  const hasUnlimitedViews = userId ? await checkRecipeAccess(userId) : false;
 
   // Debug logging
   console.log('🔍 Debug - User access check:', {
@@ -77,7 +73,11 @@ export default async function RecipePage({ params }: PageProps) {
   const FREE_PLAN_LIMIT = 3;
   let showPaywall = false;
 
-  if (!hasUnlimitedViews) {
+  // If user is not logged in, show sign-in paywall
+  if (!userId) {
+    showPaywall = true;
+  } else if (!hasUnlimitedViews) {
+    // For logged-in free users, check usage limits
     usage = await getUserUsage();
 
     // Check if free user has reached limit
@@ -86,8 +86,8 @@ export default async function RecipePage({ params }: PageProps) {
     }
   }
 
-  // Increment view counter ONLY if not showing paywall (only for free users who haven't hit limit)
-  if (!hasUnlimitedViews && !showPaywall) {
+  // Increment view counter ONLY if logged in and not showing paywall (only for free users who haven't hit limit)
+  if (userId && !hasUnlimitedViews && !showPaywall) {
     await incrementUsage('recipeViews');
     // Get updated usage for display
     usage = await getUserUsage();
@@ -154,10 +154,12 @@ export default async function RecipePage({ params }: PageProps) {
 
               {/* Content */}
               <h2 className="text-3xl font-bold text-center mb-3 text-gray-900">
-                Unlock Full Recipe Access
+                {!userId ? 'Sign In to View Recipes' : 'Unlock Full Recipe Access'}
               </h2>
               <p className="text-gray-600 text-center mb-6 text-lg">
-                Get lifetime access to <strong>all recipes</strong> for just £10
+                {!userId
+                  ? 'Create a free account to view up to 3 recipes per month, or get lifetime access for £10'
+                  : 'Get lifetime access to all recipes for just £10'}
               </p>
 
               {/* Features */}
@@ -206,14 +208,28 @@ export default async function RecipePage({ params }: PageProps) {
                 </li>
               </ul>
 
-              {/* Payment Button */}
-              <RecipeAccessButton hasAccess={false} />
+              {/* Payment/Sign In Buttons */}
+              {!userId ? (
+                <div className="space-y-3">
+                  <Link
+                    href={`/?showAuth=true&redirect=/recipes/category/${slug}`}
+                    className="block w-full bg-[var(--primary)] text-white py-3 px-6 rounded-lg font-semibold text-center hover:opacity-90 transition-opacity"
+                  >
+                    Sign In / Create Account
+                  </Link>
+                  <RecipeAccessButton hasAccess={false} />
+                </div>
+              ) : (
+                <RecipeAccessButton hasAccess={false} />
+              )}
 
               {/* Usage Info */}
-              <p className="text-sm text-gray-500 text-center mt-4">
-                You&apos;ve used {usage?.recipeViews || FREE_PLAN_LIMIT} of {FREE_PLAN_LIMIT} free
-                views
-              </p>
+              {userId && (
+                <p className="text-sm text-gray-500 text-center mt-4">
+                  You&apos;ve used {usage?.recipeViews || FREE_PLAN_LIMIT} of {FREE_PLAN_LIMIT} free
+                  views
+                </p>
+              )}
             </div>
           </div>
         )}

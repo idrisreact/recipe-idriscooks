@@ -1,0 +1,142 @@
+# Page snapshot
+
+```yaml
+- generic [active] [ref=e1]:
+    - generic [ref=e5]:
+        - heading "Idris Cooks" [level=1] [ref=e6]
+        - paragraph [ref=e7]: Culinary Excellence
+    - banner [ref=e8]:
+        - link "Idris Cooks" [ref=e12] [cursor=pointer]:
+            - /url: /
+            - img [ref=e14] [cursor=pointer]
+            - generic [ref=e16] [cursor=pointer]: Idris Cooks
+    - generic [ref=e18]:
+        - main [ref=e19]:
+            - generic [ref=e20]:
+                - img "Culinary Excellence" [ref=e22]
+                - generic [ref=e24]:
+                    - heading "Culinary Innovation Starts Here" [level=1] [ref=e25]:
+                        - text: Culinary
+                        - generic [ref=e26]: Innovation
+                        - text: Starts Here
+                    - paragraph [ref=e27]: “Innovation, to me, is about pushing boundaries and creating experiences that transform the way we taste, feel, and connect with food.”
+                    - generic [ref=e28]:
+                        - link "Explore Recipes" [ref=e29] [cursor=pointer]:
+                            - /url: /recipes
+                            - button "Explore Recipes" [ref=e30]:
+                                - text: Explore Recipes
+                                - img [ref=e31]
+                        - button "Watch Story" [ref=e33]:
+                            - img [ref=e35]
+                            - text: Watch Story
+                - img [ref=e38]
+            - generic [ref=e41]:
+                - paragraph [ref=e42]: “Every recipe tells a story. Every dish is an opportunity to innovate, to surprise, and to bring people together around what matters most.”
+                - paragraph [ref=e43]: — Chef's Philosophy
+            - generic [ref=e45]:
+                - generic [ref=e46]:
+                    - heading "Why Choose Idris Cooks" [level=2] [ref=e47]:
+                        - text: Why Choose
+                        - generic [ref=e48]: Idris Cooks
+                    - paragraph [ref=e49]: Innovation meets tradition in every recipe. Experience culinary excellence crafted by experts, designed for you.
+                - generic [ref=e50]:
+                    - generic [ref=e51]:
+                        - generic [ref=e52]: '01'
+                        - heading "Expert Chefs" [level=3] [ref=e53]:
+                            - text: Expert
+                            - generic [ref=e54]: Chefs
+                        - paragraph [ref=e55]: Learn from world-class culinary professionals
+                    - generic [ref=e56]:
+                        - generic [ref=e57]: '02'
+                        - heading "Fresh Ingredients" [level=3] [ref=e58]:
+                            - text: Fresh
+                            - generic [ref=e59]: Ingredients
+                        - paragraph [ref=e60]: Premium quality, locally-sourced produce
+                    - generic [ref=e61]:
+                        - generic [ref=e62]: '03'
+                        - heading "Quick Recipes" [level=3] [ref=e63]:
+                            - text: Quick
+                            - generic [ref=e64]: Recipes
+                        - paragraph [ref=e65]: From 15-minute meals to slow-cooked perfection
+                    - generic [ref=e66]:
+                        - generic [ref=e67]: '04'
+                        - heading "Global Community" [level=3] [ref=e68]:
+                            - text: Global
+                            - generic [ref=e69]: Community
+                        - paragraph [ref=e70]: Join thousands of passionate food lovers
+            - generic [ref=e72]:
+                - generic [ref=e74]: Popular Recipes
+                - heading "Most Popular Recipes" [level=2] [ref=e75]
+            - generic [ref=e103]:
+                - generic [ref=e104]: Ready to Cook?
+                - heading "Start Your Culinary Journey" [level=2] [ref=e105]:
+                    - text: Start Your
+                    - generic [ref=e106]: Culinary
+                    - text: Journey
+                - paragraph [ref=e107]: “The kitchen is where innovation happens. Where ingredients become art. Where passion meets precision.”
+                - generic [ref=e108]:
+                    - link "Get Started" [ref=e109] [cursor=pointer]:
+                        - /url: /recipes
+                        - button "Get Started" [ref=e110]:
+                            - text: Get Started
+                            - img [ref=e111]
+                    - link "Learn More" [ref=e113] [cursor=pointer]:
+                        - /url: /about
+                        - button "Learn More" [ref=e114]
+            - generic [ref=e116]:
+                - heading "Recent Recipes" [level=2] [ref=e117]
+                - paragraph [ref=e118]: Discover our latest culinary creations
+        - contentinfo [ref=e144]:
+            - generic [ref=e145]:
+                - generic [ref=e146]:
+                    - generic [ref=e147]:
+                        - link "Idris Cooks" [ref=e148] [cursor=pointer]:
+                            - /url: /
+                            - img [ref=e149] [cursor=pointer]
+                            - generic [ref=e151] [cursor=pointer]: Idris Cooks
+                        - paragraph [ref=e152]: Discover, save, and share amazing recipes from around the world.
+                    - generic [ref=e153]:
+                        - heading "Product" [level=4] [ref=e154]
+                        - list [ref=e155]:
+                            - listitem [ref=e156]:
+                                - link "Recipes" [ref=e157] [cursor=pointer]:
+                                    - /url: /recipes
+                            - listitem [ref=e158]:
+                                - link "Favorites" [ref=e159] [cursor=pointer]:
+                                    - /url: /favorites
+                            - listitem [ref=e160]:
+                                - link "Pricing" [ref=e161] [cursor=pointer]:
+                                    - /url: /pricing
+                    - generic [ref=e162]:
+                        - heading "Legal" [level=4] [ref=e163]
+                        - list [ref=e164]:
+                            - listitem [ref=e165]:
+                                - link "Refund Policy" [ref=e166] [cursor=pointer]:
+                                    - /url: /refund-policy
+                            - listitem [ref=e167]:
+                                - link "Terms of Service" [ref=e168] [cursor=pointer]:
+                                    - /url: /terms
+                            - listitem [ref=e169]:
+                                - link "Privacy Policy" [ref=e170] [cursor=pointer]:
+                                    - /url: /privacy
+                    - generic [ref=e171]:
+                        - heading "Contact" [level=4] [ref=e172]
+                        - list [ref=e173]:
+                            - listitem [ref=e174]:
+                                - link "Support" [ref=e175] [cursor=pointer]:
+                                    - /url: mailto:support@idriscooks.com
+                                    - img [ref=e176] [cursor=pointer]
+                                    - text: Support
+                - generic [ref=e179]:
+                    - paragraph [ref=e180]: © 2025 Idris Cooks. All rights reserved.
+                    - generic [ref=e181]:
+                        - link "Refunds" [ref=e182] [cursor=pointer]:
+                            - /url: /refund-policy
+                        - link "Terms" [ref=e183] [cursor=pointer]:
+                            - /url: /terms
+                        - link "Privacy" [ref=e184] [cursor=pointer]:
+                            - /url: /privacy
+    - alert [ref=e185]
+    - button "Open Next.js Dev Tools" [ref=e191] [cursor=pointer]:
+        - img [ref=e192] [cursor=pointer]
+```

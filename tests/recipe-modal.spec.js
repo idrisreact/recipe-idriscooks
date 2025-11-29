@@ -6,7 +6,7 @@ test.describe('Recipe Preview Modal - Dark Theme Testing', () => {
   });
 
   test('Recipe modal displays with dark theme styling', async ({ page }) => {
-    await page.goto('http://localhost:3000/recipes');
+    await page.goto('//recipes');
     
     // Wait for recipes to load
     await page.waitForSelector('article, [data-testid="recipe-card"]', { timeout: 10000 });
@@ -69,7 +69,7 @@ test.describe('Recipe Preview Modal - Dark Theme Testing', () => {
   });
 
   test('Recipe modal buttons have proper styling', async ({ page }) => {
-    await page.goto('http://localhost:3000/recipes');
+    await page.goto('//recipes');
     
     // Wait for recipes to load
     await page.waitForSelector('article, [data-testid="recipe-card"]', { timeout: 10000 });
@@ -104,7 +104,7 @@ test.describe('Recipe Preview Modal - Dark Theme Testing', () => {
   });
 
   test('Recipe modal tabs work correctly', async ({ page }) => {
-    await page.goto('http://localhost:3000/recipes');
+    await page.goto('//recipes');
     
     // Wait for recipes to load
     await page.waitForSelector('article, [data-testid="recipe-card"]', { timeout: 10000 });
