@@ -8,6 +8,7 @@ import {
   UserButton,
 } from '@/src/components/auth/auth-components';
 import { Footer } from '@/src/components/layout/Footer';
+import { CookieConsent } from '@/src/components/layout/CookieConsent';
 import Link from 'next/link';
 import { CreditCard, Crown, ChefHat } from 'lucide-react';
 import { motion, useScroll, useTransform } from 'framer-motion';
@@ -110,6 +111,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <main className="flex-1">{children}</main>
         <Footer />
       </div>
+
+      {/* Cookie Consent Banner */}
+      <CookieConsent />
     </>
   );
 }
