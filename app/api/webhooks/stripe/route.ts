@@ -153,7 +153,6 @@ async function createInvoiceForCheckout(session: Stripe.Checkout.Session) {
         description: item.description || 'Purchase',
         amount: item.amount_total || 0,
         currency: session.currency || 'gbp',
-        quantity: item.quantity || 1,
       });
     }
 
@@ -222,38 +221,7 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
 
   // Handle one-time payment for recipe access
   if (type === 'recipe_access' && userId && userId !== 'guest') {
-    // Grant lifetime access (or long duration)
-    const lifetimeEnd = new Date();
-    lifetimeEnd.setFullYear(lifetimeEnd.getFullYear() + 100); // 100 years from now
-
-    await db
-      .insert(userSubscriptions)
-      .values({
-        id: crypto.randomUUID(),
-        userId: userId,
-        planId: 'premium', // Grant premium features
-        status: 'active',
-        currentPeriodStart: new Date(),
-        currentPeriodEnd: lifetimeEnd,
-        stripeCustomerId: session.customer as string,
-        stripeSubscriptionId: session.payment_intent as string, // Use payment intent ID for one-time payments
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      })
-      .onConflictDoUpdate({
-        target: userSubscriptions.userId,
-        set: {
-          planId: 'premium',
-          status: 'active',
-          currentPeriodStart: new Date(),
-          currentPeriodEnd: lifetimeEnd,
-          stripeCustomerId: session.customer as string,
-          stripeSubscriptionId: session.payment_intent as string,
-          updatedAt: new Date(),
-        },
-      });
-
-    // Also grant access via premium_features table (which is what checkRecipeAccess uses)
+    // Grant lifetime access via premium_features table
     await db
       .insert(premiumFeatures)
       .values({
