@@ -10,6 +10,7 @@ import {
 import { Footer } from '@/src/components/layout/Footer';
 import { CookieConsent } from '@/src/components/layout/CookieConsent';
 import { MobileBottomNav } from '@/src/components/layout/MobileBottomNav';
+import { WelcomeToast } from '@/src/components/welcome-toast/welcome-toast';
 import Link from 'next/link';
 import { CreditCard, Crown, ChefHat, User, Heart } from 'lucide-react';
 import Image from 'next/image';
@@ -131,7 +132,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 
       {/* Cookie Consent Banner */}
       <CookieConsent />
-      
+
+      {/* Welcome Toast for New Users */}
+      <WelcomeToast />
+
       {/* Mobile Bottom Navigation */}
       <MobileBottomNav />
     </>
