@@ -1,7 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useAuth } from '@/src/components/auth/auth-components';
 
-export interface ShoppingListItem {
+interface ShoppingListItem {
   id: string;
   shoppingListId: string;
   name: string;
@@ -19,7 +19,7 @@ export interface ShoppingListItem {
   createdAt: Date;
 }
 
-export interface ShoppingList {
+interface ShoppingList {
   id: string;
   userId: string;
   mealPlanId: string | null;

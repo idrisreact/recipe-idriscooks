@@ -280,5 +280,3 @@ export const AboutSection = () => {
     </main>
   );
 };
-
-export default AboutSection;

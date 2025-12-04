@@ -3,9 +3,11 @@ import { Recipe } from '@/src/types/recipes.types';
 import { X, Clock, Users, Heart, Share2, BookOpen } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Text } from '@/src/components/ui/Text';
-import { useState, useEffect, useRef } from 'react';
+import { useState } from 'react';
 import { authClient } from '@/src/utils/auth-client';
 import { SignInOverlay } from './sign-in-overlay';
+import { useModal } from '@/src/hooks/use-modal';
+import { useShare } from '@/src/hooks/use-share';
 
 interface RecipePreviewModalProps {
   recipe: Recipe | null;
@@ -26,69 +28,27 @@ export const RecipePreviewModal = ({
 }: RecipePreviewModalProps) => {
   const [activeTab, setActiveTab] = useState<'ingredients' | 'steps'>('ingredients');
   const { data: session } = authClient.useSession();
-  const modalRef = useRef<HTMLDivElement>(null);
-  const previousActiveElement = useRef<HTMLElement | null>(null);
 
-  useEffect(() => {
-    if (isOpen) {
-      previousActiveElement.current = document.activeElement as HTMLElement;
-      document.body.style.overflow = 'hidden';
+  const { modalRef } = useModal<HTMLDivElement>({
+    isOpen,
+    onClose,
+    enableFocusTrap: true,
+    enableEscapeKey: true,
+    disableBodyScroll: true,
+  });
 
-      const focusableElements = modalRef.current?.querySelectorAll(
-        'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
-      ) as NodeListOf<HTMLElement>;
-
-      const firstElement = focusableElements?.[0];
-      const lastElement = focusableElements?.[focusableElements.length - 1];
-
-      const handleKeyDown = (e: KeyboardEvent) => {
-        if (e.key === 'Escape') {
-          onClose();
-          return;
-        }
-
-        if (e.key === 'Tab') {
-          if (focusableElements.length === 0) return;
-
-          if (e.shiftKey) {
-            if (document.activeElement === firstElement) {
-              e.preventDefault();
-              lastElement?.focus();
-            }
-          } else {
-            if (document.activeElement === lastElement) {
-              e.preventDefault();
-              firstElement?.focus();
-            }
-          }
-        }
-      };
-
-      document.addEventListener('keydown', handleKeyDown);
-      firstElement?.focus();
-
-      return () => {
-        document.body.style.overflow = 'auto';
-        document.removeEventListener('keydown', handleKeyDown);
-        previousActiveElement.current?.focus();
-      };
-    }
-  }, [isOpen, onClose]);
+  const { share } = useShare({
+    fallbackToCopy: true,
+  });
 
   if (!isOpen || !recipe) return null;
 
   const shareRecipe = () => {
-    if (navigator.share) {
-      navigator.share({
-        title: recipe.title,
-        text: recipe.description,
-        url: window.location.origin + `/recipes/category/${recipe.title}`,
-      });
-    } else {
-      navigator.clipboard.writeText(
-        `${recipe.title} - ${window.location.origin}/recipes/category/${recipe.title}`
-      );
-    }
+    share({
+      title: recipe.title,
+      text: recipe.description,
+      url: `${window.location.origin}/recipes/category/${recipe.title}`,
+    });
   };
 
   return (

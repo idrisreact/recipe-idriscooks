@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import Stripe from 'stripe';
 import { auth } from '@/src/utils/auth';
 import { rateLimit } from '@/src/lib/rate-limit';
+import { getRecipeAccessPrice } from '@/src/config/pricing';
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
   apiVersion: '2025-08-27.basil',
@@ -23,6 +24,8 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
+    const pricing = getRecipeAccessPrice();
+
     const checkoutSession = await stripe.checkout.sessions.create({
       payment_method_types: ['card'],
       line_items: [
@@ -30,10 +33,10 @@ export async function POST(request: NextRequest) {
           price_data: {
             currency: 'gbp',
             product_data: {
-              name: 'Recipe Access - Lifetime',
+              name: `Recipe Access - Lifetime ${pricing.label ? `(${pricing.label})` : ''}`,
               description: 'Unlimited access to all recipes, forever',
             },
-            unit_amount: 1000, // £10.00 in pence
+            unit_amount: pricing.amount,
           },
           quantity: 1,
         },
@@ -44,6 +47,7 @@ export async function POST(request: NextRequest) {
       metadata: {
         userId: session.user.id,
         type: 'recipe_access',
+        pricingTier: pricing.label || 'standard',
       },
       customer_email: session.user.email,
     });

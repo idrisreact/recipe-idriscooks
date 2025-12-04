@@ -11,6 +11,7 @@ import { incrementUsage, getUserUsage } from '@/src/lib/subscription';
 import Link from 'next/link';
 import { checkRecipeAccess } from '@/src/utils/check-recipe-access';
 import { RecipeAccessButton } from '@/src/components/payment/recipe-access-button';
+import { getRecipeAccessPrice, PRICING } from '@/src/config/pricing';
 
 interface PageProps {
   params: Promise<{ slug: string }>;
@@ -49,6 +50,10 @@ export default async function RecipePage({ params }: PageProps) {
 
   // Check if user has paid for recipe access (only if logged in)
   const hasUnlimitedViews = userId ? await checkRecipeAccess(userId) : false;
+
+  // Get current pricing
+  const pricing = getRecipeAccessPrice();
+  const isLaunchSpecial = PRICING.recipeAccess.isLaunchSpecial;
 
   // Debug logging
   console.log('🔍 Debug - User access check:', {
@@ -158,9 +163,17 @@ export default async function RecipePage({ params }: PageProps) {
               </h2>
               <p className="text-gray-600 text-center mb-6 text-lg">
                 {!userId
-                  ? 'Create a free account to view up to 3 recipes per month, or get lifetime access for £10'
-                  : 'Get lifetime access to all recipes for just £10'}
+                  ? `Create a free account to view up to 3 recipes per month, or get lifetime access ${isLaunchSpecial ? '(Early Bird Special!)' : ''}`
+                  : `Get lifetime access to all recipes ${isLaunchSpecial ? `for just ${pricing.display}` : `for ${pricing.display}`}`}
               </p>
+              {isLaunchSpecial && (
+                <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-3 mb-4">
+                  <p className="text-sm text-center text-yellow-800 font-semibold">
+                    🎉 {'badge' in pricing ? pricing.badge : 'Limited Time'} - Save £15! Regular
+                    price: {PRICING.recipeAccess.regular.display}
+                  </p>
+                </div>
+              )}
 
               {/* Features */}
               <ul className="space-y-3 mb-6">
