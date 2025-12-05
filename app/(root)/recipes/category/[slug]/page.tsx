@@ -4,8 +4,8 @@ import { auth } from '@/src/utils/auth';
 import { headers } from 'next/headers';
 import { notFound } from 'next/navigation';
 import { db } from '@/src/db';
-import { recipes as recipesTable } from '@/src/db/schemas';
-import { eq } from 'drizzle-orm';
+import { recipes as recipesTable, reviews } from '@/src/db/schemas';
+import { eq, sql } from 'drizzle-orm';
 import { Recipe } from '@/src/types/recipes.types';
 import { incrementUsage, getUserUsage } from '@/src/lib/subscription';
 import Link from 'next/link';
@@ -13,6 +13,8 @@ import { checkRecipeAccess } from '@/src/utils/check-recipe-access';
 import { RecipeAccessButton } from '@/src/components/payment/recipe-access-button';
 import { getRecipeAccessPrice, PRICING } from '@/src/config/pricing';
 import { generateRecipeSchema, getCanonicalUrl, getOgImageUrl } from '@/src/utils/seo';
+import { ReviewsSection } from '@/src/components/reviews/reviews-section';
+import { SimilarRecipes } from '@/src/components/recipe-server-component/similar-recipes';
 
 interface PageProps {
   params: Promise<{ slug: string }>;
@@ -72,12 +74,16 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
       images: [ogImage],
       creator: '@idriscooks',
     },
-    other: {
-      'recipe:prep_time': recipe.prepTime ? `${recipe.prepTime} minutes` : undefined,
-      'recipe:cook_time': recipe.cookTime ? `${recipe.cookTime} minutes` : undefined,
-      'recipe:total_time': totalTime > 0 ? `${totalTime} minutes` : undefined,
-      'recipe:servings': recipe.servings?.toString() || undefined,
-    },
+    ...(recipe.prepTime || recipe.cookTime || recipe.servings
+      ? {
+          other: {
+            ...(recipe.prepTime && { 'recipe:prep_time': `${recipe.prepTime} minutes` }),
+            ...(recipe.cookTime && { 'recipe:cook_time': `${recipe.cookTime} minutes` }),
+            ...(totalTime > 0 && { 'recipe:total_time': `${totalTime} minutes` }),
+            ...(recipe.servings && { 'recipe:servings': recipe.servings.toString() }),
+          },
+        }
+      : {}),
   };
 }
 
@@ -139,10 +145,22 @@ export default async function RecipePage({ params }: PageProps) {
     usage = await getUserUsage();
   }
 
+  // Fetch review stats for SEO schema
+  const reviewStats = await db
+    .select({
+      count: sql<number>`count(*)`,
+      avgRating: sql<number>`round(avg(${reviews.rating})::numeric, 1)`,
+    })
+    .from(reviews)
+    .where(eq(reviews.recipeId, recipe.id));
+
+  const stats = reviewStats[0] && reviewStats[0].count > 0 ? reviewStats[0] : undefined;
+
   // Generate Recipe JSON-LD schema for SEO
   const recipeSchema = generateRecipeSchema(
     recipe as unknown as Recipe,
-    getCanonicalUrl(`/recipes/category/${slug}`)
+    getCanonicalUrl(`/recipes/category/${slug}`),
+    stats
   );
 
   return (
@@ -181,6 +199,22 @@ export default async function RecipePage({ params }: PageProps) {
           canView={true}
           hasPro={hasUnlimitedViews}
         />
+
+        {/* Reviews Section */}
+        {!showPaywall && (
+          <>
+            <div className="mt-12 pt-12 border-t border-zinc-800">
+              <ReviewsSection
+                recipeId={recipe.id}
+                userId={userId}
+                hasPaidAccess={hasUnlimitedViews}
+              />
+            </div>
+
+            {/* Similar Recipes Section */}
+            <SimilarRecipes currentRecipeId={recipe.id} tags={recipe.tags as string[]} limit={4} />
+          </>
+        )}
 
         {/* Glassmorphism Paywall Overlay */}
         {showPaywall && (

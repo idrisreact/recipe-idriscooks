@@ -1,14 +1,19 @@
 import { Recipe } from '@/src/types/recipes.types';
 
+interface ReviewStats {
+  count: number;
+  avgRating: number;
+}
+
 /**
  * Generates Recipe schema markup (JSON-LD) for Google
  * @see https://schema.org/Recipe
  * @see https://developers.google.com/search/docs/appearance/structured-data/recipe
  */
-export function generateRecipeSchema(recipe: Recipe, url: string) {
+export function generateRecipeSchema(recipe: Recipe, url: string, reviewStats?: ReviewStats) {
   const totalTime = (recipe.prepTime || 0) + (recipe.cookTime || 0);
 
-  return {
+  const schema: Record<string, unknown> = {
     '@context': 'https://schema.org',
     '@type': 'Recipe',
     name: recipe.title,
@@ -24,20 +29,34 @@ export function generateRecipeSchema(recipe: Recipe, url: string) {
     cookTime: recipe.cookTime ? `PT${recipe.cookTime}M` : undefined,
     totalTime: totalTime > 0 ? `PT${totalTime}M` : undefined,
     recipeYield: recipe.servings?.toString() || '1',
-    recipeIngredient: recipe.ingredients?.map(
-      (ing) => `${ing.quantity} ${ing.unit} ${ing.name}`
-    ) || [],
-    recipeInstructions: recipe.steps?.map((step, index) => ({
-      '@type': 'HowToStep',
-      position: index + 1,
-      text: step,
-    })) || [],
+    recipeIngredient:
+      recipe.ingredients?.map((ing) => `${ing.quantity} ${ing.unit} ${ing.name}`) || [],
+    recipeInstructions:
+      recipe.steps?.map((step, index) => ({
+        '@type': 'HowToStep',
+        position: index + 1,
+        text: step,
+      })) || [],
     keywords: recipe.tags?.join(', ') || '',
     recipeCategory: recipe.tags?.[0] || 'Main Course',
-    recipeCuisine: recipe.tags?.find(tag =>
-      ['Italian', 'Mexican', 'Chinese', 'Indian', 'French', 'Japanese', 'Thai'].includes(tag)
-    ) || undefined,
+    recipeCuisine:
+      recipe.tags?.find((tag) =>
+        ['Italian', 'Mexican', 'Chinese', 'Indian', 'French', 'Japanese', 'Thai'].includes(tag)
+      ) || undefined,
   };
+
+  // Add aggregate rating if reviews exist
+  if (reviewStats && reviewStats.count > 0) {
+    schema.aggregateRating = {
+      '@type': 'AggregateRating',
+      ratingValue: reviewStats.avgRating,
+      reviewCount: reviewStats.count,
+      bestRating: 5,
+      worstRating: 1,
+    };
+  }
+
+  return schema;
 }
 
 /**
