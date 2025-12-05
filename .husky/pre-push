@@ -1,2 +1,2 @@
 # Run Stripe tests before pushing
-npm run test:stripe
+npm run test:e2e:stripe
