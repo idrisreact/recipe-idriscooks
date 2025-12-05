@@ -5,16 +5,23 @@ import { recipes } from '@/src/db/schemas';
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://idriscooks.vercel.app';
 
-  // Fetch all recipes from the database
-  const allRecipes = await db.select().from(recipes);
+  let recipeUrls: MetadataRoute.Sitemap = [];
 
-  // Generate recipe pages URLs
-  const recipeUrls: MetadataRoute.Sitemap = allRecipes.map((recipe) => ({
-    url: `${baseUrl}/recipes/category/${encodeURIComponent(recipe.title)}`,
-    lastModified: new Date(),
-    changeFrequency: 'weekly',
-    priority: 0.8,
-  }));
+  try {
+    // Fetch all recipes from the database
+    const allRecipes = await db.select().from(recipes);
+
+    // Generate recipe pages URLs
+    recipeUrls = allRecipes.map((recipe) => ({
+      url: `${baseUrl}/recipes/category/${encodeURIComponent(recipe.title)}`,
+      lastModified: new Date(),
+      changeFrequency: 'weekly',
+      priority: 0.8,
+    }));
+  } catch (error) {
+    // If database is unavailable during build (e.g., local build without DB), continue with static pages only
+    console.warn('Failed to fetch recipes for sitemap, using static pages only:', error);
+  }
 
   // Static pages
   const staticPages: MetadataRoute.Sitemap = [

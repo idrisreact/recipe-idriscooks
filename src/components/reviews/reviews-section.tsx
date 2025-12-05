@@ -1,6 +1,7 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
+import Image from 'next/image';
 import { StarRating } from './star-rating';
 import { ReviewForm } from './review-form';
 import { Review } from '@/src/db/schemas';
@@ -32,7 +33,7 @@ export function ReviewsSection({ recipeId, userId, hasPaidAccess }: ReviewsSecti
   const [editingReview, setEditingReview] = useState<Review | null>(null);
   const [deletingId, setDeletingId] = useState<number | null>(null);
 
-  const fetchReviews = async () => {
+  const fetchReviews = useCallback(async () => {
     try {
       const response = await fetch(`/api/reviews/${recipeId}`);
       const data = await response.json();
@@ -44,11 +45,11 @@ export function ReviewsSection({ recipeId, userId, hasPaidAccess }: ReviewsSecti
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [recipeId]);
 
   useEffect(() => {
     fetchReviews();
-  }, [recipeId]);
+  }, [fetchReviews]);
 
   const handleDelete = async (reviewId: number) => {
     if (!confirm('Are you sure you want to delete this review?')) {
@@ -184,11 +185,14 @@ export function ReviewsSection({ recipeId, userId, hasPaidAccess }: ReviewsSecti
               <div className="flex items-start justify-between">
                 <div className="flex items-start gap-3">
                   {review.userImage && (
-                    <img
-                      src={review.userImage}
-                      alt={review.userName}
-                      className="w-10 h-10 rounded-full"
-                    />
+                    <div className="relative w-10 h-10">
+                      <Image
+                        src={review.userImage}
+                        alt={review.userName}
+                        fill
+                        className="rounded-full object-cover"
+                      />
+                    </div>
                   )}
                   <div>
                     <p className="font-medium text-white">{review.userName}</p>
@@ -236,15 +240,17 @@ export function ReviewsSection({ recipeId, userId, hasPaidAccess }: ReviewsSecti
               {review.photos && review.photos.length > 0 && (
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
                   {review.photos.map((photo, index) => (
-                    <img
-                      key={index}
-                      src={photo}
-                      alt={`Review photo ${index + 1}`}
-                      className="w-full h-32 object-cover rounded-lg"
-                      onError={(e) => {
-                        e.currentTarget.style.display = 'none';
-                      }}
-                    />
+                    <div key={index} className="relative w-full h-32">
+                      <Image
+                        src={photo}
+                        alt={`Review photo ${index + 1}`}
+                        fill
+                        className="object-cover rounded-lg"
+                        onError={(e) => {
+                          e.currentTarget.style.display = 'none';
+                        }}
+                      />
+                    </div>
                   ))}
                 </div>
               )}

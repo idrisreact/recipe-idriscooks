@@ -8,8 +8,8 @@ describe('useCheckout', () => {
   beforeEach(() => {
     global.fetch = jest.fn();
     // Mock window.location.href
-    delete (window as any).location;
-    (window as any).location = { href: '' };
+    delete (window as { location?: { href: string } }).location;
+    (window as { location: { href: string } }).location = { href: '' };
   });
 
   afterEach(() => {

@@ -1,5 +1,7 @@
 import { render, screen, fireEvent, waitFor } from '@/src/test-utils';
 import { RecipeAccessButton } from '../recipe-access-button';
+import { useAuth } from '@/src/components/auth/auth-components';
+import { useCheckout } from '@/src/hooks/use-checkout';
 
 // Mock dependencies
 const mockPush = jest.fn();
@@ -11,13 +13,11 @@ jest.mock('next/navigation', () => ({
   }),
 }));
 
-jest.mock('@/src/components/auth/auth-components', () => ({
-  useAuth: jest.fn(),
-}));
+jest.mock('@/src/components/auth/auth-components');
+jest.mock('@/src/hooks/use-checkout');
 
-jest.mock('@/src/hooks/use-checkout', () => ({
-  useCheckout: jest.fn(),
-}));
+const mockUseAuth = useAuth as jest.MockedFunction<typeof useAuth>;
+const mockUseCheckout = useCheckout as jest.MockedFunction<typeof useCheckout>;
 
 describe('RecipeAccessButton', () => {
   beforeEach(() => {
@@ -25,12 +25,30 @@ describe('RecipeAccessButton', () => {
   });
 
   it('should show "You have full access" when user has access', () => {
-    const { useAuth } = require('@/src/components/auth/auth-components');
-    const { useCheckout } = require('@/src/hooks/use-checkout');
-
-    useAuth.mockReturnValue({ session: { user: { id: '123' } }, loading: false });
-    useCheckout.mockReturnValue({
+    mockUseAuth.mockReturnValue({
+      session: {
+        user: {
+          id: '123',
+          name: 'Test User',
+          email: 'test@example.com',
+          emailVerified: true,
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        },
+        session: {
+          id: 'session-123',
+          createdAt: new Date(),
+          updatedAt: new Date(),
+          userId: '123',
+          expiresAt: new Date(),
+          token: 'token',
+        },
+      },
+      loading: false,
+    });
+    mockUseCheckout.mockReturnValue({
       isLoading: false,
+      error: null,
       initiateCheckout: mockInitiateCheckout,
     });
 
@@ -41,12 +59,10 @@ describe('RecipeAccessButton', () => {
   });
 
   it('should redirect to sign-up when clicked without session', async () => {
-    const { useAuth } = require('@/src/components/auth/auth-components');
-    const { useCheckout } = require('@/src/hooks/use-checkout');
-
-    useAuth.mockReturnValue({ session: null, loading: false });
-    useCheckout.mockReturnValue({
+    mockUseAuth.mockReturnValue({ session: null, loading: false });
+    mockUseCheckout.mockReturnValue({
       isLoading: false,
+      error: null,
       initiateCheckout: mockInitiateCheckout,
     });
 
@@ -62,15 +78,30 @@ describe('RecipeAccessButton', () => {
   });
 
   it('should initiate checkout when clicked with session', async () => {
-    const { useAuth } = require('@/src/components/auth/auth-components');
-    const { useCheckout } = require('@/src/hooks/use-checkout');
-
-    useAuth.mockReturnValue({
-      session: { user: { id: '123', email: 'test@example.com' } },
+    mockUseAuth.mockReturnValue({
+      session: {
+        user: {
+          id: '123',
+          name: 'Test User',
+          email: 'test@example.com',
+          emailVerified: true,
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        },
+        session: {
+          id: 'session-123',
+          createdAt: new Date(),
+          updatedAt: new Date(),
+          userId: '123',
+          expiresAt: new Date(),
+          token: 'token',
+        },
+      },
       loading: false,
     });
-    useCheckout.mockReturnValue({
+    mockUseCheckout.mockReturnValue({
       isLoading: false,
+      error: null,
       initiateCheckout: mockInitiateCheckout,
     });
 
@@ -86,12 +117,10 @@ describe('RecipeAccessButton', () => {
   });
 
   it('should show loading state', () => {
-    const { useAuth } = require('@/src/components/auth/auth-components');
-    const { useCheckout } = require('@/src/hooks/use-checkout');
-
-    useAuth.mockReturnValue({ session: null, loading: true });
-    useCheckout.mockReturnValue({
+    mockUseAuth.mockReturnValue({ session: null, loading: true });
+    mockUseCheckout.mockReturnValue({
       isLoading: false,
+      error: null,
       initiateCheckout: mockInitiateCheckout,
     });
 
@@ -103,12 +132,10 @@ describe('RecipeAccessButton', () => {
   });
 
   it('should display pricing information', () => {
-    const { useAuth } = require('@/src/components/auth/auth-components');
-    const { useCheckout } = require('@/src/hooks/use-checkout');
-
-    useAuth.mockReturnValue({ session: null, loading: false });
-    useCheckout.mockReturnValue({
+    mockUseAuth.mockReturnValue({ session: null, loading: false });
+    mockUseCheckout.mockReturnValue({
       isLoading: false,
+      error: null,
       initiateCheckout: mockInitiateCheckout,
     });
 

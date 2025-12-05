@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import Image from 'next/image';
 import { StarRating } from './star-rating';
 import { Upload, X, Loader2 } from 'lucide-react';
 import toast from 'react-hot-toast';
@@ -145,11 +146,12 @@ export function ReviewForm({ recipeId, existingReview, onSuccess, onCancel }: Re
         {photos.length > 0 && (
           <div className="grid grid-cols-3 gap-2 mt-3">
             {photos.map((photo, index) => (
-              <div key={index} className="relative group">
-                <img
+              <div key={index} className="relative group h-24">
+                <Image
                   src={photo}
                   alt={`Preview ${index + 1}`}
-                  className="w-full h-24 object-cover rounded-lg"
+                  fill
+                  className="object-cover rounded-lg"
                   onError={(e) => {
                     e.currentTarget.src = '/placeholder-image.jpg';
                   }}
@@ -157,7 +159,7 @@ export function ReviewForm({ recipeId, existingReview, onSuccess, onCancel }: Re
                 <button
                   type="button"
                   onClick={() => handleRemovePhoto(index)}
-                  className="absolute top-1 right-1 p-1 bg-red-500 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
+                  className="absolute top-1 right-1 p-1 bg-red-500 rounded-full opacity-0 group-hover:opacity-100 transition-opacity z-10"
                 >
                   <X className="w-3 h-3 text-white" />
                 </button>
