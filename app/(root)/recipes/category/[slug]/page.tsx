@@ -12,6 +12,7 @@ import Link from 'next/link';
 import { checkRecipeAccess } from '@/src/utils/check-recipe-access';
 import { RecipeAccessButton } from '@/src/components/payment/recipe-access-button';
 import { getRecipeAccessPrice, PRICING } from '@/src/config/pricing';
+import { generateRecipeSchema, getCanonicalUrl, getOgImageUrl } from '@/src/utils/seo';
 
 interface PageProps {
   params: Promise<{ slug: string }>;
@@ -27,16 +28,56 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     .where(eq(recipesTable.title, decoded))
     .limit(1);
 
-  if (recipe) {
+  if (!recipe) {
     return {
-      title: recipe.title,
-      description: recipe.description,
+      title: decoded,
+      description: `Recipe: ${decoded}`,
     };
   }
 
+  const canonicalUrl = getCanonicalUrl(`/recipes/category/${slug}`);
+  const ogImage = getOgImageUrl(recipe.imageUrl);
+  const totalTime = (recipe.prepTime || 0) + (recipe.cookTime || 0);
+
   return {
-    title: decoded,
-    description: `Recipe: ${decoded}`,
+    title: `${recipe.title} | Idris Cooks`,
+    description: recipe.description,
+    keywords: recipe.tags as string[] | undefined,
+    authors: [{ name: 'Idris Cooks' }],
+    creator: 'Idris Cooks',
+    publisher: 'Idris Cooks',
+    alternates: {
+      canonical: canonicalUrl,
+    },
+    openGraph: {
+      title: recipe.title,
+      description: recipe.description,
+      url: canonicalUrl,
+      siteName: 'Idris Cooks',
+      images: [
+        {
+          url: ogImage,
+          width: 1200,
+          height: 630,
+          alt: recipe.title,
+        },
+      ],
+      locale: 'en_GB',
+      type: 'article',
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: recipe.title,
+      description: recipe.description,
+      images: [ogImage],
+      creator: '@idriscooks',
+    },
+    other: {
+      'recipe:prep_time': recipe.prepTime ? `${recipe.prepTime} minutes` : undefined,
+      'recipe:cook_time': recipe.cookTime ? `${recipe.cookTime} minutes` : undefined,
+      'recipe:total_time': totalTime > 0 ? `${totalTime} minutes` : undefined,
+      'recipe:servings': recipe.servings?.toString() || undefined,
+    },
   };
 }
 
@@ -98,8 +139,20 @@ export default async function RecipePage({ params }: PageProps) {
     usage = await getUserUsage();
   }
 
+  // Generate Recipe JSON-LD schema for SEO
+  const recipeSchema = generateRecipeSchema(
+    recipe as unknown as Recipe,
+    getCanonicalUrl(`/recipes/category/${slug}`)
+  );
+
   return (
     <div className="wrapper page">
+      {/* Recipe JSON-LD Schema for Google */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(recipeSchema) }}
+      />
+
       {/* Show usage banner for free users */}
       {!hasUnlimitedViews && usage && !showPaywall && (
         <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">

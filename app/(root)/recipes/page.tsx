@@ -3,6 +3,19 @@ import { auth } from "@/src/utils/auth";
 import { headers } from "next/headers";
 import Image from "next/image";
 import { ChevronDown } from "lucide-react";
+import { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "All Recipes - Browse Our Recipe Collection",
+  description:
+    "Browse our complete collection of recipes. Discover delicious dishes from appetizers to desserts, with easy-to-follow instructions and beautiful photos.",
+  openGraph: {
+    title: "All Recipes - Browse Our Recipe Collection | Idris Cooks",
+    description:
+      "Browse our complete collection of recipes. Discover delicious dishes from appetizers to desserts.",
+    type: "website",
+  },
+};
 
 export default async function RecipePage() {
   const session = await auth.api.getSession({ headers: await headers() });

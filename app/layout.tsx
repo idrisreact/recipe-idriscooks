@@ -16,8 +16,73 @@ const montserrat = Montserrat({
 });
 
 export const metadata: Metadata = {
-  title: 'Idris Cooks',
-  description: 'recipes for you',
+  metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL || 'https://idriscooks.vercel.app'),
+  title: {
+    default: 'Idris Cooks - Delicious Recipes & Cooking Guides',
+    template: '%s | Idris Cooks',
+  },
+  description:
+    'Discover a collection of delicious, easy-to-follow recipes from Idris Cooks. From quick weeknight dinners to impressive dishes, find your next culinary adventure.',
+  keywords: [
+    'recipes',
+    'cooking',
+    'food',
+    'dinner ideas',
+    'meal prep',
+    'easy recipes',
+    'cooking guides',
+    'idris cooks',
+  ],
+  authors: [{ name: 'Idris Cooks' }],
+  creator: 'Idris Cooks',
+  publisher: 'Idris Cooks',
+  formatDetection: {
+    email: false,
+    address: false,
+    telephone: false,
+  },
+  openGraph: {
+    type: 'website',
+    locale: 'en_GB',
+    url: '/',
+    title: 'Idris Cooks - Delicious Recipes & Cooking Guides',
+    description:
+      'Discover a collection of delicious, easy-to-follow recipes from Idris Cooks. From quick weeknight dinners to impressive dishes, find your next culinary adventure.',
+    siteName: 'Idris Cooks',
+    images: [
+      {
+        url: '/og-image.jpg',
+        width: 1200,
+        height: 630,
+        alt: 'Idris Cooks',
+      },
+    ],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Idris Cooks - Delicious Recipes & Cooking Guides',
+    description:
+      'Discover a collection of delicious, easy-to-follow recipes from Idris Cooks.',
+    creator: '@idriscooks',
+    images: ['/og-image.jpg'],
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      'max-video-preview': -1,
+      'max-image-preview': 'large',
+      'max-snippet': -1,
+    },
+  },
+  icons: {
+    icon: '/favicon.ico',
+    shortcut: '/favicon.ico',
+    apple: '/apple-touch-icon.png',
+  },
+  manifest: '/manifest.json',
 };
 
 if (typeof window !== 'undefined' && process.env.NODE_ENV === 'production') {
