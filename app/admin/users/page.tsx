@@ -12,7 +12,7 @@ export default async function UsersPage() {
   return (
     <div>
       <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-900">User Management</h1>
+        <h1 className="text-3xl font-bold text-gray-900">User Management!</h1>
         <p className="text-gray-500 mt-2">Manage user accounts and permissions</p>
       </div>
 
