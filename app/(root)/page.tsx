@@ -3,63 +3,25 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import FeaturesSection from '@/src/components/features-section';
-import { useEffect, useRef } from 'react';
-import { gsap } from 'gsap';
-import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import { useGsapParallax, useGsapAnimation } from '@/src/hooks/use-gsap-animation';
 import { ChevronDown, Play, ArrowRight } from 'lucide-react';
 
-if (typeof window !== 'undefined') {
-  gsap.registerPlugin(ScrollTrigger);
-}
-
 export default function Home() {
-  const heroRef = useRef<HTMLDivElement>(null);
-  const headingRef = useRef<HTMLHeadingElement>(null);
+  const heroRef = useGsapParallax<HTMLDivElement>({
+    opacity: 0,
+    y: -100,
+  });
 
-  useEffect(() => {
-    // Capture current ref values for cleanup
-    const headingElement = headingRef.current;
-    const heroElement = heroRef.current;
-
-    // Reset elements to initial state
-    gsap.set(headingElement, { opacity: 1, y: 0 });
-    gsap.set(heroElement, { opacity: 1, y: 0 });
-
-    // Hero parallax effect
-    const parallaxTween = gsap.to(heroElement, {
-      opacity: 0,
-      y: -100,
-      scrollTrigger: {
-        trigger: heroElement,
-        start: 'top top',
-        end: 'bottom top',
-        scrub: true,
-      },
-    });
-
-    // Heading reveal
-    const headingTween = gsap.from(headingElement, {
+  const headingRef = useGsapAnimation<HTMLHeadingElement>(
+    {
       opacity: 0,
       y: 100,
       duration: 1.2,
       ease: 'power4.out',
       delay: 0.3,
-    });
-
-    // Cleanup function
-    return () => {
-      parallaxTween.kill();
-      headingTween.kill();
-      ScrollTrigger.getAll().forEach((trigger) => trigger.kill());
-      // Reset to visible state on cleanup
-      if (headingElement) {
-        gsap.set(headingElement, { clearProps: 'all' });
-      }
-      if (heroElement) {
-        gsap.set(heroElement, { clearProps: 'all' });
-      }
-    };
-  }, []);
+    },
+    true
+  );
 
   return (
     <>

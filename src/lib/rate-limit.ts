@@ -66,7 +66,7 @@ export const rateLimitConfigs = {
   },
 } as const;
 
-export type RateLimitType = keyof typeof rateLimitConfigs;
+type RateLimitType = keyof typeof rateLimitConfigs;
 
 /**
  * Create rate limiter instances

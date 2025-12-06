@@ -1,63 +1,48 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { useRef } from 'react';
 import { gsap } from 'gsap';
+import { useGsapTimeline } from '@/src/hooks/use-gsap-animation';
+import { useSessionStorage } from '@/src/hooks/use-session-storage';
 
 export default function IntroLoader() {
-  const [isComplete, setIsComplete] = useState(false);
-  const containerRef = useRef<HTMLDivElement>(null);
+  const [hasSeenIntro, setHasSeenIntro] = useSessionStorage('hasSeenIntro', false);
   const textRef = useRef<HTMLDivElement>(null);
   const curtainRef = useRef<HTMLDivElement>(null);
 
-  useEffect(() => {
-    // Check if we've already shown the intro in this session
-    const hasSeenIntro = sessionStorage.getItem('hasSeenIntro');
-    if (hasSeenIntro) {
-      setIsComplete(true);
-      return;
-    }
+  const containerRef = useGsapTimeline((tl) => {
+    if (hasSeenIntro) return;
 
-    const ctx = gsap.context(() => {
-      const tl = gsap.timeline({
-        onComplete: () => {
-          setIsComplete(true);
-          sessionStorage.setItem('hasSeenIntro', 'true');
-        },
-      });
+    gsap.set(containerRef.current, { visibility: 'visible' });
+    gsap.set(textRef.current, { y: 100, opacity: 0 });
 
-      // Initial state
-      gsap.set(containerRef.current, { visibility: 'visible' });
-      gsap.set(textRef.current, { y: 100, opacity: 0 });
-
-      tl.to(textRef.current, {
-        y: 0,
-        opacity: 1,
-        duration: 1,
-        ease: 'power4.out',
-        delay: 0.5,
+    tl.to(textRef.current, {
+      y: 0,
+      opacity: 1,
+      duration: 1,
+      ease: 'power4.out',
+      delay: 0.5,
+    })
+      .to(textRef.current, {
+        y: -100,
+        opacity: 0,
+        duration: 0.8,
+        ease: 'power4.in',
+        delay: 1.5,
       })
-        .to(textRef.current, {
-          y: -100,
-          opacity: 0,
-          duration: 0.8,
-          ease: 'power4.in',
-          delay: 1.5,
-        })
-        .to(curtainRef.current, {
-          height: 0,
-          duration: 1.2,
-          ease: 'power4.inOut',
-        })
-        .to(containerRef.current, {
-          display: 'none',
-          duration: 0,
-        });
-    }, containerRef);
+      .to(curtainRef.current, {
+        height: 0,
+        duration: 1.2,
+        ease: 'power4.inOut',
+      })
+      .to(containerRef.current, {
+        display: 'none',
+        duration: 0,
+        onComplete: () => setHasSeenIntro(true),
+      });
+  }, [hasSeenIntro]);
 
-    return () => ctx.revert();
-  }, []);
-
-  if (isComplete) return null;
+  if (hasSeenIntro) return null;
 
   return (
     <div

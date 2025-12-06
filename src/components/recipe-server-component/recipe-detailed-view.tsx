@@ -313,33 +313,6 @@ export function RecipeDetailedView({ recipe, canView, hasPro = false }: Props) {
           {}
           {!canView && <SignInOverlay position="top" />}
         </div>
-
-        {}
-        <aside className="hidden xl:block">
-          <div className="sticky top-20 h-fit murakamicity-card">
-            <h3 className="mb-3 text-base font-semibold">Comments</h3>
-            <div className="flex flex-col gap-3 text-sm">
-              <div className="rounded-sm border border-border p-3">
-                <div className="font-medium">@homechef87</div>
-                <div className="text-muted-foreground">
-                  This was so quick to make! Perfect for busy weeknights.
-                </div>
-              </div>
-              <div className="rounded-sm border border-border p-3">
-                <div className="font-medium">@crustyBreadFan</div>
-                <div className="text-muted-foreground">
-                  Absolutely delicious! The shrimp turned out perfectly tender.
-                </div>
-              </div>
-              <div className="rounded-sm border border-border p-3">
-                <div className="font-medium">@veggielife</div>
-                <div className="text-muted-foreground">
-                  Love the colorful veggies! It&apos;s a feast for the eyes.
-                </div>
-              </div>
-            </div>
-          </div>
-        </aside>
       </div>
     </div>
   );

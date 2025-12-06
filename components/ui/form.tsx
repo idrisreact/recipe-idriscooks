@@ -121,7 +121,7 @@ function FormControl({ ...props }: React.ComponentProps<typeof Slot>) {
   );
 }
 
-function FormDescription({ className, ...props }: React.ComponentProps<"p">) {
+export function FormDescription({ className, ...props }: React.ComponentProps<"p">) {
   const { formDescriptionId } = useFormField();
 
   return (
@@ -134,7 +134,7 @@ function FormDescription({ className, ...props }: React.ComponentProps<"p">) {
   );
 }
 
-function FormMessage({ className, ...props }: React.ComponentProps<"p">) {
+export function FormMessage({ className, ...props }: React.ComponentProps<"p">) {
   const { error, formMessageId } = useFormField();
   const body = error ? String(error?.message ?? "") : props.children;
 
@@ -155,12 +155,9 @@ function FormMessage({ className, ...props }: React.ComponentProps<"p">) {
 }
 
 export {
-  useFormField,
   Form,
   FormItem,
   FormLabel,
   FormControl,
-  FormDescription,
-  FormMessage,
   FormField,
 };
