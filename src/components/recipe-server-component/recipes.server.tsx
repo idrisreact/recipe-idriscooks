@@ -1,8 +1,7 @@
 'use client';
-import { Text } from '@/src/components/ui/Text';
+
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/src/hooks/use-auth';
-import { Button } from '@/components/ui/button';
 import { Recipe } from '@/src/types/recipes.types';
 import { useState } from 'react';
 import { RecipePreviewModal } from './recipe-preview-modal';
@@ -13,6 +12,8 @@ import { RecipeFilters } from './recipe-filters';
 import { RecipeCard } from '@/src/components/recipe/recipe-card';
 import { RecipeLoadingSkeleton } from './recipe-loading-skeleton';
 import { RecipeEmptyState } from './recipe-empty-state';
+import { motion } from 'framer-motion';
+import { ArrowRight } from 'lucide-react';
 import LogRocket from 'logrocket';
 
 import { Session } from '@/src/types';
@@ -74,12 +75,13 @@ export const Recipes = ({ session }: Props) => {
 
   if (isError) {
     return (
-      <div className="mx-auto lg:w-4xl text-center">
-        <Text as="h2" className="text-red-600 mb-4">
-          Failed to load recipes
-        </Text>
-        <Text className="text-gray-600 mb-4">{error?.message || 'Something went wrong'}</Text>
-        <Button onClick={() => window.location.reload()}>Try Again</Button>
+      <div className="text-center py-16">
+        <span className="kicker text-destructive mb-4 block">Error</span>
+        <h2 className="headline-md text-white mb-4">Failed to load recipes</h2>
+        <p className="body-md mb-8">{error?.message || 'Something went wrong'}</p>
+        <button onClick={() => window.location.reload()} className="btn-primary">
+          Try Again
+        </button>
       </div>
     );
   }
@@ -105,25 +107,27 @@ export const Recipes = ({ session }: Props) => {
         resultsCount={recipes.length}
       />
 
-      {recipes.length > 0 && (
-        <div className="mb-6 flex justify-end">
-          {}
-          {}
-        </div>
-      )}
-
       {isLoading ? (
         <RecipeLoadingSkeleton />
       ) : visibleRecipes.length === 0 ? (
         <RecipeEmptyState searchTerm={search} />
       ) : (
-        <div className={`flex gap-8 ${viewMode === 'list' ? 'flex-col' : 'flex-wrap'}`}>
-          {visibleRecipes.map((recipe) => (
-            <div
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.4 }}
+          className={
+            viewMode === 'list'
+              ? 'flex flex-col gap-6'
+              : 'grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6'
+          }
+        >
+          {visibleRecipes.map((recipe, index) => (
+            <motion.div
               key={recipe.id}
-              className={`w-full ${
-                viewMode === 'list' ? '' : 'md:w-[calc(50%-16px)] lg:w-[calc(33.333%-21.33px)]'
-              }`}
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: index * 0.05, duration: 0.4 }}
             >
               <RecipeCard
                 recipe={recipe}
@@ -136,20 +140,31 @@ export const Recipes = ({ session }: Props) => {
                 }}
                 onNavigate={(recipe) => router.push(`/recipes/category/${recipe.title}`)}
               />
-            </div>
+            </motion.div>
           ))}
-        </div>
+        </motion.div>
       )}
 
+      {/* Sign In Prompt for Non-Authenticated Users */}
       {!session && recipes.length > 3 && (
-        <div className="mt-16 text-center">
-          <Text className="text-gray-400 mb-4 block text-xl">
-            Sign in to view all {recipes.length} recipes!
-          </Text>
-          <Button onClick={signIn} className="luxury-button">
-            Sign In to Explore
-          </Button>
-        </div>
+        <motion.div
+          initial={{ opacity: 0, y: 40 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          className="mt-24 text-center"
+        >
+          <div className="max-w-2xl mx-auto p-12 bg-[var(--card)] border border-white/[0.04]">
+            <span className="kicker mb-4 block">Unlock More</span>
+            <h3 className="headline-md text-white mb-4">{recipes.length - 3} More Recipes Await</h3>
+            <p className="body-lg mb-8">
+              Sign in to access our complete collection of {recipes.length} curated recipes.
+            </p>
+            <button onClick={signIn} className="btn-primary group">
+              Sign In to Explore
+              <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
+            </button>
+          </div>
+        </motion.div>
       )}
 
       <RecipePreviewModal

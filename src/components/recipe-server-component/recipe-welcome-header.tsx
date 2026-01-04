@@ -1,42 +1,44 @@
-import { Text } from "@/src/components/ui/Text";
-import { Heading } from "@/src/components/common/heading/heading";
-import { VerticalSpace } from "@/src/components/ui/VerticalSpace";
-import { Session } from "@/src/types";
+'use client';
+
+import { Session } from '@/src/types';
+import { motion } from 'framer-motion';
 
 interface RecipeWelcomeHeaderProps {
   session: Session | null;
   onSignIn: () => void;
 }
 
-export function RecipeWelcomeHeader({
-  session,
-  onSignIn,
-}: RecipeWelcomeHeaderProps) {
+export function RecipeWelcomeHeader({ session, onSignIn }: RecipeWelcomeHeaderProps) {
   if (session) {
     return (
-      <>
-        <Heading title="Welcome" subTitle={session.user.name} />
-        <VerticalSpace space="16" />
-      </>
+      <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="mb-12">
+        <span className="kicker mb-2 block">Welcome back</span>
+        <h2 className="headline-lg text-white">{session.user.name}</h2>
+      </motion.div>
     );
   }
 
   return (
-    <>
-      <div className="flex flex-col gap-5">
-        <Text as="h1" className="text-4xl">
-          Welcome to Idris Cooks
-        </Text>
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      className="mb-12 p-8 bg-[var(--card)] border border-white/[0.04]"
+    >
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-6">
+        <div>
+          <span className="kicker mb-2 block">Guest</span>
+          <h2 className="headline-sm text-white mb-2">Welcome to Idris Cooks</h2>
+          <p className="body-md">Sign in to access all recipes and save your favorites.</p>
+        </div>
         <button
           type="button"
-          aria-label="Sign in with google"
+          aria-label="Sign in with Google"
           onClick={onSignIn}
-          className="self-baseline bg-white p-2 text-black rounded-3xl border-2 text-sm cursor-pointer"
+          className="btn-primary whitespace-nowrap"
         >
-          Sign in with Google
+          Sign In
         </button>
       </div>
-      <VerticalSpace space="16" />
-    </>
+    </motion.div>
   );
 }

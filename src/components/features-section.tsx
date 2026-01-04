@@ -6,7 +6,8 @@ import { useRouter } from 'next/navigation';
 import { useQuery } from '@tanstack/react-query';
 import { Text } from '@/src/components/ui/Text';
 import RecentRecipesSection from './recent-recipes-section';
-import { ArrowRight } from 'lucide-react';
+import { ArrowRight, Heart } from 'lucide-react';
+import { motion } from 'framer-motion';
 
 function MostPopularRecipes() {
   interface PopularRecipe {
@@ -31,119 +32,138 @@ function MostPopularRecipes() {
 
   if (isLoading)
     return (
-      <section className="wrapper my-24">
-        <div className="text-center mb-16">
-          <div className="inline-block px-4 py-2 rounded-full bg-white/5 border border-white/10 backdrop-blur-sm mb-6">
-            <span className="text-sm font-medium text-white/90">Popular Recipes</span>
+      <section className="section-padded">
+        <div className="wrapper">
+          <div className="max-w-2xl mb-16">
+            <span className="kicker mb-4">Popular</span>
+            <h2 className="headline-xl text-white">Most Loved Recipes</h2>
           </div>
-          <h2 className="heading-lg mb-4">Most Popular Recipes</h2>
-        </div>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
-          {[...Array(4)].map((_, i) => (
-            <div key={i} className="luxury-card animate-pulse">
-              <div className="h-56 bg-muted rounded-xl mb-4"></div>
-              <div className="space-y-3">
-                <div className="h-6 bg-muted rounded w-3/4"></div>
-                <div className="h-4 bg-muted rounded w-full"></div>
-                <div className="h-4 bg-muted rounded w-2/3"></div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            {[...Array(4)].map((_, i) => (
+              <div key={i} className="card-editorial animate-pulse">
+                <div className="aspect-[3/4] bg-[var(--muted)]"></div>
               </div>
-            </div>
-          ))}
+            ))}
+          </div>
         </div>
       </section>
     );
 
   if (error)
     return (
-      <section className="wrapper my-20">
-        <Text className="text-center text-destructive">Failed to load popular recipes</Text>
+      <section className="section-padded">
+        <div className="wrapper">
+          <Text className="text-center text-destructive">Failed to load popular recipes</Text>
+        </div>
       </section>
     );
 
   if (!recipes?.length) return null;
 
   return (
-    <section className="py-24 bg-black">
-      <div className="wrapper mb-16">
-        <div className="max-w-4xl">
-          <div className="inline-block px-3 py-1 bg-white/10 border border-white/20 text-xs uppercase tracking-widest text-white mb-6">
-            Featured
+    <section className="section-padded bg-[var(--background-elevated)]">
+      <div className="wrapper mb-12">
+        <div className="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-8">
+          <div className="max-w-2xl">
+            <motion.span
+              initial={{ opacity: 0, x: -20 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true }}
+              className="kicker mb-4 block"
+            >
+              Popular
+            </motion.span>
+            <motion.h2
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: 0.1 }}
+              className="headline-xl text-white mb-4"
+            >
+              Most Loved
+              <br />
+              <span className="text-gradient">Recipes</span>
+            </motion.h2>
+            <motion.p
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: 0.2 }}
+              className="body-lg"
+            >
+              The dishes that have captured hearts and taste buds alike.
+            </motion.p>
           </div>
-          <h2 className="heading-xl mb-6">
-            Most Popular
-            <br />
-            <span className="text-gradient-primary">Recipes</span>
-          </h2>
-          <p className="body-lg">
-            Discover the dishes that our community loves the most. Tried, tested, and celebrated by
-            thousands of food enthusiasts worldwide.
-          </p>
+          <motion.div
+            initial={{ opacity: 0 }}
+            whileInView={{ opacity: 1 }}
+            viewport={{ once: true }}
+            transition={{ delay: 0.3 }}
+          >
+            <Link href="/recipes" className="btn-link">
+              View All
+              <ArrowRight className="w-4 h-4" />
+            </Link>
+          </motion.div>
         </div>
       </div>
 
-      {/* Horizontal Scroll Container */}
-      <div className="wrapper-xl">
-        <div className="horizontal-scroll">
+      {/* Horizontal Scroll */}
+      <div className="wrapper-wide">
+        <div className="horizontal-scroll gap-4 lg:gap-6 pb-6">
           {recipes.map((recipe, index) => (
-            <div
+            <motion.div
               key={recipe.id}
-              className="horizontal-scroll-item w-[85vw] sm:w-[70vw] md:w-[50vw] lg:w-[35vw] xl:w-[28vw] cursor-pointer"
+              initial={{ opacity: 0, y: 40 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: index * 0.1 }}
+              className="horizontal-scroll-item w-[80vw] sm:w-[60vw] md:w-[45vw] lg:w-[30vw] xl:w-[25vw] cursor-pointer group"
               onClick={() => router.push(`/recipes/category/${encodeURIComponent(recipe.title)}`)}
             >
-              <div className="editorial-card h-[600px] group">
-                {/* Recipe Image */}
+              <div className="card-editorial aspect-[3/4] relative">
+                {/* Image */}
                 <div
-                  className="editorial-card-image"
-                  style={{
-                    backgroundImage: `url(${recipe.image_url})`,
-                    backgroundSize: 'cover',
-                    backgroundPosition: 'center',
-                  }}
+                  className="absolute inset-0 bg-cover bg-center transition-transform duration-700 group-hover:scale-105"
+                  style={{ backgroundImage: `url(${recipe.image_url})` }}
                 />
+                <div className="img-overlay" />
 
-                {/* Content Overlay */}
-                <div className="editorial-card-content">
-                  {recipe.tags && recipe.tags[0] && (
-                    <span className="inline-block px-3 py-1 bg-white/10 backdrop-blur-sm border border-white/20 text-xs uppercase tracking-wider text-white mb-4">
-                      {recipe.tags[0]}
-                    </span>
-                  )}
-                  <h3 className="text-3xl sm:text-4xl font-black text-white mb-3 uppercase tracking-tight leading-tight">
-                    {recipe.title}
-                  </h3>
-                  <p className="text-white/70 line-clamp-2 mb-4 text-lg">{recipe.description}</p>
-
-                  <div className="flex items-center gap-2 text-white group-hover:text-[var(--primary)] transition-colors">
-                    <span className="text-sm uppercase tracking-wide font-bold">View Recipe</span>
-                    <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-                  </div>
-
-                  {/* Favorite Count */}
-                  <div className="mt-6 flex items-center gap-4 text-white/60">
-                    <div className="flex items-center gap-2">
-                      <span className="text-xl">♥</span>
-                      <span className="font-medium">{recipe.favoriteCount}</span>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Number Badge */}
-                <div className="absolute top-8 left-8 w-16 h-16 bg-black/50 backdrop-blur-md border-2 border-white/30 flex items-center justify-center">
-                  <span className="text-3xl font-black text-white">
+                {/* Number */}
+                <div className="absolute top-6 left-6 flex items-center gap-3">
+                  <span className="text-[80px] font-serif font-bold text-white/10 leading-none">
                     {String(index + 1).padStart(2, '0')}
                   </span>
                 </div>
+
+                {/* Content */}
+                <div className="absolute inset-0 p-6 flex flex-col justify-end">
+                  {recipe.tags && recipe.tags[0] && (
+                    <span className="caption text-[var(--primary)] mb-3">{recipe.tags[0]}</span>
+                  )}
+                  <h3 className="headline-sm text-white mb-2 line-clamp-2">{recipe.title}</h3>
+                  <p className="body-md line-clamp-2 mb-4">{recipe.description}</p>
+
+                  <div className="flex items-center justify-between">
+                    <span className="btn-link text-xs">
+                      View Recipe
+                      <ArrowRight className="w-3 h-3" />
+                    </span>
+                    <div className="flex items-center gap-1.5 text-white/50">
+                      <Heart className="w-4 h-4" />
+                      <span className="text-sm">{recipe.favoriteCount}</span>
+                    </div>
+                  </div>
+                </div>
               </div>
-            </div>
+            </motion.div>
           ))}
         </div>
-      </div>
 
-      {/* Scroll Hint */}
-      <div className="wrapper mt-12 text-center">
-        <p className="text-white/40 uppercase tracking-widest text-xs">
-          ← Scroll to explore more →
-        </p>
+        {/* Scroll Hint */}
+        <div className="text-center mt-6">
+          <span className="caption">Scroll to explore</span>
+        </div>
       </div>
     </section>
   );
@@ -152,71 +172,152 @@ function MostPopularRecipes() {
 function WhyChooseUs() {
   const features = [
     {
-      title: 'Expert',
-      subtitle: 'Chefs',
-      description: 'Learn from world-class culinary professionals',
       number: '01',
+      title: 'Expert Chefs',
+      description: 'Learn from world-class culinary professionals with decades of experience.',
     },
     {
-      title: 'Fresh',
-      subtitle: 'Ingredients',
-      description: 'Premium quality, locally-sourced produce',
       number: '02',
+      title: 'Fresh Ingredients',
+      description: 'Premium quality, locally-sourced produce for authentic flavors.',
     },
     {
-      title: 'Quick',
-      subtitle: 'Recipes',
-      description: 'From 15-minute meals to slow-cooked perfection',
       number: '03',
+      title: 'Quick Recipes',
+      description: 'From 15-minute meals to slow-cooked perfection, recipes for every moment.',
     },
     {
-      title: 'Global',
-      subtitle: 'Community',
-      description: 'Join thousands of passionate food lovers',
       number: '04',
+      title: 'Global Community',
+      description: 'Join thousands of passionate food lovers sharing their culinary journeys.',
     },
   ];
 
   return (
-    <section className="py-32 relative overflow-hidden bg-black">
+    <section className="section-padded">
       <div className="wrapper">
-        <div className="text-center mb-20">
-          <h2 className="heading-xl mb-6">
-            Why Choose
+        {/* Header */}
+        <div className="max-w-2xl mb-16 lg:mb-24">
+          <motion.span
+            initial={{ opacity: 0, x: -20 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            viewport={{ once: true }}
+            className="kicker mb-4 block"
+          >
+            Why Us
+          </motion.span>
+          <motion.h2
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ delay: 0.1 }}
+            className="headline-xl text-white mb-6"
+          >
+            The Idris Cooks
             <br />
-            <span className="text-gradient-primary">Idris Cooks</span>
-          </h2>
-          <p className="body-lg max-w-3xl mx-auto">
-            Innovation meets tradition in every recipe. Experience culinary excellence crafted by
-            experts, designed for you.
-          </p>
+            <span className="text-gradient">Difference</span>
+          </motion.h2>
+          <motion.p
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ delay: 0.2 }}
+            className="body-lg"
+          >
+            Where innovation meets tradition. Experience culinary excellence crafted by experts.
+          </motion.p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-1 border-2 border-white/10">
+        {/* Features Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-px bg-white/[0.03]">
           {features.map((feature, index) => (
-            <div
+            <motion.div
               key={index}
-              className="group relative bg-black border-r-2 border-white/10 last:border-r-0 hover:bg-white/5 transition-all duration-500 p-10"
+              initial={{ opacity: 0, y: 40 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: index * 0.1 }}
+              className="card-feature group bg-[var(--background)]"
             >
-              {/* Number */}
-              <div className="text-8xl font-black text-white/5 group-hover:text-white/10 transition-all mb-6">
-                {feature.number}
+              <div className="flex items-start gap-8">
+                {/* Number */}
+                <span className="font-serif text-6xl lg:text-7xl font-bold text-[var(--primary)]/20 group-hover:text-[var(--primary)]/40 transition-colors leading-none">
+                  {feature.number}
+                </span>
+
+                {/* Content */}
+                <div className="flex-1 pt-2">
+                  <h3 className="headline-sm text-white mb-4 group-hover:text-[var(--primary)] transition-colors">
+                    {feature.title}
+                  </h3>
+                  <p className="body-md">{feature.description}</p>
+                </div>
               </div>
 
-              {/* Title */}
-              <h3 className="text-4xl font-black uppercase text-white mb-2 leading-tight">
-                {feature.title}
-                <br />
-                <span className="text-[var(--primary)]">{feature.subtitle}</span>
-              </h3>
-
-              {/* Description */}
-              <p className="text-white/60 mt-4 leading-relaxed">{feature.description}</p>
-
-              {/* Hover accent */}
-              <div className="absolute bottom-0 left-0 right-0 h-1 bg-[var(--primary)] scale-x-0 group-hover:scale-x-100 transition-transform duration-500 origin-left" />
-            </div>
+              {/* Hover Line */}
+              <div className="absolute bottom-0 left-0 w-full h-px bg-[var(--primary)] scale-x-0 group-hover:scale-x-100 transition-transform duration-500 origin-left" />
+            </motion.div>
           ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function CTASection() {
+  return (
+    <section className="section-half bg-[var(--background-elevated)] border-y border-white/[0.03]">
+      <div className="wrapper">
+        <div className="max-w-4xl mx-auto text-center">
+          <motion.span
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="kicker mb-6 block"
+          >
+            Ready to Cook?
+          </motion.span>
+
+          <motion.h2
+            initial={{ opacity: 0, y: 40 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ delay: 0.1 }}
+            className="headline-hero text-white mb-8"
+          >
+            Start Your
+            <br />
+            <span className="text-gradient">Journey</span>
+          </motion.h2>
+
+          <motion.p
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ delay: 0.2 }}
+            className="pull-quote mb-12"
+          >
+            &ldquo;The kitchen is where innovation happens. Where ingredients become art.&rdquo;
+          </motion.p>
+
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ delay: 0.3 }}
+            className="flex flex-col sm:flex-row gap-4 justify-center"
+          >
+            <Link href="/recipes">
+              <button className="btn-primary group">
+                Get Started
+                <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
+              </button>
+            </Link>
+
+            <Link href="/about">
+              <button className="btn-outline">Learn More</button>
+            </Link>
+          </motion.div>
         </div>
       </div>
     </section>
@@ -227,48 +328,8 @@ export default function FeaturesSection() {
   return (
     <>
       <WhyChooseUs />
-
       <MostPopularRecipes />
-
-      {/* CTA Section - Bold Editorial */}
-      <section className="section-full bg-black border-y-2 border-white/10">
-        <div className="wrapper text-center">
-          <div className="max-w-5xl mx-auto">
-            <div className="inline-block px-3 py-1 bg-[var(--primary)]/20 border border-[var(--primary)]/40 text-xs uppercase tracking-widest text-[var(--primary)] mb-8">
-              Ready to Cook?
-            </div>
-
-            <h2 className="heading-hero mb-8">
-              Start Your
-              <br />
-              <span className="text-gradient-primary">Culinary</span>
-              <br />
-              Journey
-            </h2>
-
-            <p className="quote-text max-w-4xl mx-auto mb-16">
-              &ldquo;The kitchen is where innovation happens. Where ingredients become art. Where
-              passion meets precision.&rdquo;
-            </p>
-
-            <div className="flex flex-col sm:flex-row gap-6 justify-center">
-              <Link href="/recipes">
-                <button className="group px-12 py-6 bg-white text-black font-black text-xl uppercase tracking-wide hover:bg-[var(--primary)] hover:text-white transition-all duration-300 flex items-center gap-3">
-                  Get Started
-                  <ArrowRight className="w-6 h-6 group-hover:translate-x-2 transition-transform" />
-                </button>
-              </Link>
-
-              <Link href="/about">
-                <button className="group px-12 py-6 border-2 border-white text-white font-black text-xl uppercase tracking-wide hover:bg-white hover:text-black transition-all duration-300">
-                  Learn More
-                </button>
-              </Link>
-            </div>
-          </div>
-        </div>
-      </section>
-
+      <CTASection />
       <RecentRecipesSection />
     </>
   );

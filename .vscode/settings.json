@@ -1,4 +1,5 @@
 {
     "editor.formatOnSave": true,
-    "kiroAgent.configureMCP": "Disabled"
+    "kiroAgent.configureMCP": "Disabled",
+    "postman.settings.dotenv-detection-notification-visibility": false
 }
