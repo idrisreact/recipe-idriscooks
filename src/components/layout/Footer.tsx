@@ -1,151 +1,103 @@
 'use client';
 
 import Link from 'next/link';
-import { Text } from '@/src/components/ui/Text';
-import { ChefHat, Mail } from 'lucide-react';
+import { motion } from 'framer-motion';
+import { ArrowUpRight } from 'lucide-react';
 
 export function Footer() {
   const currentYear = new Date().getFullYear();
 
+  const navigationLinks = [
+    { href: '/recipes', label: 'Recipes' },
+    { href: '/favorites', label: 'Favorites' },
+    { href: '/pricing', label: 'Pricing' },
+    { href: '/about', label: 'About' },
+  ];
+
+  const legalLinks = [
+    { href: '/refund-policy', label: 'Refund Policy' },
+    { href: '/terms', label: 'Terms' },
+    { href: '/privacy', label: 'Privacy' },
+  ];
+
   return (
-    <footer className="mt-auto border-t border-white/5 bg-gradient-to-b from-transparent to-black/20">
-      <div className="wrapper py-12">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
-          {/* Brand */}
-          <div className="col-span-1">
-            <Link href="/" className="flex items-center gap-3 group mb-4">
-              <ChefHat className="w-6 h-6 text-[var(--primary)]" />
-              <span className="font-bold text-lg bg-gradient-to-r from-white to-white/80 bg-clip-text text-transparent">
-                Idris Cooks
-              </span>
+    <footer className="mt-auto border-t border-white/[0.03] bg-[var(--background)]">
+      {/* Main Footer Content */}
+      <div className="wrapper py-16 lg:py-24">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-8">
+          {/* Brand Column */}
+          <div className="lg:col-span-5">
+            <Link href="/" className="inline-flex items-center gap-4 group mb-6">
+              <div className="w-10 h-10 border border-[var(--primary)]/30 flex items-center justify-center">
+                <span className="font-serif text-lg font-bold text-[var(--primary)]">IC</span>
+              </div>
+              <div className="flex flex-col">
+                <span className="font-serif text-xl font-semibold text-white">Idris Cooks</span>
+              </div>
             </Link>
-            <Text variant="small" className="text-muted-foreground">
-              Discover, save, and share amazing recipes from around the world.
-            </Text>
+
+            <p className="body-md max-w-sm mb-8">
+              Discover, save, and share amazing recipes from around the world. Where culinary
+              excellence meets innovation.
+            </p>
+
+            <a href="mailto:support@idriscooks.com" className="btn-link text-sm">
+              support@idriscooks.com
+              <ArrowUpRight className="w-3 h-3" />
+            </a>
           </div>
 
-          {/* Product */}
-          <div>
-            <Text as="h4" variant="large" className="font-semibold mb-4">
-              Product
-            </Text>
-            <ul className="space-y-2">
-              <li>
-                <Link
-                  href="/recipes"
-                  className="text-sm text-muted-foreground hover:text-white transition-colors"
-                >
-                  Recipes
-                </Link>
-              </li>
-              <li>
-                <Link
-                  href="/favorites"
-                  className="text-sm text-muted-foreground hover:text-white transition-colors"
-                >
-                  Favorites
-                </Link>
-              </li>
-              <li>
-                <Link
-                  href="/pricing"
-                  className="text-sm text-muted-foreground hover:text-white transition-colors"
-                >
-                  Pricing
-                </Link>
-              </li>
+          {/* Navigation Column */}
+          <div className="lg:col-span-3 lg:col-start-7">
+            <h4 className="caption text-white mb-6">Navigation</h4>
+            <ul className="space-y-4">
+              {navigationLinks.map((link) => (
+                <li key={link.href}>
+                  <Link
+                    href={link.href}
+                    className="text-white/50 hover:text-[var(--primary)] transition-colors text-sm"
+                  >
+                    {link.label}
+                  </Link>
+                </li>
+              ))}
             </ul>
           </div>
 
-          {/* Legal */}
-          <div>
-            <Text as="h4" variant="large" className="font-semibold mb-4">
-              Legal
-            </Text>
-            <ul className="space-y-2">
-              <li>
-                <Link
-                  href="/refund-policy"
-                  className="text-sm text-muted-foreground hover:text-white transition-colors"
-                >
-                  Refund Policy
-                </Link>
-              </li>
-              <li>
-                <Link
-                  href="/terms"
-                  className="text-sm text-muted-foreground hover:text-white transition-colors"
-                >
-                  Terms of Service
-                </Link>
-              </li>
-              <li>
-                <Link
-                  href="/privacy"
-                  className="text-sm text-muted-foreground hover:text-white transition-colors"
-                >
-                  Privacy Policy
-                </Link>
-              </li>
-            </ul>
-          </div>
-
-          {/* Contact */}
-          <div>
-            <Text as="h4" variant="large" className="font-semibold mb-4">
-              Contact
-            </Text>
-            <ul className="space-y-2">
-              <li>
-                <a
-                  href="mailto:support@idriscooks.com"
-                  className="text-sm text-muted-foreground hover:text-white transition-colors flex items-center gap-2"
-                >
-                  <Mail className="w-4 h-4" />
-                  Support
-                </a>
-              </li>
-              {/* Add your social links here */}
-              {/* <li>
-                <a
-                  href="https://twitter.com/idriscooks"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-sm text-muted-foreground hover:text-white transition-colors flex items-center gap-2"
-                >
-                  <Twitter className="w-4 h-4" />
-                  Twitter
-                </a>
-              </li> */}
+          {/* Legal Column */}
+          <div className="lg:col-span-3">
+            <h4 className="caption text-white mb-6">Legal</h4>
+            <ul className="space-y-4">
+              {legalLinks.map((link) => (
+                <li key={link.href}>
+                  <Link
+                    href={link.href}
+                    className="text-white/50 hover:text-[var(--primary)] transition-colors text-sm"
+                  >
+                    {link.label}
+                  </Link>
+                </li>
+              ))}
             </ul>
           </div>
         </div>
+      </div>
 
-        {/* Bottom Bar */}
-        <div className="pt-8 border-t border-white/5 flex flex-col sm:flex-row justify-between items-center gap-4">
-          <Text variant="small" className="text-muted-foreground text-center sm:text-left">
-            © {currentYear} Idris Cooks. All rights reserved.
-          </Text>
+      {/* Bottom Bar */}
+      <div className="border-t border-white/[0.03]">
+        <div className="wrapper py-6">
+          <div className="flex flex-col sm:flex-row justify-between items-center gap-4">
+            <p className="text-xs text-white/30">{currentYear} Idris Cooks. All rights reserved.</p>
 
-          <div className="flex items-center gap-6">
-            <Link
-              href="/refund-policy"
-              className="text-xs text-muted-foreground hover:text-white transition-colors"
+            <motion.div
+              initial={{ opacity: 0 }}
+              whileInView={{ opacity: 1 }}
+              viewport={{ once: true }}
+              className="flex items-center gap-1"
             >
-              Refunds
-            </Link>
-            <Link
-              href="/terms"
-              className="text-xs text-muted-foreground hover:text-white transition-colors"
-            >
-              Terms
-            </Link>
-            <Link
-              href="/privacy"
-              className="text-xs text-muted-foreground hover:text-white transition-colors"
-            >
-              Privacy
-            </Link>
+              <span className="text-xs text-white/30">Crafted with</span>
+              <span className="text-[var(--primary)] text-sm">care</span>
+            </motion.div>
           </div>
         </div>
       </div>

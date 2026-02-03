@@ -12,103 +12,120 @@ import { CookieConsent } from '@/src/components/layout/CookieConsent';
 import { MobileBottomNav } from '@/src/components/layout/MobileBottomNav';
 import { WelcomeToast } from '@/src/components/welcome-toast/welcome-toast';
 import Link from 'next/link';
-import { CreditCard, Crown, ChefHat, User, Heart } from 'lucide-react';
 import Image from 'next/image';
 import { motion, useScroll, useTransform } from 'framer-motion';
 import { useEffect, useState } from 'react';
+import { usePathname } from 'next/navigation';
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   const [isScrolled, setIsScrolled] = useState(false);
+  const pathname = usePathname();
   const { scrollY } = useScroll();
 
   const navBackground = useTransform(
     scrollY,
     [0, 100],
-    ['rgba(10, 10, 10, 0.6)', 'rgba(10, 10, 10, 0.95)']
+    ['rgba(5, 5, 5, 0)', 'rgba(5, 5, 5, 0.95)']
   );
 
-  const navBlur = useTransform(scrollY, [0, 100], ['blur(8px)', 'blur(20px)']);
+  const navBorder = useTransform(
+    scrollY,
+    [0, 100],
+    ['rgba(255, 255, 255, 0)', 'rgba(255, 255, 255, 0.04)']
+  );
 
   useEffect(() => {
     const handleScroll = () => {
-      setIsScrolled(window.scrollY > 20);
+      setIsScrolled(window.scrollY > 50);
     };
 
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
+  const navItems = [
+    { href: '/recipes', label: 'Recipes' },
+    { href: '/about', label: 'About' },
+  ];
+
+  const authNavItems = [
+    { href: '/favorites', label: 'Favorites' },
+    { href: '/pricing', label: 'Pricing' },
+    { href: '/billing', label: 'Billing' },
+  ];
+
   return (
     <>
+      {/* ═══════════════════════════════════════════════════════════════
+          NAVIGATION - Editorial Minimal
+      ═══════════════════════════════════════════════════════════════ */}
       <motion.header
         style={{
           backgroundColor: navBackground,
-          backdropFilter: navBlur,
+          borderBottomColor: navBorder,
         }}
-        className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
-          isScrolled ? 'border-b border-white/10 shadow-2xl' : 'border-b border-white/5'
+        className={`fixed top-0 left-0 right-0 z-50 border-b backdrop-blur-xl transition-all duration-500 ${
+          isScrolled ? 'py-4' : 'py-6'
         }`}
       >
         <div className="wrapper">
-          <div className="flex justify-between items-center h-20">
-            {/* Logo and Navigation */}
-            <div className="flex items-center gap-10">
-              <Link href="/" className="flex items-center gap-3 group">
-                <motion.div
-                  whileHover={{ rotate: 10, scale: 1.1 }}
-                  transition={{ type: 'spring', stiffness: 300, damping: 20 }}
-                  className="relative w-10 h-10 rounded-full overflow-hidden border-2 border-[var(--primary)]"
-                >
-                  <Image
-                    src="/images/idris-cooks-logo-v1.JPG"
-                    alt="Idris Cooks Logo"
-                    fill
-                    className="object-cover"
-                  />
-                </motion.div>
-                <span className="font-bold text-xl tracking-tight bg-gradient-to-r from-white to-white/80 bg-clip-text text-transparent">
+          <div className="flex justify-between items-center">
+            {/* Logo */}
+            <Link href="/" className="flex items-center gap-4 group">
+              <motion.div
+                whileHover={{ scale: 1.05 }}
+                transition={{ type: 'spring', stiffness: 400, damping: 25 }}
+                className="relative w-10 h-10 overflow-hidden border border-white/10"
+              >
+                <Image
+                  src="/images/idris-cooks-logo-v1.JPG"
+                  alt="Idris Cooks"
+                  fill
+                  className="object-cover"
+                />
+              </motion.div>
+              <div className="flex flex-col">
+                <span className="font-serif text-lg font-semibold tracking-tight text-white">
                   Idris Cooks
                 </span>
-              </Link>
+                <span className="hidden sm:block text-[10px] uppercase tracking-[0.2em] text-white/40">
+                  Culinary Excellence
+                </span>
+              </div>
+            </Link>
 
-              <nav className="hidden md:flex items-center gap-1">
-                <NavLink href="/recipes" icon={<ChefHat className="w-4 h-4" />}>
-                  Recipes
+            {/* Desktop Navigation */}
+            <nav className="hidden md:flex items-center gap-8">
+              {navItems.map((item) => (
+                <NavLink key={item.href} href={item.href} active={pathname === item.href}>
+                  {item.label}
                 </NavLink>
-                <NavLink href="/about" icon={<User className="w-4 h-4" />}>
-                  About
-                </NavLink>
-                <SignedIn>
-                  <NavLink href="/favorites" icon={<Heart className="w-4 h-4" />}>
-                    Favorites
+              ))}
+              <SignedIn>
+                {authNavItems.map((item) => (
+                  <NavLink key={item.href} href={item.href} active={pathname === item.href}>
+                    {item.label}
                   </NavLink>
-                  <NavLink href="/pricing" icon={<Crown className="w-4 h-4" />}>
-                    Pricing
-                  </NavLink>
-                  <NavLink href="/billing" icon={<CreditCard className="w-4 h-4" />}>
-                    Billing
-                  </NavLink>
-                </SignedIn>
-              </nav>
-            </div>
+                ))}
+              </SignedIn>
+            </nav>
 
             {/* Auth Actions */}
             <div className="flex items-center gap-4">
               <SignedOut>
                 <SignInButton>
                   <motion.button
-                    whileHover={{ scale: 1.02 }}
-                    whileTap={{ scale: 0.98 }}
-                    className="hidden sm:block px-6 py-2.5 rounded-full text-sm font-medium text-white/90 hover:text-white transition-colors"
+                    whileHover={{ color: '#d4a853' }}
+                    className="hidden sm:block text-sm font-medium uppercase tracking-[0.08em] text-white/60 transition-colors"
                   >
                     Sign In
                   </motion.button>
                 </SignInButton>
                 <SignUpButton>
                   <motion.button
-                    whileHover={{ scale: 1.02, boxShadow: '0 10px 40px rgba(242, 0, 148, 0.3)' }}
+                    whileHover={{ scale: 1.02 }}
                     whileTap={{ scale: 0.98 }}
-                    className="bg-gradient-to-r from-[var(--primary)] to-[var(--primary-dark)] text-white rounded-full font-medium text-sm px-6 py-2.5 shadow-lg shadow-[var(--primary)]/20 transition-all"
+                    className="btn-primary !py-3 !px-6 text-xs"
                   >
                     Get Started
                   </motion.button>
@@ -122,46 +139,42 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         </div>
       </motion.header>
 
-      {/* Spacer to prevent content from hiding under fixed header */}
-      <div className="h-20" />
-
+      {/* Main Content */}
       <div className="min-h-screen flex flex-col">
         <main className="flex-1">{children}</main>
         <Footer />
       </div>
 
-      {/* Cookie Consent Banner */}
+      {/* Cookie Consent */}
       <CookieConsent />
 
-      {/* Welcome Toast for New Users */}
+      {/* Welcome Toast */}
       <WelcomeToast />
 
-      {/* Mobile Bottom Navigation */}
+      {/* Mobile Navigation */}
       <MobileBottomNav />
     </>
   );
 }
 
-// NavLink component for navigation items
+// NavLink Component
 function NavLink({
   href,
-  icon,
+  active,
   children,
 }: {
   href: string;
-  icon: React.ReactNode;
+  active?: boolean;
   children: React.ReactNode;
 }) {
   return (
     <Link href={href}>
-      <motion.div
-        whileHover={{ backgroundColor: 'rgba(255, 255, 255, 0.08)' }}
-        whileTap={{ scale: 0.98 }}
-        className="flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium text-white/70 hover:text-white transition-all cursor-pointer"
+      <motion.span
+        whileHover={{ color: '#ffffff' }}
+        className={`nav-link ${active ? 'active' : ''}`}
       >
-        {icon}
         {children}
-      </motion.div>
+      </motion.span>
     </Link>
   );
 }

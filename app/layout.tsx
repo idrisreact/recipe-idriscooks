@@ -1,5 +1,5 @@
 import type { Metadata } from 'next';
-import { Montserrat } from 'next/font/google';
+import { Inter, Playfair_Display } from 'next/font/google';
 import './globals.css';
 import { ReactQueryProvider } from '@/src/components/react-query-provider/react-query-provider';
 import { Toaster } from 'react-hot-toast';
@@ -8,10 +8,17 @@ import { Analytics } from '@vercel/analytics/next';
 
 import IntroLoader from '@/src/components/intro-loader';
 
-const montserrat = Montserrat({
-  variable: '--font-montserrat',
+const inter = Inter({
+  variable: '--font-inter',
   subsets: ['latin'],
-  weight: ['300', '400', '500', '600', '700', '800', '900'],
+  weight: ['300', '400', '500', '600', '700'],
+  display: 'swap',
+});
+
+const playfair = Playfair_Display({
+  variable: '--font-playfair',
+  subsets: ['latin'],
+  weight: ['400', '500', '600', '700', '800', '900'],
   display: 'swap',
 });
 
@@ -61,8 +68,7 @@ export const metadata: Metadata = {
   twitter: {
     card: 'summary_large_image',
     title: 'Idris Cooks - Delicious Recipes & Cooking Guides',
-    description:
-      'Discover a collection of delicious, easy-to-follow recipes from Idris Cooks.',
+    description: 'Discover a collection of delicious, easy-to-follow recipes from Idris Cooks.',
     creator: '@idriscooks',
     images: ['/og-image.jpg'],
   },
@@ -78,9 +84,9 @@ export const metadata: Metadata = {
     },
   },
   icons: {
-    icon: '/favicon.ico',
-    shortcut: '/favicon.ico',
-    apple: '/apple-touch-icon.png',
+    icon: '/images/idriscooks-logo.png',
+    shortcut: '/images/idriscooks-logo.png',
+    apple: '/images/idriscooks-logo.png',
   },
   manifest: '/manifest.json',
 };
@@ -96,7 +102,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className="dark">
-      <body className={`${montserrat.variable} font-montserrat antialiased`}>
+      <body className={`${inter.variable} ${playfair.variable} font-sans antialiased`}>
         <IntroLoader />
         <ReactQueryProvider>
           {children}
@@ -105,11 +111,25 @@ export default function RootLayout({
             toastOptions={{
               duration: 4000,
               style: {
-                background: '#171717',
-                color: '#ffffff',
-                border: '1px solid #2a2a2a',
-                borderRadius: '4px',
-                fontFamily: 'Montserrat, sans-serif',
+                background: '#0f0f0f',
+                color: '#fafafa',
+                border: '1px solid rgba(255, 255, 255, 0.06)',
+                borderRadius: '2px',
+                fontFamily: 'Inter, sans-serif',
+                fontSize: '14px',
+                padding: '16px 20px',
+              },
+              success: {
+                iconTheme: {
+                  primary: '#d4a853',
+                  secondary: '#0f0f0f',
+                },
+              },
+              error: {
+                iconTheme: {
+                  primary: '#dc3545',
+                  secondary: '#0f0f0f',
+                },
               },
             }}
           />

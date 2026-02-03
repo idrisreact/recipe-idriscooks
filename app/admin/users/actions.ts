@@ -10,6 +10,7 @@ import { isAdmin } from '@/src/utils/roles';
 
 export async function updateUserRole(formData: FormData) {
   // Verify admin access
+  // new update
   const session = await auth.api.getSession({ headers: await headers() });
 
   if (!session?.user) {

@@ -1,13 +1,12 @@
 'use client';
+
 import { Input } from '@/components/ui/input';
-import { Button } from '@/components/ui/button';
-import { Text } from '@/src/components/ui/Text';
-import { VerticalSpace } from '@/src/components/ui/VerticalSpace';
-import { Grid, List, Filter, X } from 'lucide-react';
+import { Grid, List, SlidersHorizontal, X, Search, ChevronDown } from 'lucide-react';
 import { z } from 'zod';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Form, FormControl, FormField, FormItem, FormLabel } from '@/components/ui/form';
+import { Form, FormControl, FormField, FormItem } from '@/components/ui/form';
+import { motion, AnimatePresence } from 'framer-motion';
 
 type FormValues = {
   search: string;
@@ -65,40 +64,55 @@ export function RecipeFilters({
   ];
 
   return (
-    <div className="mx-auto lg:w-4xl">
-      {}
-      <div className="flex flex-col gap-4 md:flex-row md:items-center md:gap-4 mb-6">
-        {}
+    <div className="mb-12">
+      {/* Search Section */}
+      <div className="mb-8">
+        <motion.span
+          initial={{ opacity: 0, x: -20 }}
+          animate={{ opacity: 1, x: 0 }}
+          className="kicker mb-4 block"
+        >
+          Search
+        </motion.span>
+        <motion.h2
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.1 }}
+          className="headline-md text-white mb-6"
+        >
+          Find Your Recipe
+        </motion.h2>
+
         <Form {...form}>
-          <form action="" onSubmit={(e) => e.preventDefault()} className="flex-1 max-w-md">
+          <form onSubmit={(e) => e.preventDefault()} className="max-w-2xl">
             <FormField
               control={form.control}
               name="search"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="text-2xl">Search for recipes</FormLabel>
-                  <VerticalSpace space="2" />
                   <FormControl>
-                    <div className="relative">
+                    <div className="relative group">
+                      <Search className="absolute left-5 top-1/2 -translate-y-1/2 w-5 h-5 text-white/30 group-focus-within:text-[var(--primary)] transition-colors" />
                       <Input
-                        placeholder="Search for recipes..."
+                        placeholder="Search recipes by name, ingredient, or cuisine..."
                         {...field}
                         value={search}
                         onChange={(e) => {
                           field.onChange(e);
                           onSearchChange(e.target.value);
                         }}
+                        className="w-full h-14 pl-14 pr-12 bg-[var(--card)] border-white/[0.04] text-white placeholder:text-white/30 focus:border-[var(--primary)]/50 focus:ring-[var(--primary)]/20 transition-all text-base"
                       />
-                      {field.value && (
+                      {search && (
                         <button
                           type="button"
                           onClick={() => {
                             field.onChange('');
                             onSearchChange('');
                           }}
-                          className="absolute right-3 top-1/2 transform -translate-y-1/2"
+                          className="absolute right-5 top-1/2 -translate-y-1/2 p-1 hover:bg-white/10 rounded transition-colors"
                         >
-                          <X className="w-4 h-4 text-gray-400" />
+                          <X className="w-4 h-4 text-white/40 hover:text-white" />
                         </button>
                       )}
                     </div>
@@ -108,82 +122,141 @@ export function RecipeFilters({
             />
           </form>
         </Form>
+      </div>
 
-        {}
-        <div className="flex items-center gap-2">
-          <Button
-            variant={viewMode === 'grid' ? 'default' : 'outline'}
-            size="sm"
+      {/* Filter Controls Bar */}
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-6 border-b border-white/[0.04]">
+        {/* Left: Results Count & Filter Toggle */}
+        <div className="flex items-center gap-6">
+          <span className="text-sm text-white/50">
+            <span className="text-white font-medium">{resultsCount}</span> recipe
+            {resultsCount !== 1 ? 's' : ''}
+            {search && (
+              <span className="text-white/30">
+                {' '}
+                for &ldquo;<span className="text-[var(--primary)]">{search}</span>&rdquo;
+              </span>
+            )}
+          </span>
+
+          <button
+            onClick={onToggleFilters}
+            className={`flex items-center gap-2 px-4 py-2 text-sm font-medium uppercase tracking-[0.08em] transition-all ${
+              showFilters
+                ? 'text-[var(--primary)] bg-[var(--primary)]/10'
+                : 'text-white/60 hover:text-white hover:bg-white/[0.04]'
+            }`}
+          >
+            <SlidersHorizontal className="w-4 h-4" />
+            Filters
+            <ChevronDown
+              className={`w-3 h-3 transition-transform ${showFilters ? 'rotate-180' : ''}`}
+            />
+          </button>
+        </div>
+
+        {/* Right: View Mode Toggle */}
+        <div className="flex items-center gap-1 p-1 bg-white/[0.02] border border-white/[0.04]">
+          <button
             onClick={() => onViewModeChange('grid')}
+            className={`p-2.5 transition-all ${
+              viewMode === 'grid'
+                ? 'bg-[var(--primary)] text-[var(--primary-foreground)]'
+                : 'text-white/40 hover:text-white hover:bg-white/[0.04]'
+            }`}
+            aria-label="Grid view"
           >
             <Grid className="w-4 h-4" />
-          </Button>
-          <Button
-            variant={viewMode === 'list' ? 'default' : 'outline'}
-            size="sm"
+          </button>
+          <button
             onClick={() => onViewModeChange('list')}
+            className={`p-2.5 transition-all ${
+              viewMode === 'list'
+                ? 'bg-[var(--primary)] text-[var(--primary-foreground)]'
+                : 'text-white/40 hover:text-white hover:bg-white/[0.04]'
+            }`}
+            aria-label="List view"
           >
             <List className="w-4 h-4" />
-          </Button>
-        </div>
-
-        {}
-        <div className="flex-shrink-0">
-          <Button variant="outline" onClick={onToggleFilters} className="w-full md:w-auto">
-            <Filter className="w-4 h-4 mr-2" />
-            Filters
-          </Button>
+          </button>
         </div>
       </div>
 
-      {}
-      {showFilters && (
-        <div className="bg-gray-50 p-4 rounded-lg mb-4">
-          {}
-          <div className="mb-4">
-            <Text className="font-medium mb-2">Sort by:</Text>
-            <div className="flex gap-2 flex-wrap">
-              {sortOptions.map((option) => (
-                <Button
-                  key={option.value}
-                  variant={sortBy === option.value ? 'default' : 'outline'}
-                  size="sm"
-                  onClick={() => onSortChange(option.value as SortOption)}
-                >
-                  {option.label}
-                </Button>
-              ))}
-            </div>
-          </div>
-
-          {}
-          {allTags.length > 0 && (
-            <div>
-              <Text className="font-medium mb-2">Filter by tags:</Text>
-              <div className="flex gap-2 flex-wrap">
-                {allTags.map((tag) => (
-                  <Button
-                    key={tag}
-                    variant={selectedTags.includes(tag) ? 'default' : 'outline'}
-                    size="sm"
-                    onClick={() => onTagToggle(tag)}
-                  >
-                    {tag}
-                  </Button>
-                ))}
+      {/* Expanded Filters Panel */}
+      <AnimatePresence>
+        {showFilters && (
+          <motion.div
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: 'auto', opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            transition={{ duration: 0.3, ease: 'easeInOut' }}
+            className="overflow-hidden"
+          >
+            <div className="py-8 space-y-8">
+              {/* Sort Options */}
+              <div>
+                <span className="caption text-white/60 mb-4 block">Sort by</span>
+                <div className="flex flex-wrap gap-2">
+                  {sortOptions.map((option) => (
+                    <button
+                      key={option.value}
+                      onClick={() => onSortChange(option.value as SortOption)}
+                      className={`px-4 py-2 text-sm font-medium uppercase tracking-[0.06em] transition-all ${
+                        sortBy === option.value
+                          ? 'bg-[var(--primary)] text-[var(--primary-foreground)]'
+                          : 'bg-white/[0.02] text-white/50 border border-white/[0.04] hover:border-[var(--primary)]/30 hover:text-white'
+                      }`}
+                    >
+                      {option.label}
+                    </button>
+                  ))}
+                </div>
               </div>
-            </div>
-          )}
-        </div>
-      )}
 
-      {}
-      <div className="mb-4">
-        <Text className="text-gray-600">
-          {resultsCount} recipe{resultsCount !== 1 ? 's' : ''} found
-          {search && ` for "${search}"`}
-        </Text>
-      </div>
+              {/* Tag Filters */}
+              {allTags.length > 0 && (
+                <div>
+                  <span className="caption text-white/60 mb-4 block">Filter by category</span>
+                  <div className="flex flex-wrap gap-2">
+                    {allTags.map((tag) => (
+                      <button
+                        key={tag}
+                        onClick={() => onTagToggle(tag)}
+                        className={`px-4 py-2 text-sm font-medium transition-all ${
+                          selectedTags.includes(tag)
+                            ? 'bg-[var(--primary)] text-[var(--primary-foreground)]'
+                            : 'bg-white/[0.02] text-white/50 border border-white/[0.04] hover:border-[var(--primary)]/30 hover:text-white'
+                        }`}
+                      >
+                        {tag}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Active Filters */}
+              {selectedTags.length > 0 && (
+                <div className="flex items-center gap-3 pt-4 border-t border-white/[0.04]">
+                  <span className="text-xs text-white/40 uppercase tracking-wider">Active:</span>
+                  <div className="flex flex-wrap gap-2">
+                    {selectedTags.map((tag) => (
+                      <button
+                        key={tag}
+                        onClick={() => onTagToggle(tag)}
+                        className="flex items-center gap-2 px-3 py-1.5 bg-[var(--primary)]/10 border border-[var(--primary)]/20 text-[var(--primary)] text-xs font-medium hover:bg-[var(--primary)]/20 transition-colors"
+                      >
+                        {tag}
+                        <X className="w-3 h-3" />
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }
