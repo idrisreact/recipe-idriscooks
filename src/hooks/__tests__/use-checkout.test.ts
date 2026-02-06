@@ -1,5 +1,10 @@
 import { renderHook, act, waitFor } from '@testing-library/react';
 import { useCheckout } from '../use-checkout';
+import { navigateTo } from '../../utils/navigation';
+
+jest.mock('../../utils/navigation', () => ({
+  navigateTo: jest.fn(),
+}));
 
 describe('useCheckout', () => {
   const mockCheckoutUrl = '/api/checkout';
@@ -7,9 +12,7 @@ describe('useCheckout', () => {
 
   beforeEach(() => {
     global.fetch = jest.fn();
-    // Mock window.location.href
-    delete (window as { location?: { href: string } }).location;
-    (window as { location: { href: string } }).location = { href: '' };
+    (navigateTo as jest.Mock).mockClear();
   });
 
   afterEach(() => {
@@ -50,8 +53,7 @@ describe('useCheckout', () => {
       },
     });
 
-    // Note: window.location.href assignment doesn't work reliably in jsdom
-    // This is better tested in E2E tests
+    expect(navigateTo).toHaveBeenCalledWith(mockCheckoutResponse.url);
   });
 
   it('should handle checkout error when no URL is returned', async () => {

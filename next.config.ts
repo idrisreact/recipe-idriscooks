@@ -27,6 +27,7 @@ const nextConfig: NextConfig = {
       },
     ],
   },
+  transpilePackages: ['better-auth', 'nanostores'],
 };
 
 export default nextConfig;

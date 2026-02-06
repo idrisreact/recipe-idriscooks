@@ -1,4 +1,18 @@
 import '@testing-library/jest-dom';
+import { TextEncoder, TextDecoder } from 'util';
+
+Object.assign(global, { TextDecoder, TextEncoder });
+
+if (typeof window !== 'undefined') {
+  global.Request = window.Request || class Request { } as any;
+  global.Response = window.Response || class Response { } as any;
+  global.Headers = window.Headers || class Headers { } as any;
+} else {
+  global.Request = class Request { } as any;
+  global.Response = class Response { } as any;
+  global.Headers = class Headers { } as any;
+}
+
 
 // Mock Next.js router
 jest.mock('next/navigation', () => ({
@@ -38,13 +52,13 @@ Object.defineProperty(window, 'matchMedia', {
 
 // Mock IntersectionObserver
 global.IntersectionObserver = class IntersectionObserver {
-  constructor() {}
-  disconnect() {}
-  observe() {}
+  constructor() { }
+  disconnect() { }
+  observe() { }
   takeRecords() {
     return [];
   }
-  unobserve() {}
+  unobserve() { }
 } as any;
 
 // Suppress console errors in tests (optional)
