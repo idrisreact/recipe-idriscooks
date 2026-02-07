@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { navigateTo } from '../utils/navigation';
 
 interface UseCheckoutOptions {
   checkoutUrl: string;
@@ -36,7 +37,8 @@ export function useCheckout({
 
       if (data.url) {
         onSuccess?.();
-        window.location.href = data.url;
+        setIsLoading(false);
+        navigateTo(data.url);
       } else {
         throw new Error('No checkout URL received');
       }

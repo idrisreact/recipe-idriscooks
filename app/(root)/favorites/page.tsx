@@ -31,7 +31,17 @@ import { useSearchParams } from 'next/navigation';
 
 function FavoritesContent() {
   const { data: session, isPending } = authClient.useSession();
-  const { favorites, loading, error, removeFromFavorites, isFavorited } = useFavorites();
+  const {
+    favorites,
+    loading,
+    error,
+    removeFromFavorites,
+    isFavorited,
+    page,
+    setPage,
+    total,
+    hasMore,
+  } = useFavorites();
   const router = useRouter();
   const searchParams = useSearchParams();
   const [previewRecipe, setPreviewRecipe] = useState<Recipe | null>(null);
@@ -102,7 +112,6 @@ function FavoritesContent() {
     );
   }
 
-  console.log(favorites);
   const shareRecipe = (recipe: Recipe) => {
     if (navigator.share) {
       navigator.share({
@@ -175,8 +184,8 @@ function FavoritesContent() {
         <>
           <div className="mb-6 flex justify-between items-center flex-wrap gap-4">
             <Text variant="large" className="text-muted-foreground font-medium">
-              {favorites.length} favorite recipe
-              {favorites.length !== 1 ? 's' : ''}
+              {total} favorite recipe
+              {total !== 1 ? 's' : ''}
             </Text>
 
             {favorites.length > 0 && (
@@ -248,6 +257,26 @@ function FavoritesContent() {
               );
             })}
           </div>
+
+          {total > favorites.length && (
+            <div className="flex justify-center items-center gap-4 mt-8">
+              <button
+                onClick={() => setPage((p) => Math.max(0, p - 1))}
+                disabled={page === 0}
+                className="murakamicity-button-outline disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                Previous
+              </button>
+              <Text className="text-muted-foreground">Page {page + 1}</Text>
+              <button
+                onClick={() => setPage((p) => p + 1)}
+                disabled={!hasMore}
+                className="murakamicity-button-outline disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                Next
+              </button>
+            </div>
+          )}
 
           {}
           <RecipePreviewModal

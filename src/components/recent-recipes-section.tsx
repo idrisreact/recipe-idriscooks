@@ -27,6 +27,7 @@ export default function RecentRecipesSection() {
   const sectionRef = useRef<HTMLElement>(null);
   const headingRef = useRef<HTMLDivElement>(null);
   const recipeRefs = useRef<(HTMLDivElement | null)[]>([]);
+  const hasAnimated = useRef(false);
   const { addToFavorites, removeFromFavorites, isFavorited } = useFavorites();
 
   const {
@@ -46,7 +47,9 @@ export default function RecentRecipesSection() {
 
   useEffect(() => {
     if (typeof window === 'undefined') return;
+    if (!recipes?.length || hasAnimated.current) return;
 
+    hasAnimated.current = true;
     gsap.registerPlugin(ScrollTrigger);
 
     if (headingRef.current) {

@@ -1,5 +1,10 @@
 import { renderHook, act, waitFor } from '@testing-library/react';
 import { useCheckout } from '../use-checkout';
+import { navigateTo } from '../../utils/navigation';
+
+jest.mock('../../utils/navigation', () => ({
+  navigateTo: jest.fn(),
+}));
 
 describe('useCheckout', () => {
   const mockCheckoutUrl = '/api/checkout';
@@ -7,9 +12,7 @@ describe('useCheckout', () => {
 
   beforeEach(() => {
     global.fetch = jest.fn();
-    // Mock window.location.href
-    delete (window as { location?: { href: string } }).location;
-    (window as { location: { href: string } }).location = { href: '' };
+    (navigateTo as jest.Mock).mockClear();
   });
 
   afterEach(() => {
@@ -50,8 +53,7 @@ describe('useCheckout', () => {
       },
     });
 
-    // Note: window.location.href assignment doesn't work reliably in jsdom
-    // This is better tested in E2E tests
+    expect(navigateTo).toHaveBeenCalledWith(mockCheckoutResponse.url);
   });
 
   it('should handle checkout error when no URL is returned', async () => {
@@ -125,9 +127,7 @@ describe('useCheckout', () => {
     expect(onSuccess).toHaveBeenCalled();
   });
 
-  it.skip('should set loading state during checkout', async () => {
-    // TODO: Fix async timing issue with loading state
-    // This is better tested in integration/E2E tests
+  it('should set loading state during checkout', async () => {
     (global.fetch as jest.Mock).mockResolvedValueOnce({
       json: async () => mockCheckoutResponse,
     });
@@ -138,17 +138,13 @@ describe('useCheckout', () => {
       })
     );
 
-    // Check initial loading state
     expect(result.current.isLoading).toBe(false);
 
-    // Initiate checkout and check loading
-    const checkoutPromise = act(async () => {
+    await act(async () => {
       await result.current.initiateCheckout();
     });
 
-    await checkoutPromise;
-
-    // After completion, loading should be false
+    // After completion, loading should be false (fixed: setIsLoading(false) on success)
     expect(result.current.isLoading).toBe(false);
   });
 });

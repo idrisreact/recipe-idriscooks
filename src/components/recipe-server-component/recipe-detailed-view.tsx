@@ -2,9 +2,7 @@
 
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
-import { useRef, useState, useMemo } from 'react';
-import { toPng } from 'html-to-image';
-import jsPDF from 'jspdf';
+import { useState, useMemo } from 'react';
 import { ArrowLeft, Heart, Share2, Download, Lock, ChefHat } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Text } from '@/src/components/ui/Text';
@@ -32,7 +30,6 @@ function formatMinutes(total: number): string {
 export function RecipeDetailedView({ recipe, canView, hasPro = false }: Props) {
   const router = useRouter();
   const { addToFavorites, removeFromFavorites, isFavorited } = useFavorites();
-  const contentRef = useRef<HTMLDivElement>(null);
   const [isDownloading, setIsDownloading] = useState(false);
 
   const totalTime = (recipe.prepTime ?? 0) + (recipe.cookTime ?? 0);
@@ -65,46 +62,33 @@ export function RecipeDetailedView({ recipe, canView, hasPro = false }: Props) {
       return;
     }
 
-    if (!contentRef.current) return;
-
     try {
       setIsDownloading(true);
       const toastId = toast.loading('Generating PDF...');
 
-      // Use html-to-image to generate PNG
-      const dataUrl = await toPng(contentRef.current, {
-        cacheBust: true,
-        pixelRatio: 2,
-        backgroundColor: '#ffffff', // Ensure white background
+      const response = await fetch('/api/pdf/generate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          recipes: [recipe],
+          title: recipe.title,
+        }),
       });
 
-      const pdf = new jsPDF({
-        orientation: 'portrait',
-        unit: 'mm',
-        format: 'a4',
-      });
-
-      const imgWidth = 210;
-      const pageHeight = 297;
-
-      // Calculate image dimensions
-      const imgProps = pdf.getImageProperties(dataUrl);
-      const imgHeight = (imgProps.height * imgWidth) / imgProps.width;
-
-      let heightLeft = imgHeight;
-      let position = 0;
-
-      pdf.addImage(dataUrl, 'PNG', 0, position, imgWidth, imgHeight);
-      heightLeft -= pageHeight;
-
-      while (heightLeft >= 0) {
-        position = heightLeft - imgHeight;
-        pdf.addPage();
-        pdf.addImage(dataUrl, 'PNG', 0, position, imgWidth, imgHeight);
-        heightLeft -= pageHeight;
+      if (!response.ok) {
+        throw new Error('Failed to generate PDF');
       }
 
-      pdf.save(`${recipe.title.replace(/\s+/g, '-').toLowerCase()}.pdf`);
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `${recipe.title.replace(/\s+/g, '-').toLowerCase()}.pdf`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      window.URL.revokeObjectURL(url);
+
       toast.success('PDF downloaded successfully!', { id: toastId });
     } catch (error) {
       console.error('Error generating PDF:', error);
@@ -174,7 +158,7 @@ export function RecipeDetailedView({ recipe, canView, hasPro = false }: Props) {
       {}
       <div className="grid grid-cols-1 xl:grid-cols-[1fr_360px] gap-6">
         {}
-        <div className="murakamicity-card" ref={contentRef}>
+        <div className="murakamicity-card">
           <div className="p-4 md:p-6 grid grid-cols-1 lg:grid-cols-[1fr_1fr] gap-6">
             {}
             <div className="relative h-[200px] sm:h-[240px] w-full overflow-hidden rounded-sm lg:h-[320px] order-1">

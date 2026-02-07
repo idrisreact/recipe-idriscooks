@@ -1,10 +1,27 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { z } from 'zod';
 import {
   addToFavorites,
   removeFromFavorites,
   getUserFavorites,
 } from '@/src/utils/favorite-recipes';
 import { auth } from '@/src/utils/auth';
+
+const FavoritesQuerySchema = z
+  .object({
+    limit: z
+      .string()
+      .nullish()
+      .transform((val) => (val ? parseInt(val, 10) : undefined)),
+    offset: z
+      .string()
+      .nullish()
+      .transform((val) => (val ? parseInt(val, 10) : undefined)),
+  })
+  .transform((data) => ({
+    limit: data.limit && data.limit > 0 && data.limit <= 50 ? data.limit : undefined,
+    offset: data.offset && data.offset >= 0 ? data.offset : undefined,
+  }));
 
 export async function GET(request: NextRequest) {
   try {
@@ -16,13 +33,23 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const favorites = await getUserFavorites(session.user.id);
-
-    return NextResponse.json({
-      data: favorites,
-      count: favorites.length,
+    const { searchParams } = new URL(request.url);
+    const params = FavoritesQuerySchema.parse({
+      limit: searchParams.get('limit'),
+      offset: searchParams.get('offset'),
     });
+
+    const result = await getUserFavorites(session.user.id, params);
+
+    return NextResponse.json(result);
   } catch (error) {
+    if (error instanceof z.ZodError) {
+      return NextResponse.json(
+        { error: 'Invalid parameters', details: error.errors },
+        { status: 400 }
+      );
+    }
+
     console.error('Error fetching favorites:', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
