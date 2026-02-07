@@ -1,82 +1,99 @@
-import { useState, useEffect } from 'react';
+import { useState, useCallback } from 'react';
+import { useQuery, useMutation, useQueryClient, keepPreviousData } from '@tanstack/react-query';
 import {
   FavoriteRecipeWithRecipe,
   AddToFavoritesRequest,
   RemoveFromFavoritesRequest,
 } from '../types';
 
+interface PaginatedFavoritesResponse {
+  data: FavoriteRecipeWithRecipe[];
+  total: number;
+  limit: number;
+  offset: number;
+  hasMore: boolean;
+}
+
+const FAVORITES_PAGE_SIZE = 20;
+
 export function useFavorites() {
-  const [favorites, setFavorites] = useState<FavoriteRecipeWithRecipe[]>([]);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const queryClient = useQueryClient();
+  const [page, setPage] = useState(0);
 
-  const fetchFavorites = async () => {
-    setLoading(true);
-    setError(null);
-
-    try {
-      const response = await fetch('/api/favorites');
-
-      if (!response.ok) {
+  const {
+    data: response,
+    isLoading: loading,
+    error: queryError,
+  } = useQuery<PaginatedFavoritesResponse>({
+    queryKey: ['favorites', page],
+    queryFn: async () => {
+      const params = new URLSearchParams({
+        limit: String(FAVORITES_PAGE_SIZE),
+        offset: String(page * FAVORITES_PAGE_SIZE),
+      });
+      const res = await fetch(`/api/favorites?${params}`);
+      if (!res.ok) {
         throw new Error('Failed to fetch favorites');
       }
+      return res.json();
+    },
+    placeholderData: keepPreviousData,
+  });
 
-      const data = await response.json();
-      setFavorites(data.data || []);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'An error occurred');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const addToFavorites = async (recipeId: number) => {
-    try {
-      const response = await fetch('/api/favorites', {
+  const addMutation = useMutation({
+    mutationFn: async (recipeId: number) => {
+      const res = await fetch('/api/favorites', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ recipeId } as AddToFavoritesRequest),
       });
-
-      if (!response.ok) {
+      if (!res.ok) {
         throw new Error('Failed to add to favorites');
       }
+      return res.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['favorites'] });
+    },
+  });
 
-      await fetchFavorites();
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to add to favorites');
-    }
-  };
-
-  const removeFromFavorites = async (recipeId: number) => {
-    try {
-      const response = await fetch('/api/favorites', {
+  const removeMutation = useMutation({
+    mutationFn: async (recipeId: number) => {
+      const res = await fetch('/api/favorites', {
         method: 'DELETE',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ recipeId } as RemoveFromFavoritesRequest),
       });
-
-      if (!response.ok) {
+      if (!res.ok) {
         throw new Error('Failed to remove from favorites');
       }
+      return res.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['favorites'] });
+    },
+  });
 
-      await fetchFavorites();
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to remove from favorites');
-    }
-  };
+  const favorites = response?.data ?? [];
+  const total = response?.total ?? 0;
+  const hasMore = response?.hasMore ?? false;
+  const error =
+    queryError?.message ?? addMutation.error?.message ?? removeMutation.error?.message ?? null;
 
-  const isFavorited = (recipeId: number) => {
-    return favorites.some((favorite) => favorite.recipeId === recipeId);
-  };
+  const isFavorited = useCallback(
+    (recipeId: number) => favorites.some((fav) => fav.recipeId === recipeId),
+    [favorites]
+  );
 
-  useEffect(() => {
-    fetchFavorites();
-  }, []);
+  const addToFavorites = useCallback(
+    (recipeId: number) => addMutation.mutateAsync(recipeId),
+    [addMutation]
+  );
+
+  const removeFromFavorites = useCallback(
+    (recipeId: number) => removeMutation.mutateAsync(recipeId),
+    [removeMutation]
+  );
 
   return {
     favorites,
@@ -85,6 +102,9 @@ export function useFavorites() {
     addToFavorites,
     removeFromFavorites,
     isFavorited,
-    refetch: fetchFavorites,
+    page,
+    setPage,
+    total,
+    hasMore,
   };
 }

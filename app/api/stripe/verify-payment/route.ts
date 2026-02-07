@@ -36,18 +36,16 @@ export async function POST(request: NextRequest) {
     if (session.mode === 'subscription' && session.subscription) {
       // Handle subscription payment
       const subscription = session.subscription as Stripe.Subscription;
-      const plan = subscription.items.data[0]?.price;
+      const subscriptionItem = subscription.items.data[0];
+      const plan = subscriptionItem?.price;
 
       return NextResponse.json({
         subscription: {
           id: subscription.id,
           status: subscription.status,
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          current_period_start: (subscription as any).current_period_start,
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          current_period_end: (subscription as any).current_period_end,
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          cancel_at_period_end: (subscription as any).cancel_at_period_end,
+          current_period_start: subscriptionItem?.current_period_start,
+          current_period_end: subscriptionItem?.current_period_end,
+          cancel_at_period_end: subscription.cancel_at_period_end,
         },
         plan: plan
           ? {

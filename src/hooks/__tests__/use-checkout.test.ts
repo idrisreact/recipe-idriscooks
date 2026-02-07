@@ -127,9 +127,7 @@ describe('useCheckout', () => {
     expect(onSuccess).toHaveBeenCalled();
   });
 
-  it.skip('should set loading state during checkout', async () => {
-    // TODO: Fix async timing issue with loading state
-    // This is better tested in integration/E2E tests
+  it('should set loading state during checkout', async () => {
     (global.fetch as jest.Mock).mockResolvedValueOnce({
       json: async () => mockCheckoutResponse,
     });
@@ -140,17 +138,13 @@ describe('useCheckout', () => {
       })
     );
 
-    // Check initial loading state
     expect(result.current.isLoading).toBe(false);
 
-    // Initiate checkout and check loading
-    const checkoutPromise = act(async () => {
+    await act(async () => {
       await result.current.initiateCheckout();
     });
 
-    await checkoutPromise;
-
-    // After completion, loading should be false
+    // After completion, loading should be false (fixed: setIsLoading(false) on success)
     expect(result.current.isLoading).toBe(false);
   });
 });

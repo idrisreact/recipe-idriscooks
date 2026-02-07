@@ -37,6 +37,7 @@ export function useCheckout({
 
       if (data.url) {
         onSuccess?.();
+        setIsLoading(false);
         navigateTo(data.url);
       } else {
         throw new Error('No checkout URL received');

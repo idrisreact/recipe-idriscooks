@@ -122,25 +122,21 @@ export async function GET(request: NextRequest) {
         break;
     }
 
-    // Execute single optimized query
-    let queryBuilder = db.select().from(recipes);
+    // Execute single optimized query with dynamic builder
+    const queryBuilder = db.select().from(recipes).$dynamic();
 
     if (whereConditions.length > 0) {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      queryBuilder = queryBuilder.where(and(...whereConditions)) as any;
+      queryBuilder.where(and(...whereConditions));
     }
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    queryBuilder = queryBuilder.orderBy(orderBy) as any;
+    queryBuilder.orderBy(orderBy);
 
     if (params.offset) {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      queryBuilder = queryBuilder.offset(params.offset) as any;
+      queryBuilder.offset(params.offset);
     }
 
     if (params.limit) {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      queryBuilder = queryBuilder.limit(params.limit) as any;
+      queryBuilder.limit(params.limit);
     }
 
     const results = await queryBuilder;

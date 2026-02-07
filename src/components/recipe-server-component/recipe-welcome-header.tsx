@@ -1,5 +1,6 @@
 'use client';
 
+import { memo } from 'react';
 import { Session } from '@/src/types';
 import { motion } from 'framer-motion';
 
@@ -8,7 +9,10 @@ interface RecipeWelcomeHeaderProps {
   onSignIn: () => void;
 }
 
-export function RecipeWelcomeHeader({ session, onSignIn }: RecipeWelcomeHeaderProps) {
+export const RecipeWelcomeHeader = memo(function RecipeWelcomeHeader({
+  session,
+  onSignIn,
+}: RecipeWelcomeHeaderProps) {
   if (session) {
     return (
       <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="mb-12">
@@ -41,4 +45,4 @@ export function RecipeWelcomeHeader({ session, onSignIn }: RecipeWelcomeHeaderPr
       </div>
     </motion.div>
   );
-}
+});

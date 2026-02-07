@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import { NextRequest, NextResponse } from 'next/server';
 import Stripe from 'stripe';
 import { db } from '@/src/db';
@@ -180,16 +179,18 @@ async function createInvoiceForCheckout(session: Stripe.Checkout.Session) {
         console.log(
           `✅ Invoice ${finalizedInvoice.id} created and marked as paid for session ${session.id}`
         );
-      } catch (payError: any) {
+      } catch (payError) {
         // If marking as paid fails, log but don't fail the webhook
-        console.warn('Could not mark invoice as paid (this is ok):', payError.message);
+        const message = payError instanceof Error ? payError.message : String(payError);
+        console.warn('Could not mark invoice as paid (this is ok):', message);
         console.log(`✅ Invoice ${finalizedInvoice.id} created (payment already processed)`);
       }
     }
 
     return finalizedInvoice;
-  } catch (error: any) {
-    console.error('Error creating invoice for checkout:', error.message || error);
+  } catch (error) {
+    const message = error instanceof Error ? error.message : String(error);
+    console.error('Error creating invoice for checkout:', message);
     // Don't throw - we don't want to fail the webhook if invoice creation fails
     // The payment has already succeeded, invoice is just for records
   }
@@ -281,113 +282,13 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
     return;
   }
 
-  // Handle PDF download payments with guest user (email fallback)
-  if (type === 'pdf_download' && (userId === 'guest' || !userId) && customerEmail) {
-    console.log('Webhook: Attempting email fallback for PDF access:', customerEmail);
-
-    try {
-      const { user: userSchema } = await import('@/src/db/schemas/user.schema');
-      const userRecord = await db
-        .select()
-        .from(userSchema)
-        .where(eq(userSchema.email, customerEmail))
-        .limit(1);
-
-      if (userRecord.length > 0) {
-        const foundUserId = userRecord[0].id;
-        console.log('Webhook: Granting PDF access via email fallback to user:', foundUserId);
-
-        await db
-          .insert(premiumFeatures)
-          .values({
-            userId: foundUserId,
-            feature: 'pdf_downloads',
-            grantedAt: new Date(),
-            expiresAt: null,
-            metadata: {
-              sessionId: session.id,
-              amountPaid: session.amount_total ? session.amount_total / 100 : 0,
-              recipeCount: recipeCount ? parseInt(recipeCount) : 1,
-              planType: 'pdf_download',
-              grantedViaEmail: true,
-            },
-          })
-          .onConflictDoUpdate({
-            target: [premiumFeatures.userId, premiumFeatures.feature],
-            set: {
-              grantedAt: new Date(),
-              metadata: {
-                sessionId: session.id,
-                amountPaid: session.amount_total ? session.amount_total / 100 : 0,
-                recipeCount: recipeCount ? parseInt(recipeCount) : 1,
-                planType: 'pdf_download',
-                grantedViaEmail: true,
-              },
-            },
-          });
-
-        console.log('Webhook: PDF access granted via email fallback successfully');
-      } else {
-        console.warn('Webhook: User not found for email fallback:', customerEmail);
-      }
-    } catch (error) {
-      console.error('Webhook: Failed to grant access via email fallback:', error);
-    }
-    return;
-  }
-
-  // Handle other PDF download scenarios by amount (fallback for missing metadata)
-  if (!type && customerEmail && [299, 499, 799, 999, 1000].includes(session.amount_total || 0)) {
-    console.log('Webhook: Attempting amount-based fallback for:', customerEmail);
-
-    try {
-      const { user: userSchema } = await import('@/src/db/schemas/user.schema');
-      const userRecord = await db
-        .select()
-        .from(userSchema)
-        .where(eq(userSchema.email, customerEmail))
-        .limit(1);
-
-      if (userRecord.length > 0) {
-        const foundUserId = userRecord[0].id;
-        const featureType = session.amount_total === 1000 ? 'recipe_access' : 'pdf_downloads';
-
-        console.log(`Webhook: Granting ${featureType} via amount fallback to user:`, foundUserId);
-
-        await db
-          .insert(premiumFeatures)
-          .values({
-            userId: foundUserId,
-            feature: featureType,
-            grantedAt: new Date(),
-            expiresAt: featureType === 'recipe_access' ? null : null,
-            metadata: {
-              sessionId: session.id,
-              amountPaid: session.amount_total ? session.amount_total / 100 : 0,
-              planType: featureType === 'recipe_access' ? 'lifetime' : 'pdf_download',
-              grantedViaAmountFallback: true,
-            },
-          })
-          .onConflictDoUpdate({
-            target: [premiumFeatures.userId, premiumFeatures.feature],
-            set: {
-              grantedAt: new Date(),
-              metadata: {
-                sessionId: session.id,
-                amountPaid: session.amount_total ? session.amount_total / 100 : 0,
-                planType: featureType === 'recipe_access' ? 'lifetime' : 'pdf_download',
-                grantedViaAmountFallback: true,
-              },
-            },
-          });
-
-        console.log('Webhook: Access granted via amount fallback successfully');
-      } else {
-        console.warn('Webhook: User not found for amount fallback:', customerEmail);
-      }
-    } catch (error) {
-      console.error('Webhook: Failed to grant access via amount fallback:', error);
-    }
+  // Guest checkout without authenticated userId - log for manual resolution
+  if (type === 'pdf_download' && (userId === 'guest' || !userId)) {
+    console.warn(
+      'Webhook: Guest checkout completed without authenticated userId. ' +
+        'Session requires manual resolution.',
+      { sessionId: session.id, type, customerEmail }
+    );
     return;
   }
 
@@ -407,8 +308,10 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
   }
 
   if (subscriptionId) {
-    const subscriptionResponse = await stripe.subscriptions.retrieve(subscriptionId);
-    const subscription = subscriptionResponse as any;
+    const subscription = await stripe.subscriptions.retrieve(subscriptionId);
+    const subscriptionItem = subscription.items.data[0];
+    const periodStart = subscriptionItem?.current_period_start;
+    const periodEnd = subscriptionItem?.current_period_end;
 
     // Upsert user subscription
     await db
@@ -418,12 +321,8 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
         userId: userId,
         planId: planId || 'pro', // Default to pro if planId missing but subscription exists
         status: subscription.status,
-        currentPeriodStart: new Date(
-          (subscription.current_period_start || subscription.currentPeriodStart) * 1000
-        ),
-        currentPeriodEnd: new Date(
-          (subscription.current_period_end || subscription.currentPeriodEnd) * 1000
-        ),
+        currentPeriodStart: periodStart ? new Date(periodStart * 1000) : new Date(),
+        currentPeriodEnd: periodEnd ? new Date(periodEnd * 1000) : new Date(),
         stripeSubscriptionId: subscription.id,
         stripeCustomerId: subscription.customer as string,
         createdAt: new Date(),
@@ -434,12 +333,8 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
         set: {
           planId: planId || 'pro',
           status: subscription.status,
-          currentPeriodStart: new Date(
-            (subscription.current_period_start || subscription.currentPeriodStart) * 1000
-          ),
-          currentPeriodEnd: new Date(
-            (subscription.current_period_end || subscription.currentPeriodEnd) * 1000
-          ),
+          currentPeriodStart: periodStart ? new Date(periodStart * 1000) : new Date(),
+          currentPeriodEnd: periodEnd ? new Date(periodEnd * 1000) : new Date(),
           stripeSubscriptionId: subscription.id,
           updatedAt: new Date(),
         },
@@ -447,8 +342,7 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
   }
 }
 
-async function handleSubscriptionUpdated(subscriptionData: Stripe.Subscription) {
-  const subscription = subscriptionData as any;
+async function handleSubscriptionUpdated(subscription: Stripe.Subscription) {
   const userId = subscription.metadata?.userId || subscription.metadata?.clerkUserId;
 
   if (!userId) {
@@ -456,22 +350,18 @@ async function handleSubscriptionUpdated(subscriptionData: Stripe.Subscription) 
     return;
   }
 
+  const subscriptionItem = subscription.items.data[0];
+  const periodStart = subscriptionItem?.current_period_start;
+  const periodEnd = subscriptionItem?.current_period_end;
+
   await db
     .update(userSubscriptions)
     .set({
       status: subscription.status,
-      currentPeriodStart: new Date(
-        (subscription.current_period_start || subscription.currentPeriodStart) * 1000
-      ),
-      currentPeriodEnd: new Date(
-        (subscription.current_period_end || subscription.currentPeriodEnd) * 1000
-      ),
-      cancelAtPeriodEnd:
-        subscription.cancel_at_period_end || subscription.cancelAtPeriodEnd || false,
-      canceledAt:
-        subscription.canceled_at || subscription.canceledAt
-          ? new Date((subscription.canceled_at || subscription.canceledAt) * 1000)
-          : null,
+      currentPeriodStart: periodStart ? new Date(periodStart * 1000) : new Date(),
+      currentPeriodEnd: periodEnd ? new Date(periodEnd * 1000) : new Date(),
+      cancelAtPeriodEnd: subscription.cancel_at_period_end ?? false,
+      canceledAt: subscription.canceled_at ? new Date(subscription.canceled_at * 1000) : null,
       updatedAt: new Date(),
     })
     .where(eq(userSubscriptions.stripeSubscriptionId, subscription.id));
@@ -488,11 +378,11 @@ async function handleSubscriptionDeleted(subscription: Stripe.Subscription) {
     .where(eq(userSubscriptions.stripeSubscriptionId, subscription.id));
 }
 
-async function handleInvoicePaymentSucceeded(invoiceData: Stripe.Invoice) {
-  const invoice = invoiceData as any;
+async function handleInvoicePaymentSucceeded(invoice: Stripe.Invoice) {
+  const subscriptionDetails = invoice.parent?.subscription_details;
   const userId =
-    invoice.subscription_details?.metadata?.userId ||
-    invoice.subscription_details?.metadata?.clerkUserId ||
+    subscriptionDetails?.metadata?.userId ||
+    subscriptionDetails?.metadata?.clerkUserId ||
     invoice.metadata?.userId ||
     invoice.metadata?.clerkUserId;
 
@@ -500,34 +390,44 @@ async function handleInvoicePaymentSucceeded(invoiceData: Stripe.Invoice) {
     return;
   }
 
-  const [subscription] = await db
-    .select()
-    .from(userSubscriptions)
-    .where(eq(userSubscriptions.stripeSubscriptionId, invoice.subscription as string))
-    .limit(1);
+  const stripeSubscriptionId =
+    typeof subscriptionDetails?.subscription === 'string'
+      ? subscriptionDetails.subscription
+      : subscriptionDetails?.subscription?.id;
+
+  let subscriptionRecord;
+  if (stripeSubscriptionId) {
+    const [found] = await db
+      .select()
+      .from(userSubscriptions)
+      .where(eq(userSubscriptions.stripeSubscriptionId, stripeSubscriptionId))
+      .limit(1);
+    subscriptionRecord = found;
+  }
 
   await db.insert(billingHistory).values({
     id: crypto.randomUUID(),
     userId: userId,
-    subscriptionId: subscription?.id,
+    subscriptionId: subscriptionRecord?.id,
     amount: (invoice.amount_paid / 100).toFixed(2),
     currency: invoice.currency,
     status: 'succeeded',
     description: invoice.description || 'Subscription payment',
     invoiceUrl: invoice.hosted_invoice_url || undefined,
     stripeInvoiceId: invoice.id,
-    stripePaymentIntentId: invoice.payment_intent as string,
     billingDate: new Date(invoice.created * 1000),
-    paidAt: new Date(invoice.status_transitions.paid_at! * 1000),
+    paidAt: invoice.status_transitions.paid_at
+      ? new Date(invoice.status_transitions.paid_at * 1000)
+      : new Date(),
     createdAt: new Date(),
   });
 }
 
-async function handleInvoicePaymentFailed(invoiceData: Stripe.Invoice) {
-  const invoice = invoiceData as any;
+async function handleInvoicePaymentFailed(invoice: Stripe.Invoice) {
+  const subscriptionDetails = invoice.parent?.subscription_details;
   const userId =
-    invoice.subscription_details?.metadata?.userId ||
-    invoice.subscription_details?.metadata?.clerkUserId ||
+    subscriptionDetails?.metadata?.userId ||
+    subscriptionDetails?.metadata?.clerkUserId ||
     invoice.metadata?.userId ||
     invoice.metadata?.clerkUserId;
 
@@ -535,16 +435,25 @@ async function handleInvoicePaymentFailed(invoiceData: Stripe.Invoice) {
     return;
   }
 
-  const [subscription] = await db
-    .select()
-    .from(userSubscriptions)
-    .where(eq(userSubscriptions.stripeSubscriptionId, invoice.subscription as string))
-    .limit(1);
+  const stripeSubscriptionId =
+    typeof subscriptionDetails?.subscription === 'string'
+      ? subscriptionDetails.subscription
+      : subscriptionDetails?.subscription?.id;
+
+  let subscriptionRecord;
+  if (stripeSubscriptionId) {
+    const [found] = await db
+      .select()
+      .from(userSubscriptions)
+      .where(eq(userSubscriptions.stripeSubscriptionId, stripeSubscriptionId))
+      .limit(1);
+    subscriptionRecord = found;
+  }
 
   await db.insert(billingHistory).values({
     id: crypto.randomUUID(),
     userId: userId,
-    subscriptionId: subscription?.id,
+    subscriptionId: subscriptionRecord?.id,
     amount: (invoice.amount_due / 100).toFixed(2),
     currency: invoice.currency,
     status: 'failed',
@@ -567,67 +476,59 @@ async function handleChargeRefunded(charge: Stripe.Charge) {
       return;
     }
 
-    // Try to find the customer and user
-    const customerEmail = charge.billing_details?.email;
-    const chargeMetadata = charge.metadata;
-
     console.log('Refund details:', {
       chargeId: charge.id,
       amount: charge.amount_refunded,
       currency: charge.currency,
-      customerEmail,
-      metadata: chargeMetadata,
+      paymentIntentId,
     });
 
-    // If we have user information, revoke access
-    if (customerEmail) {
-      try {
-        const { user: userSchema } = await import('@/src/db/schemas/user.schema');
-        const userRecord = await db
-          .select()
-          .from(userSchema)
-          .where(eq(userSchema.email, customerEmail))
-          .limit(1);
+    // Look up the user via billing history using the payment intent ID
+    try {
+      const [billingRecord] = await db
+        .select()
+        .from(billingHistory)
+        .where(eq(billingHistory.stripePaymentIntentId, paymentIntentId))
+        .limit(1);
 
-        if (userRecord.length > 0) {
-          const userId = userRecord[0].id;
-
-          // For one-time purchases (PDF downloads, recipe access), remove the feature
-          // Note: This is a policy decision - you might want to keep access even after refund
-          await db
-            .delete(premiumFeatures)
-            .where(
-              and(eq(premiumFeatures.userId, userId), eq(premiumFeatures.feature, 'pdf_downloads'))
-            );
-
-          await db
-            .delete(premiumFeatures)
-            .where(
-              and(eq(premiumFeatures.userId, userId), eq(premiumFeatures.feature, 'recipe_access'))
-            );
-
-          console.log(`Revoked access for user ${userId} due to refund`);
-
-          // Log the refund in billing history
-          await db.insert(billingHistory).values({
-            id: crypto.randomUUID(),
-            userId: userId,
-            amount: (charge.amount_refunded / 100).toFixed(2),
-            currency: charge.currency,
-            status: 'refunded',
-            description: `Refund for charge ${charge.id}`,
-            stripePaymentIntentId: paymentIntentId,
-            billingDate: new Date(),
-            createdAt: new Date(),
-          });
-
-          console.log('Refund recorded in billing history');
-        } else {
-          console.log('User not found for refund email:', customerEmail);
-        }
-      } catch (error) {
-        console.error('Error processing refund:', error);
+      if (!billingRecord) {
+        console.warn('Webhook: No billing record found for paymentIntent:', paymentIntentId);
+        return;
       }
+
+      const userId = billingRecord.userId;
+
+      // Revoke premium features for this user
+      await db
+        .delete(premiumFeatures)
+        .where(
+          and(eq(premiumFeatures.userId, userId), eq(premiumFeatures.feature, 'pdf_downloads'))
+        );
+
+      await db
+        .delete(premiumFeatures)
+        .where(
+          and(eq(premiumFeatures.userId, userId), eq(premiumFeatures.feature, 'recipe_access'))
+        );
+
+      console.log(`Revoked access for user ${userId} due to refund`);
+
+      // Log the refund in billing history
+      await db.insert(billingHistory).values({
+        id: crypto.randomUUID(),
+        userId: userId,
+        amount: (charge.amount_refunded / 100).toFixed(2),
+        currency: charge.currency,
+        status: 'refunded',
+        description: `Refund for charge ${charge.id}`,
+        stripePaymentIntentId: paymentIntentId,
+        billingDate: new Date(),
+        createdAt: new Date(),
+      });
+
+      console.log('Refund recorded in billing history');
+    } catch (error) {
+      console.error('Error processing refund:', error);
     }
   } catch (error) {
     console.error('Error handling charge refund:', error);
