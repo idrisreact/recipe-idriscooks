@@ -140,7 +140,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       </motion.header>
 
       {/* Main Content */}
-      <div className="min-h-screen flex flex-col">
+      <div className="min-h-screen flex flex-col pb-[calc(4rem+env(safe-area-inset-bottom))] md:pb-0">
         <main className="flex-1">{children}</main>
         <Footer />
       </div>
