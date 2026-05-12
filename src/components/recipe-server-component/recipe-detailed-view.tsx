@@ -2,14 +2,14 @@
 
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
-import { useState, useMemo } from 'react';
-import { ArrowLeft, Heart, Share2, Download, Lock, ChefHat } from 'lucide-react';
+import { useMemo, useState } from 'react';
+import { ArrowLeft, Download, Heart, Lock, Share2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Text } from '@/src/components/ui/Text';
 import { Recipe } from '@/src/types/recipes.types';
 import { useFavorites } from '@/src/hooks/use-favorites';
 import { SignInOverlay } from './sign-in-overlay';
 import AddToShoppingListButton from '@/src/components/shopping-list/add-to-shopping-list-button';
+import AddToCollectionButton from '@/src/components/collections/add-to-collection-button';
 import { CookingModeButton } from '@/src/components/recipe-step-cards/cooking-mode-button';
 import { convertInstructionsToSteps } from '@/src/components/recipe-step-cards/utils';
 import toast from 'react-hot-toast';
@@ -27,6 +27,27 @@ function formatMinutes(total: number): string {
   return m ? `${h} hr ${m} min` : `${h} hr`;
 }
 
+function formatIngredient(quantity: number, unit: string): string {
+  return [quantity, unit].filter(Boolean).join(' ');
+}
+
+function splitStep(step: string, index: number) {
+  const firstStop = step.indexOf('.');
+  const hasUsefulHeading = firstStop > 16 && firstStop < 72;
+
+  if (!hasUsefulHeading) {
+    return {
+      heading: `Step ${index + 1}`,
+      body: step,
+    };
+  }
+
+  return {
+    heading: step.slice(0, firstStop),
+    body: step.slice(firstStop + 1).trim() || step,
+  };
+}
+
 export function RecipeDetailedView({ recipe, canView, hasPro = false }: Props) {
   const router = useRouter();
   const { addToFavorites, removeFromFavorites, isFavorited } = useFavorites();
@@ -35,7 +56,6 @@ export function RecipeDetailedView({ recipe, canView, hasPro = false }: Props) {
   const totalTime = (recipe.prepTime ?? 0) + (recipe.cookTime ?? 0);
   const favorited = isFavorited(recipe.id);
 
-  // Convert recipe steps to cooking mode format
   const cookingSteps = useMemo(() => {
     return convertInstructionsToSteps(recipe.steps || [], recipe.imageUrl);
   }, [recipe.steps, recipe.imageUrl]);
@@ -99,205 +119,202 @@ export function RecipeDetailedView({ recipe, canView, hasPro = false }: Props) {
   };
 
   return (
-    <div className="w-full max-w-none mx-auto px-4 sm:px-6 lg:max-w-7xl">
-      {}
-      <div className="flex items-center justify-between py-4">
+    <article className="relative w-full">
+      <div className="mb-8 flex items-center justify-between gap-4">
         <Button
           variant="outline"
           onClick={() => router.push('/recipes')}
-          className="murakamicity-button-outline flex items-center gap-2"
+          className="rounded-none border-[var(--ink)] bg-transparent text-[var(--ink)] shadow-none hover:bg-[var(--parchment)]"
         >
-          <ArrowLeft className="h-4 w-4" /> Back
+          <ArrowLeft className="h-4 w-4" /> Recipes
         </Button>
 
-        <div className="hidden md:flex items-center gap-2">
-          <Button
-            variant="outline"
-            onClick={() => router.push(`/cook/${recipe.id}`)}
-            className="murakamicity-button-outline gap-2 bg-[var(--primary)] text-white hover:bg-[var(--primary-dark)] border-none"
-          >
-            <ChefHat className="h-4 w-4" /> Cook with Me
-          </Button>
-          <AddToShoppingListButton
-            recipeId={recipe.id}
-            recipeName={recipe.title}
-            variant="secondary"
-          />
+        <div className="hidden flex-wrap items-center justify-end gap-2 md:flex">
           <Button
             variant="outline"
             onClick={handleDownloadPDF}
             disabled={isDownloading}
-            className="murakamicity-button-outline gap-2 relative group"
+            className="rounded-none border-[var(--ink)] bg-transparent text-[var(--ink)] shadow-none hover:bg-[var(--ink)] hover:text-[var(--cream)]"
           >
-            {hasPro ? (
-              <Download className="h-4 w-4" />
-            ) : (
-              <Lock className="h-4 w-4 text-muted-foreground" />
-            )}
-            {isDownloading ? 'Generating...' : 'Download PDF'}
-            {!hasPro && (
-              <span className="absolute -top-8 left-1/2 -translate-x-1/2 bg-black text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none">
-                Pro Feature
-              </span>
-            )}
+            {hasPro ? <Download className="h-4 w-4" /> : <Lock className="h-4 w-4" />}
+            {isDownloading ? 'Generating...' : 'PDF'}
           </Button>
           <Button
             variant="outline"
             onClick={toggleFavorite}
-            className="murakamicity-button-outline gap-2"
+            className="rounded-none border-[var(--ink)] bg-transparent text-[var(--ink)] shadow-none hover:bg-[var(--ink)] hover:text-[var(--cream)]"
           >
-            <Heart className={`h-4 w-4 ${favorited ? 'fill-primary text-primary' : ''}`} />
-            {favorited ? 'Favorited' : 'Favorite'}
+            <Heart className={`h-4 w-4 ${favorited ? 'fill-[var(--tomato)] text-[var(--tomato)]' : ''}`} />
+            {favorited ? 'Saved' : 'Save'}
           </Button>
-          <Button variant="outline" onClick={share} className="murakamicity-button-outline gap-2">
+          <Button
+            variant="outline"
+            onClick={share}
+            className="rounded-none border-[var(--ink)] bg-transparent text-[var(--ink)] shadow-none hover:bg-[var(--ink)] hover:text-[var(--cream)]"
+          >
             <Share2 className="h-4 w-4" /> Share
           </Button>
         </div>
       </div>
 
-      {}
-      <div className="grid grid-cols-1 xl:grid-cols-[1fr_360px] gap-6">
-        {}
-        <div className="murakamicity-card">
-          <div className="p-4 md:p-6 grid grid-cols-1 lg:grid-cols-[1fr_1fr] gap-6">
-            {}
-            <div className="relative h-[200px] sm:h-[240px] w-full overflow-hidden rounded-sm lg:h-[320px] order-1">
-              <Image
-                src={recipe.imageUrl}
-                alt={recipe.title}
-                fill
-                className="object-cover"
-                sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 420px"
-                priority
-              />
-            </div>
-
-            {}
-            <div className="flex flex-col gap-4 order-2">
-              <div>
-                <h1 className="text-xl sm:text-2xl md:text-3xl font-semibold leading-tight">
-                  {recipe.title}
-                </h1>
-              </div>
-
-              <div className="flex flex-wrap items-center gap-2 text-sm">
-                <span className="rounded-full bg-muted text-muted-foreground px-3 py-1">
-                  Main dish
-                </span>
-                <span className="rounded-full bg-muted text-muted-foreground px-3 py-1">
-                  {formatMinutes(totalTime)}
-                </span>
-                <span className="rounded-full bg-muted text-muted-foreground px-3 py-1">
-                  Serves {recipe.servings}
-                </span>
-              </div>
-
-              <Text className="text-muted-foreground leading-relaxed">{recipe.description}</Text>
-
-              {}
-              {recipe.tags?.length > 0 && (
-                <div className="flex flex-wrap gap-2 text-xs">
-                  {recipe.tags.map((t) => (
-                    <span key={t} className="rounded-full bg-primary/20 text-primary px-3 py-1">
-                      #{t}
-                    </span>
-                  ))}
-                </div>
-              )}
-
-              {}
-              <div className="mt-2 grid grid-cols-3 gap-2 sm:flex sm:flex-wrap sm:gap-3 text-sm">
-                <div className="rounded-sm border border-border px-3 py-2 text-center sm:text-left">
-                  <div className="font-medium">Prep</div>
-                  <div className="text-xs text-muted-foreground sm:inline sm:ml-1">
-                    {formatMinutes(recipe.prepTime)}
-                  </div>
-                </div>
-                <div className="rounded-sm border border-border px-3 py-2 text-center sm:text-left">
-                  <div className="font-medium">Cook</div>
-                  <div className="text-xs text-muted-foreground sm:inline sm:ml-1">
-                    {formatMinutes(recipe.cookTime)}
-                  </div>
-                </div>
-                <div className="rounded-sm border border-border px-3 py-2 text-center sm:text-left">
-                  <div className="font-medium">Total</div>
-                  <div className="text-xs text-muted-foreground sm:inline sm:ml-1">
-                    {formatMinutes(totalTime)}
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {}
-          <div className="px-4 md:px-6">
-            <h2 className="mb-3 text-lg font-semibold">Ingredients</h2>
-            <div className="flex flex-wrap gap-2">
-              {recipe.ingredients?.map((ing) => (
-                <span
-                  key={`${ing.name}-${ing.unit}`}
-                  className="rounded-full bg-muted text-muted-foreground px-3 py-1 text-sm"
-                >
-                  {ing.quantity}
-                  {ing.unit ? ` ${ing.unit}` : ''} {ing.name}
-                </span>
-              ))}
-            </div>
-          </div>
-
-          {}
-          <div className="p-4 md:p-6">
-            <h2 className="mb-4 text-lg font-semibold">Step-by-step preparation</h2>
-            <div className="grid gap-4 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
-              {recipe.steps?.map((step, idx) => (
-                <div key={idx} className="rounded-sm border border-border bg-card p-3">
-                  <div className="mb-2 text-sm font-medium">Step {idx + 1}</div>
-                  <p className="text-sm text-muted-foreground leading-relaxed">{step}</p>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          {}
-          <div className="flex md:hidden flex-col gap-2 p-4 border-t border-border">
-            <CookingModeButton
-              steps={cookingSteps}
-              className="murakamicity-button-outline gap-2 bg-[var(--primary)] text-white hover:bg-[var(--primary-dark)] border-none w-full text-sm px-6 py-3 rounded-lg font-semibold"
-            />
-            <Button
-              variant="outline"
-              onClick={handleDownloadPDF}
-              disabled={isDownloading}
-              className="murakamicity-button-outline gap-2 w-full text-sm"
-            >
-              {hasPro ? (
-                <Download className="h-4 w-4" />
-              ) : (
-                <Lock className="h-4 w-4 text-muted-foreground" />
-              )}
-              {isDownloading ? 'Generating...' : 'Download PDF'}
-            </Button>
-            <Button
-              variant="outline"
-              onClick={toggleFavorite}
-              className="murakamicity-button-outline gap-2 w-full text-sm"
-            >
-              <Heart className={`h-4 w-4 ${favorited ? 'fill-primary text-primary' : ''}`} />
-              {favorited ? 'Favorited' : 'Favorite'}
-            </Button>
-            <Button
-              variant="outline"
-              onClick={share}
-              className="murakamicity-button-outline gap-2 w-full text-sm"
-            >
-              <Share2 className="h-4 w-4" /> Share
-            </Button>
-          </div>
-
-          {}
-          {!canView && <SignInOverlay position="top" />}
+      <div>
+        <p className="eyebrow">
+          Recipes / {recipe.tags?.[0] || 'Archive'} / {recipe.tags?.[1] || 'Dinner'}
+        </p>
+        <h1 className="display-m mt-4 max-w-5xl">{recipe.title}</h1>
+        <div className="mt-7 flex flex-wrap gap-x-8 gap-y-3 font-mono text-xs uppercase tracking-[0.04em] text-[var(--ink-65)]">
+          <span>{formatMinutes(totalTime)} total</span>
+          <span>{formatMinutes(recipe.prepTime)} prep</span>
+          <span>Serves {recipe.servings}</span>
+          <span className="text-[var(--tomato)]">
+            {canView ? 'Ready to cook' : 'Preview only'}
+          </span>
         </div>
       </div>
-    </div>
+
+      <div className="mt-10 grid grid-cols-1 gap-8 lg:grid-cols-[1.4fr_1fr] lg:gap-12">
+        <div className="relative h-[360px] overflow-hidden bg-[var(--parchment)] sm:h-[460px] lg:h-[520px]">
+          <Image
+            src={recipe.imageUrl}
+            alt={recipe.title}
+            fill
+            className="object-cover"
+            sizes="(max-width: 1024px) 100vw, 60vw"
+            priority
+          />
+        </div>
+
+        <aside className="flex flex-col bg-[var(--ink)] p-6 text-[var(--cream)] sm:p-8">
+          <p className="eyebrow-peach">The promise</p>
+          <p className="mt-4 font-serif text-[28px] leading-[1.2] text-[var(--cream)]">
+            {recipe.description}
+          </p>
+
+          <div className="my-7 h-px bg-[var(--cream-15)]" />
+
+          <p className="eyebrow-peach">Skip to</p>
+          <nav className="mt-4 space-y-3 text-sm">
+            {[
+              ['Ingredients', '#ingredients'],
+              ['Method', '#method'],
+              ['Make-ahead notes', '#notes'],
+              ['Comments', '#comments'],
+            ].map(([label, href]) => (
+              <a
+                key={label}
+                href={href}
+                className="flex items-center justify-between border-b border-dashed border-[var(--cream-15)] pb-2 text-[var(--cream-85)] transition-colors hover:text-[var(--peach)]"
+              >
+                <span>{label}</span>
+                <span aria-hidden="true">v</span>
+              </a>
+            ))}
+          </nav>
+
+          <div className="mt-8 space-y-3">
+            <CookingModeButton
+              steps={cookingSteps}
+              className="!w-full !justify-center !rounded-none !bg-[var(--tomato)] !py-4 !text-[var(--cream)] hover:!bg-[#B33E26]"
+            />
+            <div className="grid gap-3">
+              <AddToShoppingListButton
+                recipeId={recipe.id}
+                recipeName={recipe.title}
+                variant="secondary"
+                className="!justify-center !rounded-none !border !border-[var(--cream-15)] !px-4 !py-3 !text-sm !font-semibold !normal-case !tracking-normal !text-[var(--cream)] hover:!bg-[var(--cream)] hover:!text-[var(--ink)]"
+              />
+              <AddToCollectionButton
+                recipeId={recipe.id}
+                recipeName={recipe.title}
+                variant="secondary"
+                className="!justify-center !rounded-none !border !border-[var(--cream-15)] !px-4 !py-3 !text-sm !font-semibold !normal-case !tracking-normal !text-[var(--cream)] hover:!bg-[var(--cream)] hover:!text-[var(--ink)]"
+              />
+            </div>
+          </div>
+        </aside>
+      </div>
+
+      <div className="mt-14 grid grid-cols-1 gap-12 lg:grid-cols-[1fr_1.4fr] lg:gap-16">
+        <section id="ingredients">
+          <p className="eyebrow">Ingredients</p>
+          <div className="mt-3 border-t border-[var(--ink)]">
+            {recipe.ingredients?.map((ingredient) => (
+              <div
+                key={`${ingredient.name}-${ingredient.unit}-${ingredient.quantity}`}
+                className="grid grid-cols-[100px_1fr] gap-4 border-b border-[var(--ink-line)] py-3 text-sm"
+              >
+                <span className="font-mono text-xs text-[var(--tomato)]">
+                  {formatIngredient(ingredient.quantity, ingredient.unit)}
+                </span>
+                <span>{ingredient.name}</span>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        <section id="method">
+          <p className="eyebrow">Method / {recipe.steps?.length || 0} steps</p>
+          <div className="mt-3 border-t border-[var(--ink)]">
+            {recipe.steps?.map((step, index) => {
+              const parsedStep = splitStep(step, index);
+
+              return (
+                <div
+                  key={`${step}-${index}`}
+                  className="grid grid-cols-[60px_1fr] gap-4 border-b border-[var(--ink-line)] py-5"
+                >
+                  <span className="font-mono text-sm text-[var(--tomato)]">
+                    {String(index + 1).padStart(2, '0')}
+                  </span>
+                  <div>
+                    <h2 className="font-serif text-[22px] leading-tight">{parsedStep.heading}</h2>
+                    <p className="mt-2 text-sm leading-6 text-[var(--ink-85)]">
+                      {parsedStep.body}
+                    </p>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </section>
+      </div>
+
+      <section id="notes" className="mt-14 border-t border-[var(--ink)] pt-5">
+        <p className="eyebrow">Make-ahead notes</p>
+        <p className="body-md mt-3 max-w-2xl">
+          Cook once, eat calmer. Most dishes here hold well for a day or two; refresh herbs, citrus,
+          and crunchy toppings right before serving.
+        </p>
+      </section>
+
+      <div className="mt-8 grid gap-2 md:hidden">
+        <Button
+          variant="outline"
+          onClick={handleDownloadPDF}
+          disabled={isDownloading}
+          className="rounded-none border-[var(--ink)] bg-transparent text-[var(--ink)] shadow-none"
+        >
+          {hasPro ? <Download className="h-4 w-4" /> : <Lock className="h-4 w-4" />}
+          {isDownloading ? 'Generating...' : 'Download PDF'}
+        </Button>
+        <Button
+          variant="outline"
+          onClick={toggleFavorite}
+          className="rounded-none border-[var(--ink)] bg-transparent text-[var(--ink)] shadow-none"
+        >
+          <Heart className={`h-4 w-4 ${favorited ? 'fill-[var(--tomato)] text-[var(--tomato)]' : ''}`} />
+          {favorited ? 'Favorited' : 'Favorite'}
+        </Button>
+        <Button
+          variant="outline"
+          onClick={share}
+          className="rounded-none border-[var(--ink)] bg-transparent text-[var(--ink)] shadow-none"
+        >
+          <Share2 className="h-4 w-4" /> Share
+        </Button>
+      </div>
+
+      {!canView && <SignInOverlay position="top" />}
+    </article>
   );
 }

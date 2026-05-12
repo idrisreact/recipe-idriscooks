@@ -35,50 +35,39 @@ export function CookieConsent() {
   if (!showBanner) return null;
 
   return (
-    <div className="fixed bottom-0 left-0 right-0 z-50 p-4 md:p-6 animate-in slide-in-from-bottom duration-300">
-      <div className="max-w-6xl mx-auto">
-        <div className="bg-background/95 backdrop-blur-xl rounded-2xl shadow-2xl p-6 md:p-8 border-2 border-border relative">
-          {/* Close button */}
+    <div className="fixed bottom-0 left-0 right-0 z-50 border-t border-[var(--ink)] bg-[var(--cream)] animate-in slide-in-from-bottom duration-300">
+      <div className="wrapper">
+        <div className="relative py-5">
           <button
             onClick={handleDecline}
-            className="absolute top-4 right-4 text-muted-foreground hover:text-foreground transition-colors"
+            className="absolute right-0 top-4 text-[var(--ink-50)] transition-colors hover:text-[var(--ink)]"
             aria-label="Close cookie banner"
           >
             <X className="w-5 h-5" />
           </button>
 
-          <div className="flex flex-col md:flex-row items-start md:items-center gap-6">
-            {/* Icon and Text */}
-            <div className="flex-1">
-              <div className="flex items-start gap-3">
-                <div className="text-4xl">🍪</div>
-                <div>
-                  <h3 className="text-lg font-semibold text-foreground mb-2">
-                    We value your privacy
-                  </h3>
-                  <p className="text-sm text-muted-foreground leading-relaxed">
-                    We use cookies to enhance your browsing experience, serve personalized content,
-                    and analyze our traffic. By clicking &quot;Accept All&quot;, you consent to our
-                    use of cookies.{' '}
-                    <Link href="/privacy" className="text-primary hover:underline font-medium">
-                      Read our Privacy Policy
-                    </Link>
-                  </p>
-                </div>
-              </div>
+          <div className="flex flex-col gap-5 pr-8 md:flex-row md:items-center md:justify-between">
+            <div className="max-w-3xl">
+              <p className="eyebrow mb-2">Privacy</p>
+              <p className="text-sm leading-6 text-[var(--ink-75)]">
+                We use cookies to improve the site and understand what recipes people return to.
+                Accept all, or decline non-essential cookies.{' '}
+                <Link href="/privacy" className="font-medium text-[var(--ink)] underline underline-offset-4">
+                  Privacy Policy
+                </Link>
+              </p>
             </div>
 
-            {/* Buttons */}
-            <div className="flex flex-col sm:flex-row gap-3 w-full md:w-auto">
+            <div className="flex w-full flex-col gap-3 sm:w-auto sm:flex-row">
               <button
                 onClick={handleDecline}
-                className="px-6 py-2.5 rounded-lg border border-border text-foreground hover:bg-muted transition-colors font-medium whitespace-nowrap"
+                className="border border-[var(--ink)] px-6 py-3 text-sm font-medium text-[var(--ink)] transition-colors hover:bg-[var(--parchment)]"
               >
                 Decline
               </button>
               <button
                 onClick={handleAccept}
-                className="px-6 py-2.5 rounded-lg bg-primary text-primary-foreground hover:opacity-90 transition-opacity font-medium whitespace-nowrap"
+                className="bg-[var(--ink)] px-6 py-3 text-sm font-medium text-[var(--cream)] transition-colors hover:bg-[#0F0E0C]"
               >
                 Accept All
               </button>

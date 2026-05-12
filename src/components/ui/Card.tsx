@@ -50,79 +50,63 @@ export const Card = (props: CardProps) => {
 
     return (
       <article
-        className={`card-editorial relative w-full aspect-[3/4] cursor-pointer group ${className}`}
+        className={`group w-full cursor-pointer border-t border-[var(--ink)] pt-3 transition-transform duration-200 hover:-translate-y-0.5 ${className}`}
         aria-labelledby={`recipe-title-${title.replace(/\s+/g, '-').toLowerCase()}`}
         onClick={onClick}
         onKeyDown={handleKeyDown}
         tabIndex={0}
         role="button"
       >
-        {/* Background Image with Subtle Zoom */}
+        <div className="flex items-center justify-between gap-4 font-mono text-[10px] uppercase tracking-[0.18em]">
+          <span className="text-[var(--olive)]">Recipe</span>
+          {metadata && <div aria-label="Recipe details">{metadata}</div>}
+        </div>
+
         <div
-          className="absolute inset-0 bg-cover bg-center transition-transform duration-700 ease-out group-hover:scale-105"
+          className="mt-4 h-[260px] w-full overflow-hidden bg-[var(--parchment)] bg-cover bg-center transition-transform duration-500 group-hover:scale-[1.01] sm:h-[300px]"
           style={{ backgroundImage: `url(${backgroundImage})` }}
         />
 
-        {/* Gradient Overlay - Editorial Style */}
-        <div className="absolute inset-0 bg-gradient-to-t from-[#050505] via-[#050505]/40 to-transparent opacity-90 group-hover:opacity-95 transition-opacity duration-500" />
-
-        {/* Actions (Top Right) - Refined */}
-        {actions && (
-          <div className="absolute top-5 right-5 z-20 opacity-0 group-hover:opacity-100 transition-all duration-300 translate-y-1 group-hover:translate-y-0">
-            {actions}
-          </div>
-        )}
-
-        {/* Metadata (Top Left) */}
-        {metadata && (
-          <div className="absolute top-5 left-5 z-20" aria-label="Recipe details">
-            {metadata}
-          </div>
-        )}
-
-        {/* Content (Bottom) - Editorial Layout */}
-        <div className="absolute bottom-0 left-0 right-0 p-6 z-20">
-          {/* Author - Subtle */}
+        <div className="pt-5">
           {author && (
-            <div className="flex items-center gap-2 mb-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300 delay-75">
+            <div className="mb-3 flex items-center gap-2">
               {author.image ? (
                 <Image
                   src={author.image}
                   alt={author.name}
                   width={20}
                   height={20}
-                  className="rounded-full border border-white/10"
+                  className="rounded-full border border-[var(--ink-line)]"
                 />
               ) : (
-                <div className="w-5 h-5 bg-[var(--primary)]/20 border border-[var(--primary)]/30 flex items-center justify-center">
-                  <span className="text-[8px] font-bold text-[var(--primary)]">
+                <div className="w-5 h-5 border border-[var(--tomato)] flex items-center justify-center">
+                  <span className="text-[8px] font-bold text-[var(--tomato)]">
                     {author.name.charAt(0)}
                   </span>
                 </div>
               )}
-              <span className="text-[10px] font-medium text-white/50 uppercase tracking-[0.1em]">
+              <span className="font-mono text-[10px] font-medium uppercase tracking-[0.1em] text-[var(--ink-50)]">
                 {author.name}
               </span>
             </div>
           )}
 
-          {/* Title - Serif Editorial */}
-          <h2
-            id={`recipe-title-${title.replace(/\s+/g, '-').toLowerCase()}`}
-            className="font-serif text-xl lg:text-2xl font-semibold text-white mb-2 leading-tight group-hover:text-[var(--primary)] transition-colors duration-300"
-          >
-            {title}
-          </h2>
-
-          {/* Subtitle - Revealed on Hover */}
-          {subtitle && (
-            <p className="text-white/50 text-sm line-clamp-2 mb-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300 delay-100 font-light">
-              {subtitle}
-            </p>
-          )}
-
-          {/* Accent Line */}
-          <div className="h-px w-8 bg-[var(--primary)] transform scale-x-0 group-hover:scale-x-100 transition-transform duration-500 origin-left delay-150" />
+          <div className="flex items-start justify-between gap-4">
+            <div>
+              <h2
+                id={`recipe-title-${title.replace(/\s+/g, '-').toLowerCase()}`}
+                className="font-serif text-3xl font-normal leading-[1.08] text-[var(--ink)] transition-colors duration-300 group-hover:text-[var(--tomato)]"
+              >
+                {title}
+              </h2>
+              {subtitle && (
+                <p className="mt-2 line-clamp-2 text-sm leading-6 text-[var(--ink-65)]">
+                  {subtitle}
+                </p>
+              )}
+            </div>
+            {actions && <div className="shrink-0 opacity-100 transition-opacity">{actions}</div>}
+          </div>
         </div>
 
         {children}

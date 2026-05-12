@@ -1,5 +1,5 @@
 import type { Metadata } from 'next';
-import { Inter, Playfair_Display } from 'next/font/google';
+import { DM_Sans, Instrument_Serif, JetBrains_Mono } from 'next/font/google';
 import './globals.css';
 import { ReactQueryProvider } from '@/src/components/react-query-provider/react-query-provider';
 import { Toaster } from 'react-hot-toast';
@@ -8,17 +8,25 @@ import { Analytics } from '@vercel/analytics/next';
 
 import IntroLoader from '@/src/components/intro-loader';
 
-const inter = Inter({
-  variable: '--font-inter',
+const dmSans = DM_Sans({
+  variable: '--font-sans',
   subsets: ['latin'],
-  weight: ['300', '400', '500', '600', '700'],
+  weight: ['400', '500', '600', '700'],
   display: 'swap',
 });
 
-const playfair = Playfair_Display({
-  variable: '--font-playfair',
+const instrumentSerif = Instrument_Serif({
+  variable: '--font-serif',
   subsets: ['latin'],
-  weight: ['400', '500', '600', '700', '800', '900'],
+  weight: ['400'],
+  style: ['normal', 'italic'],
+  display: 'swap',
+});
+
+const jetbrainsMono = JetBrains_Mono({
+  variable: '--font-mono',
+  subsets: ['latin'],
+  weight: ['400', '500'],
   display: 'swap',
 });
 
@@ -101,8 +109,11 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className="dark">
-      <body className={`${inter.variable} ${playfair.variable} font-sans antialiased`}>
+    <html
+      lang="en"
+      className={`${dmSans.variable} ${instrumentSerif.variable} ${jetbrainsMono.variable}`}
+    >
+      <body className="font-sans antialiased">
         <IntroLoader />
         <ReactQueryProvider>
           {children}
@@ -111,24 +122,24 @@ export default function RootLayout({
             toastOptions={{
               duration: 4000,
               style: {
-                background: '#0f0f0f',
-                color: '#fafafa',
-                border: '1px solid rgba(255, 255, 255, 0.06)',
-                borderRadius: '2px',
-                fontFamily: 'Inter, sans-serif',
+                background: '#1C1A17',
+                color: '#F5EFE6',
+                border: '1px solid rgba(245, 239, 230, 0.12)',
+                borderRadius: '0px',
+                fontFamily: 'var(--font-sans), system-ui, sans-serif',
                 fontSize: '14px',
                 padding: '16px 20px',
               },
               success: {
                 iconTheme: {
-                  primary: '#d4a853',
-                  secondary: '#0f0f0f',
+                  primary: '#C8472D',
+                  secondary: '#F5EFE6',
                 },
               },
               error: {
                 iconTheme: {
-                  primary: '#dc3545',
-                  secondary: '#0f0f0f',
+                  primary: '#C8472D',
+                  secondary: '#F5EFE6',
                 },
               },
             }}

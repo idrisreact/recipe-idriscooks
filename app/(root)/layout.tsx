@@ -10,29 +10,17 @@ import {
 import { Footer } from '@/src/components/layout/Footer';
 import { CookieConsent } from '@/src/components/layout/CookieConsent';
 import { MobileBottomNav } from '@/src/components/layout/MobileBottomNav';
+import { MusicPlayer } from '@/src/components/music-player/MusicPlayer';
 import { WelcomeToast } from '@/src/components/welcome-toast/welcome-toast';
 import Link from 'next/link';
-import Image from 'next/image';
-import { motion, useScroll, useTransform } from 'framer-motion';
+import { motion } from 'framer-motion';
 import { useEffect, useState } from 'react';
 import { usePathname } from 'next/navigation';
+import { Search } from 'lucide-react';
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   const [isScrolled, setIsScrolled] = useState(false);
   const pathname = usePathname();
-  const { scrollY } = useScroll();
-
-  const navBackground = useTransform(
-    scrollY,
-    [0, 100],
-    ['rgba(5, 5, 5, 0)', 'rgba(5, 5, 5, 0.95)']
-  );
-
-  const navBorder = useTransform(
-    scrollY,
-    [0, 100],
-    ['rgba(255, 255, 255, 0)', 'rgba(255, 255, 255, 0.04)']
-  );
 
   useEffect(() => {
     const handleScroll = () => {
@@ -45,119 +33,120 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 
   const navItems = [
     { href: '/recipes', label: 'Recipes' },
+    { href: '/collections', label: 'Collections' },
+    { href: '/meal-plans', label: 'Meal Plans' },
     { href: '/about', label: 'About' },
   ];
 
   const authNavItems = [
     { href: '/favorites', label: 'Favorites' },
+    { href: '/shopping-list', label: 'Shopping List' },
     { href: '/pricing', label: 'Pricing' },
-    { href: '/billing', label: 'Billing' },
   ];
 
   return (
     <>
-      {/* ═══════════════════════════════════════════════════════════════
-          NAVIGATION - Editorial Minimal
-      ═══════════════════════════════════════════════════════════════ */}
       <motion.header
-        style={{
-          backgroundColor: navBackground,
-          borderBottomColor: navBorder,
-        }}
-        className={`fixed top-0 left-0 right-0 z-50 border-b backdrop-blur-xl transition-all duration-500 ${
-          isScrolled ? 'py-4' : 'py-6'
+        className={`fixed top-0 left-0 right-0 z-50 border-b border-[var(--ink-line)] bg-[var(--cream)]/95 backdrop-blur transition-all duration-300 ${
+          isScrolled ? 'py-3' : 'py-5'
         }`}
       >
         <div className="wrapper">
           <div className="flex justify-between items-center">
-            {/* Logo */}
-            <Link href="/" className="flex items-center gap-4 group">
-              <motion.div
-                whileHover={{ scale: 1.05 }}
-                transition={{ type: 'spring', stiffness: 400, damping: 25 }}
-                className="relative w-10 h-10 overflow-hidden border border-white/10"
-              >
-                <Image
-                  src="/images/idris-cooks-logo-v1.JPG"
-                  alt="Idris Cooks"
-                  fill
-                  className="object-cover"
-                />
-              </motion.div>
-              <div className="flex flex-col">
-                <span className="font-serif text-lg font-semibold tracking-tight text-white">
-                  Idris Cooks
-                </span>
-                <span className="hidden sm:block text-[10px] uppercase tracking-[0.2em] text-white/40">
-                  Culinary Excellence
-                </span>
-              </div>
+            <Link href="/" className="flex items-baseline gap-1.5 group" aria-label="Idris Cooks">
+              <span className="font-serif text-[28px] leading-none text-[var(--ink)]">Idris</span>
+              <span className="font-serif italic text-[28px] leading-none text-[var(--tomato)]">
+                cooks
+              </span>
             </Link>
 
-            {/* Desktop Navigation */}
-            <nav className="hidden md:flex items-center gap-8">
-              {navItems.map((item) => (
-                <NavLink key={item.href} href={item.href} active={pathname === item.href}>
-                  {item.label}
-                </NavLink>
-              ))}
-              <SignedIn>
-                {authNavItems.map((item) => (
+            <div className="hidden lg:flex items-center gap-8">
+              <nav className="flex items-center gap-7">
+                {navItems.map((item) => (
                   <NavLink key={item.href} href={item.href} active={pathname === item.href}>
                     {item.label}
                   </NavLink>
                 ))}
-              </SignedIn>
-            </nav>
+                <SignedIn>
+                  {authNavItems.map((item) => (
+                    <NavLink key={item.href} href={item.href} active={pathname === item.href}>
+                      {item.label}
+                    </NavLink>
+                  ))}
+                </SignedIn>
+              </nav>
 
-            {/* Auth Actions */}
-            <div className="flex items-center gap-4">
+              <button
+                type="button"
+                className="inline-flex items-center gap-2 rounded-full border border-[var(--ink)] px-3 py-2 text-xs font-medium text-[var(--ink)] transition-colors hover:bg-[var(--parchment)]"
+                aria-label="Open search"
+              >
+                <Search className="h-3.5 w-3.5" />
+                <span>Search</span>
+                <span className="text-[var(--ink-50)]">⌘K</span>
+              </button>
+            </div>
+
+            <div className="flex items-center gap-3">
               <SignedOut>
                 <SignInButton>
-                  <motion.button
-                    whileHover={{ color: '#d4a853' }}
-                    className="hidden sm:block text-sm font-medium uppercase tracking-[0.08em] text-white/60 transition-colors"
-                  >
-                    Sign In
-                  </motion.button>
+                  <button className="hidden sm:inline-flex text-sm font-medium text-[var(--ink-75)] underline-offset-4 transition-colors hover:text-[var(--tomato)] hover:underline">
+                    Sign in
+                  </button>
                 </SignInButton>
                 <SignUpButton>
-                  <motion.button
-                    whileHover={{ scale: 1.02 }}
-                    whileTap={{ scale: 0.98 }}
-                    className="btn-primary !py-3 !px-6 text-xs"
-                  >
-                    Get Started
-                  </motion.button>
+                  <button className="btn-ink !px-5 !py-3 text-xs">Join</button>
                 </SignUpButton>
               </SignedOut>
               <SignedIn>
                 <UserButton />
               </SignedIn>
             </div>
+
+            <nav className="hidden md:flex lg:hidden items-center gap-5">
+              {navItems.slice(0, 3).map((item) => (
+                <NavLink key={item.href} href={item.href} active={pathname === item.href}>
+                  {item.label}
+                </NavLink>
+              ))}
+              <SignedIn>
+                <NavLink href="/favorites" active={pathname === '/favorites'}>
+                  Favorites
+                </NavLink>
+              </SignedIn>
+            </nav>
+          </div>
+
+          <div className="mt-4 flex md:hidden items-center justify-between border-t border-[var(--ink-line)] pt-3">
+            <nav className="flex items-center gap-5 overflow-x-auto text-sm">
+              {navItems.map((item) => (
+                <NavLink key={item.href} href={item.href} active={pathname === item.href}>
+                  {item.label}
+                </NavLink>
+              ))}
+            </nav>
+            <SignedOut>
+              <SignInButton>
+                <button className="shrink-0 text-sm font-medium text-[var(--tomato)]">Sign in</button>
+              </SignInButton>
+            </SignedOut>
           </div>
         </div>
       </motion.header>
 
-      {/* Main Content */}
       <div className="min-h-screen flex flex-col pb-[calc(4rem+env(safe-area-inset-bottom))] md:pb-0">
         <main className="flex-1">{children}</main>
         <Footer />
       </div>
 
-      {/* Cookie Consent */}
       <CookieConsent />
-
-      {/* Welcome Toast */}
       <WelcomeToast />
-
-      {/* Mobile Navigation */}
       <MobileBottomNav />
+      <MusicPlayer />
     </>
   );
 }
 
-// NavLink Component
 function NavLink({
   href,
   active,
@@ -170,7 +159,7 @@ function NavLink({
   return (
     <Link href={href}>
       <motion.span
-        whileHover={{ color: '#ffffff' }}
+        whileHover={{ color: '#C8472D' }}
         className={`nav-link ${active ? 'active' : ''}`}
       >
         {children}

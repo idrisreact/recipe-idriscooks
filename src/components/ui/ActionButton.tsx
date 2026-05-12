@@ -15,7 +15,7 @@ export const ActionButton = ({
   icon: Icon,
   onClick,
   isActive,
-  activeColor = 'text-primary',
+  activeColor = 'text-[var(--tomato)]',
   className = '',
   ariaLabel,
   disabled = false,
@@ -28,7 +28,7 @@ export const ActionButton = ({
       disabled={disabled}
       aria-label={ariaLabel}
       aria-pressed={isActive}
-      className={`bg-card/90 hover:bg-card border-border hover:border-primary focus:ring-2 focus:ring-primary focus:ring-offset-2 focus:ring-offset-background min-w-[44px] min-h-[44px] transition-all duration-200 ${className}`}
+      className={`min-h-10 min-w-10 border border-[var(--ink-line)] bg-[var(--cream)] text-[var(--ink-60)] shadow-none transition-colors duration-200 hover:border-[var(--ink)] hover:bg-[var(--parchment)] hover:text-[var(--ink)] focus:ring-2 focus:ring-[var(--tomato)] focus:ring-offset-2 focus:ring-offset-[var(--cream)] ${className}`}
     >
       <Icon
         className={`w-4 h-4 ${isActive ? `fill-current ${activeColor}` : 'text-muted-foreground'}`}

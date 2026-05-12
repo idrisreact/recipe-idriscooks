@@ -27,7 +27,7 @@ export function RecipeCard({
       <ActionButton
         icon={Heart}
         isActive={isFavorited}
-        activeColor="text-red-500"
+        activeColor="text-[var(--tomato)]"
         ariaLabel={isFavorited ? `Remove ${recipe.title} from favorites` : `Add ${recipe.title} to favorites`}
         onClick={async (e) => {
           e.stopPropagation();
