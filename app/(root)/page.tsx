@@ -84,19 +84,21 @@ export default async function Home() {
             </div>
           </div>
 
-          <div className="relative min-h-[520px] overflow-hidden lg:min-h-full">
-            <Image
-              src={featured?.imageUrl ?? '/images/food background.png'}
-              alt={featured?.title ?? 'Overhead table with a finished dish, herbs, and citrus zest'}
-              fill
-              className="object-cover"
-              priority
-              sizes="(max-width: 1024px) 100vw, 50vw"
-            />
+          <div className="relative min-h-[520px] lg:min-h-full">
+            <div className="absolute inset-0 overflow-hidden">
+              <Image
+                src={featured?.imageUrl ?? '/images/food background.png'}
+                alt={featured?.title ?? 'Overhead table with a finished dish, herbs, and citrus zest'}
+                fill
+                className="object-cover"
+                priority
+                sizes="(max-width: 1024px) 100vw, 50vw"
+              />
+            </div>
             {featured && (
               <Link
                 href={`/recipes/category/${encodeURIComponent(featured.title)}`}
-                className="absolute bottom-8 left-6 right-6 border-t-2 border-[var(--tomato)] bg-[var(--cream)] p-5 sm:left-auto sm:right-auto sm:w-[280px] lg:-left-12 lg:bottom-14"
+                className="absolute bottom-8 left-6 right-6 z-10 border-t-2 border-[var(--tomato)] bg-[var(--cream)] p-5 sm:left-auto sm:right-auto sm:w-[280px] lg:-left-12 lg:bottom-14"
               >
                 <p className="eyebrow">This week's pick</p>
                 <h2 className="subhead mt-2">{featured.title}</h2>

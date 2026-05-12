@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Check, Trash2, ShoppingCart, Plus, ChevronDown, ChevronUp, ArrowLeft } from 'lucide-react';
+import { Check, Trash2, Plus, ChevronDown, ChevronUp, ArrowLeft } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import {
   useShoppingLists,
@@ -13,17 +13,12 @@ import {
   useDeleteItem,
 } from '@/src/hooks/use-shopping-list';
 
-// Helper function to format quantity display
-function formatQuantity(quantity: number | string): string {
+const formatQuantity = (quantity: number | string): string => {
   const num = typeof quantity === 'string' ? parseFloat(quantity) : quantity;
   if (isNaN(num)) return String(quantity);
-
-  // If it's a whole number, return without decimal
   if (num % 1 === 0) return String(Math.round(num));
-
-  // Otherwise, round to 1 decimal place
   return num.toFixed(1);
-}
+};
 
 export default function ShoppingListPage() {
   const router = useRouter();
@@ -41,13 +36,10 @@ export default function ShoppingListPage() {
 
   const toggleListExpanded = (listId: string) => {
     setExpandedLists((prev) => {
-      const newSet = new Set(prev);
-      if (newSet.has(listId)) {
-        newSet.delete(listId);
-      } else {
-        newSet.add(listId);
-      }
-      return newSet;
+      const next = new Set(prev);
+      if (next.has(listId)) next.delete(listId);
+      else next.add(listId);
+      return next;
     });
   };
 
@@ -86,173 +78,175 @@ export default function ShoppingListPage() {
   };
 
   return (
-    <div className="min-h-screen bg-black">
-      <div className="wrapper py-8">
-        {/* Header */}
-        <div className="flex items-center justify-between mb-8">
-          <div className="flex items-center gap-4">
-            <button
-              onClick={() => router.back()}
-              className="p-2 hover:bg-white/10 rounded-full transition-colors"
-            >
-              <ArrowLeft className="w-5 h-5 text-white/70" />
-            </button>
-            <div className="flex items-center gap-3">
-              <ShoppingCart className="w-8 h-8 text-[var(--primary)]" />
-              <h1 className="text-3xl md:text-4xl font-black uppercase tracking-wider text-white">
-                Shopping Lists
-              </h1>
-            </div>
-          </div>
-        </div>
+    <main className="bg-[var(--cream)] min-h-screen">
+      <section className="pt-36 lg:pt-40">
+        <div className="wrapper pb-12 lg:pb-16">
+          <button
+            type="button"
+            onClick={() => router.back()}
+            className="btn-link mb-8"
+          >
+            <ArrowLeft className="h-4 w-4" />
+            Back
+          </button>
 
-        {/* Content */}
-        <div className="max-w-4xl space-y-6">
+          <p className="eyebrow-rule">Shopping / Lists</p>
+          <h1 className="display-m mt-6 max-w-3xl">
+            The list, before the <span className="italic-tomato">market</span>.
+          </h1>
+          <p className="body-lg mt-6 max-w-2xl">
+            Build a list from any recipe, tick things off as you go, and keep a clean record of
+            what you actually bought.
+          </p>
+        </div>
+      </section>
+
+      <section className="pb-24">
+        <div className="wrapper max-w-4xl">
           {isLoading ? (
-            <div className="flex items-center justify-center py-12">
-              <div className="animate-spin rounded-full h-12 w-12 border-2 border-[var(--primary)] border-t-transparent" />
-            </div>
+            <LoadingState />
           ) : !lists || lists.length === 0 ? (
-            <div className="luxury-card p-12 text-center">
-              <ShoppingCart className="w-24 h-24 text-white/20 mx-auto mb-6" />
-              <h2 className="text-2xl font-bold text-white mb-4">No shopping lists yet</h2>
-              <p className="text-white/50 mb-8">
-                Create your first shopping list to start organizing your ingredients
-              </p>
-              <button
-                onClick={() => setShowNewListInput(true)}
-                className="px-8 py-4 bg-[var(--primary)] text-white font-bold uppercase tracking-wide rounded-lg hover:bg-[var(--primary-dark)] transition-colors"
-              >
-                Create Your First List
-              </button>
-            </div>
+            <EmptyState onCreate={() => setShowNewListInput(true)} />
           ) : (
-            <>
+            <div className="flex flex-col gap-6">
               {lists.map((list) => {
                 const isExpanded = expandedLists.has(list.id);
                 const totalItems = list.items?.length || 0;
-                const completedItems = list.items?.filter((item) => item.isCompleted).length || 0;
+                const completedItems =
+                  list.items?.filter((item) => item.isCompleted).length || 0;
                 const progress = totalItems > 0 ? (completedItems / totalItems) * 100 : 0;
 
                 return (
-                  <div key={list.id} className="luxury-card p-0 overflow-hidden">
-                    {/* List Header */}
-                    <div
-                      className="p-6 cursor-pointer hover:bg-white/5 transition-colors"
+                  <article
+                    key={list.id}
+                    className="border-t border-[var(--ink)] bg-[var(--cream)]"
+                  >
+                    <button
+                      type="button"
                       onClick={() => toggleListExpanded(list.id)}
+                      className="flex w-full items-start justify-between gap-6 px-1 pt-5 pb-4 text-left transition-colors hover:bg-[var(--parchment)]"
                     >
-                      <div className="flex items-center justify-between mb-3">
-                        <h3 className="text-2xl font-bold text-white">{list.name}</h3>
-                        <div className="flex items-center gap-3">
-                          <span className="text-lg text-white/50">
-                            {completedItems}/{totalItems}
-                          </span>
-                          {isExpanded ? (
-                            <ChevronUp className="w-6 h-6 text-white/50" />
-                          ) : (
-                            <ChevronDown className="w-6 h-6 text-white/50" />
-                          )}
-                        </div>
+                      <div className="flex-1">
+                        <p className="mono-label text-[var(--tomato)]">
+                          {completedItems} / {totalItems} done
+                        </p>
+                        <h2 className="subhead mt-2">{list.name}</h2>
                       </div>
+                      <div className="pt-2">
+                        {isExpanded ? (
+                          <ChevronUp className="h-5 w-5 text-[var(--ink-60)]" />
+                        ) : (
+                          <ChevronDown className="h-5 w-5 text-[var(--ink-60)]" />
+                        )}
+                      </div>
+                    </button>
 
-                      {/* Progress Bar */}
-                      <div className="h-2 bg-white/10 rounded-full overflow-hidden">
-                        <motion.div
-                          className="h-full bg-[var(--primary)]"
-                          initial={{ width: 0 }}
-                          animate={{ width: `${progress}%` }}
-                          transition={{ duration: 0.3 }}
-                        />
-                      </div>
+                    <div className="mt-2 h-px w-full bg-[var(--ink-line)]">
+                      <motion.div
+                        className="h-px bg-[var(--tomato)]"
+                        initial={{ width: 0 }}
+                        animate={{ width: `${progress}%` }}
+                        transition={{ duration: 0.4 }}
+                      />
                     </div>
 
-                    {/* List Items */}
                     {isExpanded && (
-                      <div className="border-t border-white/10">
+                      <div className="pt-6 pb-2">
                         {list.items && list.items.length > 0 ? (
-                          <div className="p-6 space-y-2">
+                          <ul className="flex flex-col">
                             {list.items.map((item) => (
-                              <div
+                              <li
                                 key={item.id}
-                                className="flex items-center gap-4 p-4 rounded-lg hover:bg-white/5 transition-colors group"
+                                className="group flex items-center gap-4 border-b border-[var(--ink-line)] py-4"
                               >
-                                {/* Checkbox */}
                                 <button
+                                  type="button"
                                   onClick={() => handleToggleItem(item.id, item.isCompleted)}
-                                  className={`w-6 h-6 rounded border-2 flex items-center justify-center transition-all flex-shrink-0 ${
+                                  aria-label={
+                                    item.isCompleted ? 'Mark as not done' : 'Mark as done'
+                                  }
+                                  className={`flex h-6 w-6 flex-shrink-0 items-center justify-center border transition-colors ${
                                     item.isCompleted
-                                      ? 'bg-[var(--primary)] border-[var(--primary)]'
-                                      : 'border-white/30 hover:border-[var(--primary)]'
+                                      ? 'border-[var(--ink)] bg-[var(--ink)]'
+                                      : 'border-[var(--ink)] bg-transparent hover:bg-[var(--parchment)]'
                                   }`}
                                 >
-                                  {item.isCompleted && <Check className="w-4 h-4 text-white" />}
+                                  {item.isCompleted && (
+                                    <Check className="h-3.5 w-3.5 text-[var(--cream)]" />
+                                  )}
                                 </button>
 
-                                {/* Item Details */}
                                 <div className="flex-1">
                                   <p
-                                    className={`text-base ${
+                                    className={`body-md ${
                                       item.isCompleted
-                                        ? 'text-white/40 line-through'
-                                        : 'text-white/90'
+                                        ? 'text-[var(--ink-50)] line-through'
+                                        : 'text-[var(--ink)]'
                                     }`}
                                   >
-                                    {formatQuantity(item.quantity)} {item.unit && `${item.unit} `}
+                                    <span className="mono-label mr-2 text-[var(--ink-60)]">
+                                      {formatQuantity(item.quantity)}
+                                      {item.unit && ` ${item.unit}`}
+                                    </span>
                                     {item.name}
                                   </p>
                                   {item.category && (
-                                    <p className="text-xs text-white/40 mt-1">{item.category}</p>
+                                    <p className="eyebrow mt-1 text-[var(--ink-50)]">
+                                      {item.category}
+                                    </p>
                                   )}
                                 </div>
 
-                                {/* Delete Button */}
                                 <button
+                                  type="button"
                                   onClick={() => handleDeleteItem(item.id)}
-                                  className="opacity-0 group-hover:opacity-100 transition-opacity p-2 hover:bg-red-500/20 rounded flex-shrink-0"
+                                  aria-label="Remove item"
+                                  className="p-2 text-[var(--ink-50)] opacity-0 transition-opacity hover:text-[var(--tomato)] group-hover:opacity-100"
                                 >
-                                  <Trash2 className="w-5 h-5 text-red-500" />
+                                  <Trash2 className="h-4 w-4" />
                                 </button>
-                              </div>
+                              </li>
                             ))}
-                          </div>
+                          </ul>
                         ) : (
-                          <p className="p-6 text-center text-white/40 text-sm">
-                            No items in this list
+                          <p className="body-sm py-8 text-center">
+                            No items in this list yet.
                           </p>
                         )}
 
-                        {/* List Actions */}
-                        <div className="p-6 border-t border-white/10 flex gap-3">
+                        <div className="mt-6 flex flex-wrap gap-3 border-t border-[var(--ink-line)] pt-6">
                           <button
+                            type="button"
                             onClick={() => handleClearCompleted(list.id)}
                             disabled={completedItems === 0}
-                            className="flex-1 px-6 py-3 text-sm font-bold text-white/70 hover:text-white hover:bg-white/5 rounded-lg transition-colors disabled:opacity-30 disabled:cursor-not-allowed uppercase tracking-wide"
+                            className="btn-link disabled:cursor-not-allowed disabled:opacity-30"
                           >
-                            Clear Completed
+                            Clear completed
                           </button>
+                          <span className="text-[var(--ink-line)]">/</span>
                           <button
+                            type="button"
                             onClick={() => handleDeleteList(list.id)}
-                            className="px-6 py-3 text-sm font-bold text-red-500 hover:bg-red-500/10 rounded-lg transition-colors uppercase tracking-wide"
+                            className="btn-link"
+                            style={{ color: 'var(--tomato)' }}
                           >
-                            Delete List
+                            Delete list
                           </button>
                         </div>
                       </div>
                     )}
-                  </div>
+                  </article>
                 );
               })}
-            </>
+            </div>
           )}
 
-          {/* New List Input */}
           {showNewListInput ? (
-            <div className="luxury-card p-6">
-              <h3 className="text-lg font-bold text-white mb-4">Create New List</h3>
+            <div className="mt-10 border-t border-[var(--ink)] pt-8">
+              <p className="eyebrow">New list</p>
+              <h3 className="subhead mt-3">Name your list.</h3>
               {createError && (
-                <div className="mb-4 p-3 bg-red-500/10 border border-red-500/30 rounded-lg">
-                  <p className="text-red-400 text-sm">{createError}</p>
-                </div>
+                <p className="mono-label mt-4 text-[var(--tomato)]">{createError}</p>
               )}
               <input
                 type="text"
@@ -262,25 +256,27 @@ export default function ShoppingListPage() {
                   setCreateError(null);
                 }}
                 onKeyDown={(e) => e.key === 'Enter' && handleCreateList()}
-                placeholder="List name..."
-                className="w-full bg-black/50 border border-white/20 text-white placeholder-white/40 px-4 py-3 rounded-lg focus:outline-none focus:border-[var(--primary)] mb-4"
+                placeholder="e.g. Sunday roast"
+                className="mt-6 w-full border-b border-[var(--ink)] bg-transparent py-3 text-lg text-[var(--ink)] placeholder-[var(--ink-50)] outline-none focus:border-[var(--tomato)]"
                 autoFocus
               />
-              <div className="flex gap-3">
+              <div className="mt-6 flex flex-wrap gap-4">
                 <button
+                  type="button"
                   onClick={handleCreateList}
                   disabled={!newListName.trim()}
-                  className="flex-1 px-6 py-3 bg-[var(--primary)] text-white font-bold rounded-lg hover:bg-[var(--primary-dark)] transition-colors disabled:opacity-30 disabled:cursor-not-allowed uppercase tracking-wide"
+                  className="btn-ink disabled:cursor-not-allowed disabled:opacity-40"
                 >
-                  Create List
+                  Create list
                 </button>
                 <button
+                  type="button"
                   onClick={() => {
                     setShowNewListInput(false);
                     setNewListName('');
                     setCreateError(null);
                   }}
-                  className="px-6 py-3 text-white/70 hover:bg-white/5 rounded-lg transition-colors uppercase tracking-wide font-bold"
+                  className="btn-link"
                 >
                   Cancel
                 </button>
@@ -290,16 +286,45 @@ export default function ShoppingListPage() {
             lists &&
             lists.length > 0 && (
               <button
+                type="button"
                 onClick={() => setShowNewListInput(true)}
-                className="w-full p-6 border-2 border-dashed border-white/20 rounded-lg text-white/50 hover:text-white hover:border-[var(--primary)] transition-colors flex items-center justify-center gap-3 font-bold uppercase tracking-wide"
+                className="mt-10 flex w-full items-center justify-center gap-3 border border-dashed border-[var(--ink)] px-6 py-8 transition-colors hover:bg-[var(--parchment)]"
               >
-                <Plus className="w-6 h-6" />
-                Create New List
+                <Plus className="h-4 w-4 text-[var(--ink)]" />
+                <span className="mono-label text-[var(--ink)]">Add another list</span>
               </button>
             )
           )}
         </div>
-      </div>
-    </div>
+      </section>
+    </main>
   );
 }
+
+const LoadingState = () => (
+  <div className="flex flex-col gap-6 py-8">
+    {[0, 1, 2].map((i) => (
+      <div key={i} className="border-t border-[var(--ink-line)] pt-5">
+        <div className="h-3 w-20 animate-pulse bg-[var(--parchment)]" />
+        <div className="mt-3 h-7 w-2/3 animate-pulse bg-[var(--parchment)]" />
+        <div className="mt-5 h-px w-full bg-[var(--ink-line)]" />
+      </div>
+    ))}
+  </div>
+);
+
+const EmptyState = ({ onCreate }: { onCreate: () => void }) => (
+  <div className="border-t border-[var(--ink)] py-16 text-center">
+    <p className="eyebrow">No lists yet</p>
+    <h2 className="display-s mt-4">
+      Start with a <span className="italic-tomato">single list</span>.
+    </h2>
+    <p className="body-lg mx-auto mt-6 max-w-md">
+      Build a list from any recipe, or write one from scratch for tonight&apos;s dinner.
+    </p>
+    <button type="button" onClick={onCreate} className="btn-ink mt-10">
+      Create your first list
+      <Plus className="h-4 w-4" />
+    </button>
+  </div>
+);
