@@ -183,9 +183,9 @@ export function PDFGenerator({
 
   if (checkingAccess) {
     return (
-      <div className="animate-pulse flex items-center gap-2 px-4 py-2 bg-muted rounded-lg">
-        <div className="w-4 h-4 bg-muted-foreground/30 rounded"></div>
-        <span className="text-muted-foreground">Checking access...</span>
+      <div className="flex items-center gap-3 border-t border-[var(--ink-line)] py-3 pl-1">
+        <div className="h-2 w-2 animate-pulse bg-[var(--ink-50)]" />
+        <span className="mono-label text-[var(--ink-60)]">Checking access...</span>
       </div>
     );
   }
@@ -193,19 +193,23 @@ export function PDFGenerator({
   if (hasPDFAccess) {
     return (
       <button
+        type="button"
         onClick={handlePDFClick}
         disabled={isGenerating || recipes.length === 0}
-        className="murakamicity-button flex items-center gap-2 bg-primary hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed"
+        className="btn-ink group disabled:cursor-not-allowed disabled:opacity-40"
       >
         {isGenerating ? (
           <>
-            <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-            Generating PDF...
+            <span className="inline-block h-3 w-3 animate-spin border border-[var(--cream)] border-t-transparent" />
+            Generating PDF
           </>
         ) : (
           <>
-            <Download className="w-4 h-4" />
-            Download PDF ({recipes.length} recipes)
+            <Download className="h-4 w-4" />
+            Download PDF
+            <span className="mono-label ml-1 text-[var(--cream-70)]">
+              {recipes.length} {recipes.length === 1 ? 'recipe' : 'recipes'}
+            </span>
           </>
         )}
       </button>
@@ -214,52 +218,55 @@ export function PDFGenerator({
 
   return (
     <>
-      <div className="flex items-center gap-2 flex-wrap">
+      <div className="flex flex-col items-stretch gap-3 sm:flex-row sm:items-center">
+        <div className="flex flex-col">
+          <span className="eyebrow text-[var(--tomato)]">PDF / One-time</span>
+          <span className="mono-label mt-1 text-[var(--ink-60)]">
+            ${calculateDisplayPrice(recipes.length)} for {recipes.length}{' '}
+            {recipes.length === 1 ? 'recipe' : 'recipes'}
+          </span>
+        </div>
+
         <button
+          type="button"
           onClick={handlePDFClick}
           disabled={processingPayment || recipes.length === 0}
-          className="murakamicity-button flex items-center gap-2 bg-primary hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed"
+          className="btn-tomato disabled:cursor-not-allowed disabled:opacity-40"
         >
           {processingPayment ? (
             <>
-              <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-              Processing...
+              <span className="inline-block h-3 w-3 animate-spin border border-[var(--cream)] border-t-transparent" />
+              Processing
             </>
           ) : (
             <>
-              <CreditCard className="w-4 h-4" />
-              Buy PDF Access - ${calculateDisplayPrice(recipes.length)}
+              <CreditCard className="h-4 w-4" />
+              Buy PDF access
             </>
           )}
         </button>
 
         {session?.user && (
           <button
+            type="button"
             onClick={refreshAccess}
             disabled={checkingAccess}
-            className="murakamicity-button-outline flex items-center gap-2 text-sm"
+            className="btn-link disabled:cursor-not-allowed disabled:opacity-40"
             title="Click if you've already paid but don't see access"
           >
-            {checkingAccess ? (
-              <>
-                <div className="w-3 h-3 border-2 border-current border-t-transparent rounded-full animate-spin"></div>
-                Checking...
-              </>
-            ) : (
-              <>🔄 Refresh Access</>
-            )}
+            {checkingAccess ? 'Checking...' : 'Refresh access'}
           </button>
         )}
       </div>
       {showLoginModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-[var(--ink)]/60">
           <div className="relative">
             <SignInOverlay noBackground onClose={() => setShowLoginModal(false)} />
             <button
-              className="absolute top-2 right-2 text-gray-500 hover:text-gray-700 text-2xl"
+              type="button"
+              className="absolute right-3 top-3 text-2xl leading-none text-[var(--ink-60)] hover:text-[var(--tomato)]"
               onClick={() => setShowLoginModal(false)}
               aria-label="Close login modal"
-              style={{ zIndex: 10 }}
             >
               ×
             </button>

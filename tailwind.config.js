@@ -1,29 +1,23 @@
 module.exports = {
     content: [
-      "./src/**/*.{js,jsx,ts,tsx}",    // your app code
-      "./.storybook/**/*.{js,ts,jsx,tsx}"  // include your stories too
+      "./src/**/*.{js,jsx,ts,tsx}",
+      "./app/**/*.{js,jsx,ts,tsx}",
+      "./.storybook/**/*.{js,ts,jsx,tsx}"
     ],
     theme: {
       extend: {
         colors: {
-          primary: '#00916E',      // Green
-          accent: '#FFCF00',       // Yellow
-          'brand-orange': '#EE6123', // Custom Orange
-          pink: '#FA003F',         // Pink
-          cream: '#FEEFE5',        // Cream
+          cream: '#F5EFE6',
+          parchment: '#E8DFD0',
+          ink: '#1C1A17',
+          tomato: '#C8472D',
+          peach: '#F5B7A3',
+          olive: '#6B7548',
         },
-        animation: {
-          shimmer: 'shimmer 2s linear infinite',
-        },
-        keyframes: {
-          shimmer: {
-            from: {
-              transform: 'translateX(-100%)',
-            },
-            to: {
-              transform: 'translateX(100%)',
-            },
-          },
+        fontFamily: {
+          serif: ['var(--font-serif)', 'Georgia', 'serif'],
+          sans: ['var(--font-sans)', 'system-ui', 'sans-serif'],
+          mono: ['var(--font-mono)', 'ui-monospace', 'monospace'],
         },
       },
     },

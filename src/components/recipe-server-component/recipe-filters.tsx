@@ -65,12 +65,11 @@ export function RecipeFilters({
 
   return (
     <div className="mb-12">
-      {/* Search Section */}
       <div className="mb-8">
         <motion.span
           initial={{ opacity: 0, x: -20 }}
           animate={{ opacity: 1, x: 0 }}
-          className="kicker mb-4 block"
+          className="eyebrow mb-4 block"
         >
           Search
         </motion.span>
@@ -78,7 +77,7 @@ export function RecipeFilters({
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1 }}
-          className="headline-md text-white mb-6"
+          className="subhead mb-6"
         >
           Find Your Recipe
         </motion.h2>
@@ -92,7 +91,7 @@ export function RecipeFilters({
                 <FormItem>
                   <FormControl>
                     <div className="relative group">
-                      <Search className="absolute left-5 top-1/2 -translate-y-1/2 w-5 h-5 text-white/30 group-focus-within:text-[var(--primary)] transition-colors" />
+                      <Search className="absolute left-5 top-1/2 -translate-y-1/2 w-5 h-5 text-[var(--ink-50)] group-focus-within:text-[var(--tomato)] transition-colors" />
                       <Input
                         placeholder="Search recipes by name, ingredient, or cuisine..."
                         {...field}
@@ -101,7 +100,7 @@ export function RecipeFilters({
                           field.onChange(e);
                           onSearchChange(e.target.value);
                         }}
-                        className="w-full h-14 pl-14 pr-12 bg-[var(--card)] border-white/[0.04] text-white placeholder:text-white/30 focus:border-[var(--primary)]/50 focus:ring-[var(--primary)]/20 transition-all text-base"
+                        className="w-full h-14 rounded-none border-[var(--ink)] bg-transparent pl-14 pr-12 text-base text-[var(--ink)] placeholder:text-[var(--ink-50)] focus:border-[var(--tomato)] focus:ring-[var(--tomato)]/20"
                       />
                       {search && (
                         <button
@@ -110,9 +109,9 @@ export function RecipeFilters({
                             field.onChange('');
                             onSearchChange('');
                           }}
-                          className="absolute right-5 top-1/2 -translate-y-1/2 p-1 hover:bg-white/10 rounded transition-colors"
+                          className="absolute right-5 top-1/2 -translate-y-1/2 p-1 text-[var(--ink-50)] transition-colors hover:text-[var(--tomato)]"
                         >
-                          <X className="w-4 h-4 text-white/40 hover:text-white" />
+                          <X className="w-4 h-4" />
                         </button>
                       )}
                     </div>
@@ -124,17 +123,14 @@ export function RecipeFilters({
         </Form>
       </div>
 
-      {/* Filter Controls Bar */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-6 border-b border-white/[0.04]">
-        {/* Left: Results Count & Filter Toggle */}
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-6 border-b border-[var(--ink)]">
         <div className="flex items-center gap-6">
-          <span className="text-sm text-white/50">
-            <span className="text-white font-medium">{resultsCount}</span> recipe
+          <span className="text-sm text-[var(--ink-60)]">
+            <span className="font-medium text-[var(--ink)]">{resultsCount}</span> recipe
             {resultsCount !== 1 ? 's' : ''}
             {search && (
-              <span className="text-white/30">
-                {' '}
-                for &ldquo;<span className="text-[var(--primary)]">{search}</span>&rdquo;
+              <span className="text-[var(--ink-50)]">
+                {' '}for &ldquo;<span className="text-[var(--tomato)]">{search}</span>&rdquo;
               </span>
             )}
           </span>
@@ -143,8 +139,8 @@ export function RecipeFilters({
             onClick={onToggleFilters}
             className={`flex items-center gap-2 px-4 py-2 text-sm font-medium uppercase tracking-[0.08em] transition-all ${
               showFilters
-                ? 'text-[var(--primary)] bg-[var(--primary)]/10'
-                : 'text-white/60 hover:text-white hover:bg-white/[0.04]'
+                ? 'bg-[var(--ink)] text-[var(--cream)]'
+                : 'border border-[var(--ink)] text-[var(--ink)] hover:bg-[var(--parchment)]'
             }`}
           >
             <SlidersHorizontal className="w-4 h-4" />
@@ -155,14 +151,13 @@ export function RecipeFilters({
           </button>
         </div>
 
-        {/* Right: View Mode Toggle */}
-        <div className="flex items-center gap-1 p-1 bg-white/[0.02] border border-white/[0.04]">
+        <div className="flex w-fit items-center gap-1 border border-[var(--ink)] p-1">
           <button
             onClick={() => onViewModeChange('grid')}
             className={`p-2.5 transition-all ${
               viewMode === 'grid'
-                ? 'bg-[var(--primary)] text-[var(--primary-foreground)]'
-                : 'text-white/40 hover:text-white hover:bg-white/[0.04]'
+                ? 'bg-[var(--ink)] text-[var(--cream)]'
+                : 'text-[var(--ink-50)] hover:bg-[var(--parchment)] hover:text-[var(--ink)]'
             }`}
             aria-label="Grid view"
           >
@@ -172,8 +167,8 @@ export function RecipeFilters({
             onClick={() => onViewModeChange('list')}
             className={`p-2.5 transition-all ${
               viewMode === 'list'
-                ? 'bg-[var(--primary)] text-[var(--primary-foreground)]'
-                : 'text-white/40 hover:text-white hover:bg-white/[0.04]'
+                ? 'bg-[var(--ink)] text-[var(--cream)]'
+                : 'text-[var(--ink-50)] hover:bg-[var(--parchment)] hover:text-[var(--ink)]'
             }`}
             aria-label="List view"
           >
@@ -182,7 +177,6 @@ export function RecipeFilters({
         </div>
       </div>
 
-      {/* Expanded Filters Panel */}
       <AnimatePresence>
         {showFilters && (
           <motion.div
@@ -193,9 +187,8 @@ export function RecipeFilters({
             className="overflow-hidden"
           >
             <div className="py-8 space-y-8">
-              {/* Sort Options */}
               <div>
-                <span className="caption text-white/60 mb-4 block">Sort by</span>
+                <span className="caption mb-4 block">Sort by</span>
                 <div className="flex flex-wrap gap-2">
                   {sortOptions.map((option) => (
                     <button
@@ -203,8 +196,8 @@ export function RecipeFilters({
                       onClick={() => onSortChange(option.value as SortOption)}
                       className={`px-4 py-2 text-sm font-medium uppercase tracking-[0.06em] transition-all ${
                         sortBy === option.value
-                          ? 'bg-[var(--primary)] text-[var(--primary-foreground)]'
-                          : 'bg-white/[0.02] text-white/50 border border-white/[0.04] hover:border-[var(--primary)]/30 hover:text-white'
+                          ? 'bg-[var(--ink)] text-[var(--cream)]'
+                          : 'border border-[var(--ink)] text-[var(--ink)] hover:bg-[var(--parchment)]'
                       }`}
                     >
                       {option.label}
@@ -213,10 +206,9 @@ export function RecipeFilters({
                 </div>
               </div>
 
-              {/* Tag Filters */}
               {allTags.length > 0 && (
                 <div>
-                  <span className="caption text-white/60 mb-4 block">Filter by category</span>
+                  <span className="caption mb-4 block">Filter by category</span>
                   <div className="flex flex-wrap gap-2">
                     {allTags.map((tag) => (
                       <button
@@ -224,8 +216,8 @@ export function RecipeFilters({
                         onClick={() => onTagToggle(tag)}
                         className={`px-4 py-2 text-sm font-medium transition-all ${
                           selectedTags.includes(tag)
-                            ? 'bg-[var(--primary)] text-[var(--primary-foreground)]'
-                            : 'bg-white/[0.02] text-white/50 border border-white/[0.04] hover:border-[var(--primary)]/30 hover:text-white'
+                            ? 'bg-[var(--ink)] text-[var(--cream)]'
+                            : 'border border-[var(--ink)] text-[var(--ink)] hover:bg-[var(--parchment)]'
                         }`}
                       >
                         {tag}
@@ -235,16 +227,17 @@ export function RecipeFilters({
                 </div>
               )}
 
-              {/* Active Filters */}
               {selectedTags.length > 0 && (
-                <div className="flex items-center gap-3 pt-4 border-t border-white/[0.04]">
-                  <span className="text-xs text-white/40 uppercase tracking-wider">Active:</span>
+                <div className="flex items-center gap-3 border-t border-[var(--ink-line)] pt-4">
+                  <span className="text-xs uppercase tracking-wider text-[var(--ink-50)]">
+                    Active:
+                  </span>
                   <div className="flex flex-wrap gap-2">
                     {selectedTags.map((tag) => (
                       <button
                         key={tag}
                         onClick={() => onTagToggle(tag)}
-                        className="flex items-center gap-2 px-3 py-1.5 bg-[var(--primary)]/10 border border-[var(--primary)]/20 text-[var(--primary)] text-xs font-medium hover:bg-[var(--primary)]/20 transition-colors"
+                        className="flex items-center gap-2 border border-[var(--tomato)] px-3 py-1.5 text-xs font-medium text-[var(--tomato)] transition-colors hover:bg-[var(--tomato)] hover:text-[var(--cream)]"
                       >
                         {tag}
                         <X className="w-3 h-3" />

@@ -1,325 +1,153 @@
-'use client';
-
 import Image from 'next/image';
 import Link from 'next/link';
-import FeaturesSection from '@/src/components/features-section';
-import { useGsapParallax, useGsapAnimation } from '@/src/hooks/use-gsap-animation';
-import { ArrowRight, ArrowDown } from 'lucide-react';
-import { motion } from 'framer-motion';
+import { ArrowRight } from 'lucide-react';
+import { desc } from 'drizzle-orm';
+import { db } from '@/src/db';
+import { recipes as recipesTable } from '@/src/db/schemas';
+import { Recipe } from '@/src/types/recipes.types';
+import { HomeRotation } from '@/src/components/home/home-rotation';
 
-export default function Home() {
-  const heroRef = useGsapParallax<HTMLDivElement>({
-    opacity: 0,
-    y: -50,
-  });
+export const dynamic = 'force-dynamic';
 
-  const headingRef = useGsapAnimation<HTMLHeadingElement>(
-    {
-      opacity: 0,
-      y: 80,
-      duration: 1.4,
-      ease: 'power4.out',
-      delay: 0.4,
-    },
-    true
-  );
+const pillars = [
+  {
+    number: '01',
+    title: 'Weeknight',
+    description: 'Fast food without the panic. Short lists, clear steps, big return.',
+  },
+  {
+    number: '02',
+    title: 'Weekend',
+    description: 'A little more time, a little more ceremony, still no pointless fuss.',
+  },
+  {
+    number: '03',
+    title: 'Project',
+    description: 'The dishes you block out an afternoon for because the payoff is worth it.',
+  },
+];
+
+const formatTime = (mins: number): string => {
+  if (!mins) return '';
+  if (mins < 60) return `${mins} min`;
+  const hr = Math.floor(mins / 60);
+  const rem = mins % 60;
+  return rem ? `${hr} hr ${rem} min` : `${hr} hr`;
+};
+
+const fetchRotationRecipes = async (): Promise<Recipe[]> => {
+  try {
+    const rows = await db
+      .select()
+      .from(recipesTable)
+      .orderBy(desc(recipesTable.id))
+      .limit(12);
+    return rows as Recipe[];
+  } catch (error) {
+    console.error('[home] failed to load rotation recipes', error);
+    return [];
+  }
+};
+
+export default async function Home() {
+  const recipes = await fetchRotationRecipes();
+  const featured = recipes[0];
 
   return (
     <>
-      {/* ═══════════════════════════════════════════════════════════════
-          HERO SECTION - Bold Editorial Cinematic
-      ═══════════════════════════════════════════════════════════════ */}
-      <section ref={heroRef} className="section-hero">
-        {/* Background Image with Cinematic Treatment */}
-        <div className="absolute inset-0 z-0">
-          <Image
-            src="/images/food background.png"
-            alt="Culinary Excellence"
-            fill
-            className="img-cover"
-            priority
-            quality={95}
-          />
-          {/* Multi-layer overlay for depth */}
-          <div className="absolute inset-0 bg-gradient-to-b from-[#050505]/40 via-transparent to-[#050505]" />
-          <div className="absolute inset-0 bg-gradient-to-r from-[#050505]/60 via-transparent to-transparent" />
-          <div className="img-vignette" />
-        </div>
+      <section className="min-h-screen bg-[var(--cream)] pt-28 md:pt-24">
+        <div className="grid min-h-[calc(100vh-6rem)] grid-cols-1 lg:grid-cols-[1.1fr_1fr]">
+          <div className="flex flex-col justify-between px-6 pb-12 pt-12 sm:px-8 lg:px-16 lg:pb-16 lg:pt-[72px] xl:px-24">
+            <div>
+              <p className="eyebrow-rule">Issue 14 / Spring</p>
+              <h1 className="display-xl mt-8 max-w-4xl">
+                Cook
+                <br />
+                <span className="italic-tomato">like</span> you
+                <br />
+                mean it.
+              </h1>
+              <p className="body-lg mt-8 max-w-[420px]">
+                Recipes I actually cook on weeknights - tested until they are not fussy, written so
+                you do not need to re-read a step three times.
+              </p>
+            </div>
 
-        {/* Hero Content - Asymmetric Editorial Layout */}
-        <div className="wrapper relative z-10 flex flex-col items-start justify-center min-h-screen py-32">
-          {/* Kicker */}
-          <motion.p
-            initial={{ opacity: 0, x: -30 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.8, delay: 0.2 }}
-            className="kicker mb-6"
-          >
-            The Art of Culinary Excellence
-          </motion.p>
-
-          {/* Main Headline - Left Aligned, Massive */}
-          <h1 ref={headingRef} className="headline-massive text-white max-w-5xl mb-8">
-            Where Every
-            <br />
-            <span className="text-gradient">Dish Tells</span>
-            <br />A Story
-          </h1>
-
-          {/* Subheadline */}
-          <motion.p
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.8 }}
-            className="body-xl max-w-xl mb-12"
-          >
-            Discover recipes that transform ordinary ingredients into extraordinary experiences.
-          </motion.p>
-
-          {/* CTA Buttons - Editorial Style */}
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 1 }}
-            className="flex flex-col sm:flex-row gap-4"
-          >
-            <Link href="/recipes">
-              <button className="btn-primary group">
-                Explore Recipes
-                <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
-              </button>
-            </Link>
-
-            <Link href="/about">
-              <button className="btn-outline">Our Story</button>
-            </Link>
-          </motion.div>
-
-          {/* Decorative line */}
-          <motion.div
-            initial={{ scaleX: 0 }}
-            animate={{ scaleX: 1 }}
-            transition={{ duration: 1.2, delay: 1.2 }}
-            className="absolute bottom-32 left-6 sm:left-8 lg:left-16 xl:left-24 w-24 h-px bg-[var(--primary)] origin-left"
-          />
-        </div>
-
-        {/* Scroll Indicator - Refined */}
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 1.5, duration: 0.6 }}
-          className="absolute bottom-12 left-1/2 -translate-x-1/2 z-10 flex flex-col items-center gap-3"
-        >
-          <span className="caption">Scroll to Explore</span>
-          <motion.div
-            animate={{ y: [0, 8, 0] }}
-            transition={{ duration: 1.5, repeat: Infinity, ease: 'easeInOut' }}
-          >
-            <ArrowDown className="w-4 h-4 text-white/40" />
-          </motion.div>
-        </motion.div>
-
-        {/* Side Text - Editorial Detail */}
-        <div className="hidden lg:block absolute right-16 xl:right-24 top-1/2 -translate-y-1/2 z-10">
-          <motion.div
-            initial={{ opacity: 0, x: 30 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.8, delay: 1.4 }}
-            className="flex flex-col items-end gap-2"
-          >
-            <span className="caption">Est. 2024</span>
-            <div className="w-px h-12 bg-gradient-to-b from-white/20 to-transparent" />
-          </motion.div>
-        </div>
-      </section>
-
-      {/* ═══════════════════════════════════════════════════════════════
-          QUOTE SECTION - Editorial Pull Quote
-      ═══════════════════════════════════════════════════════════════ */}
-      <section className="section-half bg-[var(--background-elevated)] border-y border-white/[0.03]">
-        <div className="wrapper">
-          <div className="max-w-4xl mx-auto text-center">
-            {/* Decorative Quote Mark */}
-            <motion.span
-              initial={{ opacity: 0, scale: 0.8 }}
-              whileInView={{ opacity: 1, scale: 1 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.6 }}
-              className="inline-block text-[var(--primary)]/20 text-[120px] leading-none font-serif mb-[-60px]"
-            >
-              &ldquo;
-            </motion.span>
-
-            <motion.blockquote
-              initial={{ opacity: 0, y: 40 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.8, delay: 0.2 }}
-              className="pull-quote mb-12"
-            >
-              Every recipe tells a story. Every dish is an opportunity to innovate, to surprise, and
-              to bring people together around what matters most.
-            </motion.blockquote>
-
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.6, delay: 0.4 }}
-              className="flex items-center justify-center gap-6"
-            >
-              <div className="h-px w-12 bg-[var(--primary)]" />
-              <p className="caption text-[var(--primary)]">Idris Cooks Philosophy</p>
-              <div className="h-px w-12 bg-[var(--primary)]" />
-            </motion.div>
-          </div>
-        </div>
-      </section>
-
-      {/* ═══════════════════════════════════════════════════════════════
-          FEATURED SECTION - Asymmetric Editorial Grid
-      ═══════════════════════════════════════════════════════════════ */}
-      <section className="section-padded">
-        <div className="wrapper">
-          {/* Section Header - Left Aligned */}
-          <div className="max-w-2xl mb-16">
-            <motion.p
-              initial={{ opacity: 0, x: -20 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              viewport={{ once: true }}
-              className="kicker mb-4"
-            >
-              Featured
-            </motion.p>
-            <motion.h2
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: 0.1 }}
-              className="headline-xl text-white mb-6"
-            >
-              Curated for You
-            </motion.h2>
-            <motion.p
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: 0.2 }}
-              className="body-lg"
-            >
-              Handpicked recipes from our collection, designed to inspire your next culinary
-              adventure.
-            </motion.p>
-          </div>
-
-          {/* Asymmetric Grid */}
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-            {/* Large Featured Card */}
-            <motion.div
-              initial={{ opacity: 0, y: 40 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.6 }}
-              className="lg:col-span-7 group"
-            >
-              <Link href="/recipes" className="block">
-                <div className="card-editorial aspect-[4/3] lg:aspect-[16/10]">
-                  <Image
-                    src="/images/food background.png"
-                    alt="Featured Recipe"
-                    fill
-                    className="img-cover transition-transform duration-700 group-hover:scale-105"
-                  />
-                  <div className="img-overlay" />
-                  <div className="absolute inset-0 p-8 lg:p-12 flex flex-col justify-end">
-                    <span className="caption text-[var(--primary)] mb-3">Latest Creation</span>
-                    <h3 className="headline-md text-white mb-3">Seasonal Specials</h3>
-                    <p className="body-md max-w-md mb-6">
-                      Discover recipes that celebrate the best ingredients of the season.
-                    </p>
-                    <span className="btn-link w-fit">
-                      View Collection
-                      <ArrowRight className="w-4 h-4" />
-                    </span>
-                  </div>
-                </div>
+            <div className="mt-10 flex flex-col gap-5 sm:flex-row sm:items-center">
+              <Link href="/recipes" className="btn-ink group w-fit">
+                Browse recipes
+                <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
               </Link>
-            </motion.div>
-
-            {/* Stacked Cards */}
-            <div className="lg:col-span-5 flex flex-col gap-6">
-              <motion.div
-                initial={{ opacity: 0, y: 40 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.6, delay: 0.1 }}
-                className="group flex-1"
-              >
-                <Link href="/recipes" className="block h-full">
-                  <div className="card-editorial h-full min-h-[200px]">
-                    <Image
-                      src="/images/food background.png"
-                      alt="Quick Recipes"
-                      fill
-                      className="img-cover transition-transform duration-700 group-hover:scale-105"
-                    />
-                    <div className="img-overlay" />
-                    <div className="absolute inset-0 p-6 lg:p-8 flex flex-col justify-end">
-                      <span className="caption text-[var(--primary)] mb-2">Quick & Easy</span>
-                      <h3 className="headline-sm text-white">30-Minute Meals</h3>
-                    </div>
-                  </div>
-                </Link>
-              </motion.div>
-
-              <motion.div
-                initial={{ opacity: 0, y: 40 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.6, delay: 0.2 }}
-                className="group flex-1"
-              >
-                <Link href="/recipes" className="block h-full">
-                  <div className="card-editorial h-full min-h-[200px]">
-                    <Image
-                      src="/images/food background.png"
-                      alt="Techniques"
-                      fill
-                      className="img-cover transition-transform duration-700 group-hover:scale-105"
-                    />
-                    <div className="img-overlay" />
-                    <div className="absolute inset-0 p-6 lg:p-8 flex flex-col justify-end">
-                      <span className="caption text-[var(--primary)] mb-2">Master Class</span>
-                      <h3 className="headline-sm text-white">Essential Techniques</h3>
-                    </div>
-                  </div>
-                </Link>
-              </motion.div>
+              <Link href="/about" className="btn-link w-fit">
+                What I am cooking this week
+              </Link>
             </div>
           </div>
 
-          {/* View All Link */}
-          <motion.div
-            initial={{ opacity: 0 }}
-            whileInView={{ opacity: 1 }}
-            viewport={{ once: true }}
-            transition={{ delay: 0.4 }}
-            className="mt-12 flex justify-center"
-          >
-            <Link href="/recipes" className="btn-link">
-              View All Recipes
-              <ArrowRight className="w-4 h-4" />
-            </Link>
-          </motion.div>
+          <div className="relative min-h-[520px] lg:min-h-full">
+            <div className="absolute inset-0 overflow-hidden">
+              <Image
+                src={featured?.imageUrl ?? '/images/food background.png'}
+                alt={featured?.title ?? 'Overhead table with a finished dish, herbs, and citrus zest'}
+                fill
+                className="object-cover"
+                priority
+                sizes="(max-width: 1024px) 100vw, 50vw"
+              />
+            </div>
+            {featured && (
+              <Link
+                href={`/recipes/category/${encodeURIComponent(featured.title)}`}
+                className="absolute bottom-8 left-6 right-6 z-10 border-t-2 border-[var(--tomato)] bg-[var(--cream)] p-5 sm:left-auto sm:right-auto sm:w-[280px] lg:-left-12 lg:bottom-14"
+              >
+                <p className="eyebrow">This week's pick</p>
+                <h2 className="subhead mt-2">{featured.title}</h2>
+                <p className="mono-label mt-3 text-[var(--ink-60)]">
+                  {formatTime(featured.cookTime)} / serves {featured.servings}
+                </p>
+              </Link>
+            )}
+          </div>
         </div>
       </section>
 
-      {/* Divider */}
-      <div className="divider-accent" />
+      <HomeRotation recipes={recipes} />
 
-      {/* Features Section */}
-      <FeaturesSection />
+      <section className="bg-[var(--parchment)] px-6 py-16 sm:px-8 lg:px-16 lg:py-20 xl:px-24">
+        <div className="mx-auto grid max-w-[1440px] grid-cols-1 gap-12 lg:grid-cols-[0.8fr_1.2fr] lg:items-start">
+          <div>
+            <p className="eyebrow">Three pillars</p>
+            <h2 className="display-s mt-3">Weeknight, weekend, project.</h2>
+          </div>
+          <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
+            {pillars.map((pillar) => (
+              <article key={pillar.number} className="border-t border-[var(--ink)] pt-4">
+                <p className="mono-label text-[var(--tomato)]">{pillar.number}</p>
+                <h3 className="heading mt-6 text-[2rem]">{pillar.title}</h3>
+                <p className="body-sm mt-3">{pillar.description}</p>
+              </article>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section className="bg-[var(--ink)] px-6 py-16 text-[var(--cream)] sm:px-8 lg:px-16 lg:py-20 xl:px-24">
+        <div className="mx-auto flex max-w-[1440px] flex-col gap-8 lg:flex-row lg:items-end lg:justify-between">
+          <div className="max-w-3xl">
+            <p className="eyebrow-peach">A small archive of good things to cook.</p>
+            <h2 className="mt-4 font-serif text-5xl font-normal leading-none tracking-[-0.01em] text-[var(--cream)] sm:text-6xl lg:text-7xl">
+              No life stories before the recipe.
+            </h2>
+            <p className="mt-6 max-w-xl text-[17px] leading-7 text-[var(--cream-70)]">
+              No 47-ingredient lists. Just dishes that have earned a spot in the rotation.
+            </p>
+          </div>
+          <Link href="/recipes" className="btn-cream group w-fit">
+            Start with the basics
+            <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
+          </Link>
+        </div>
+      </section>
     </>
   );
 }

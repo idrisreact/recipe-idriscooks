@@ -164,7 +164,7 @@ export default async function RecipePage({ params }: PageProps) {
   );
 
   return (
-    <div className="wrapper page">
+    <div className="wrapper bg-[var(--cream)] pb-24 pt-36 lg:pt-40">
       {/* Recipe JSON-LD Schema for Google */}
       <script
         type="application/ld+json"
@@ -203,7 +203,7 @@ export default async function RecipePage({ params }: PageProps) {
         {/* Reviews Section */}
         {!showPaywall && (
           <>
-            <div className="mt-12 pt-12 border-t border-zinc-800">
+            <div id="comments" className="mt-12 border-t border-[var(--ink-line)] pt-12">
               <ReviewsSection
                 recipeId={recipe.id}
                 userId={userId}

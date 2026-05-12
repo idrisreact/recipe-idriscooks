@@ -89,32 +89,30 @@ export default function IntroLoader() {
       className="fixed inset-0 z-[9999] flex items-center justify-center invisible"
     >
       {/* Curtain */}
-      <div ref={curtainRef} className="absolute inset-0 bg-[#050505] w-full h-full" />
+      <div ref={curtainRef} className="absolute inset-0 bg-[var(--cream)] w-full h-full" />
 
       {/* Content */}
       <div className="relative z-10 flex flex-col items-center">
         {/* Decorative Line Above */}
-        <div ref={lineRef} className="w-12 h-px bg-[var(--primary)] mb-8 origin-center" />
+        <div ref={lineRef} className="w-12 h-px bg-[var(--olive)] mb-8 origin-center" />
 
         {/* Logo Mark */}
         <div
           ref={logoRef}
-          className="w-16 h-16 border border-[var(--primary)]/30 flex items-center justify-center mb-6"
+          className="w-16 h-16 border border-[var(--ink)] flex items-center justify-center mb-6"
         >
-          <span className="font-serif text-3xl font-bold text-[var(--primary)]">IC</span>
+          <span className="font-serif text-3xl font-normal text-[var(--tomato)]">IC</span>
         </div>
 
-        {/* Brand Name */}
         <div ref={textRef} className="text-center mb-4">
-          <h1 className="font-serif text-3xl md:text-4xl font-semibold text-white tracking-tight">
-            Idris Cooks
+          <h1 className="font-serif text-3xl md:text-4xl font-normal tracking-tight text-[var(--ink)]">
+            Idris <span className="italic text-[var(--tomato)]">cooks</span>
           </h1>
         </div>
 
-        {/* Tagline */}
         <div ref={taglineRef}>
-          <p className="text-[10px] md:text-xs uppercase tracking-[0.3em] text-[var(--primary)]">
-            Culinary Excellence
+          <p className="font-mono text-[10px] md:text-xs uppercase tracking-[0.3em] text-[var(--olive)]">
+            Tested, not fussy
           </p>
         </div>
       </div>

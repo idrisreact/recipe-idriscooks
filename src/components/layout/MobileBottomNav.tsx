@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Home, Search, Heart } from 'lucide-react';
+import { Home, Search, Heart, Folder, CalendarDays } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 export function MobileBottomNav() {
@@ -15,8 +15,8 @@ export function MobileBottomNav() {
       icon: Home,
     },
     {
-      href: '/search',
-      label: 'Search',
+      href: '/recipes',
+      label: 'Recipes',
       icon: Search,
     },
     {
@@ -24,20 +24,30 @@ export function MobileBottomNav() {
       label: 'Favorites',
       icon: Heart,
     },
+    {
+      href: '/collections',
+      label: 'Collections',
+      icon: Folder,
+    },
+    {
+      href: '/meal-plans',
+      label: 'Plans',
+      icon: CalendarDays,
+    },
   ];
 
   return (
-    <div className="md:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 pb-[env(safe-area-inset-bottom)] z-50">
+    <div className="md:hidden fixed bottom-0 left-0 right-0 bg-[var(--cream)] border-t border-[var(--ink-line)] pb-[env(safe-area-inset-bottom)] z-50">
       <nav className="flex justify-around items-center h-16">
         {links.map(({ href, label, icon: Icon }) => {
-          const isActive = pathname === href;
+          const isActive = pathname === href || (href !== '/' && pathname.startsWith(href));
           return (
             <Link
               key={href}
               href={href}
               className={cn(
                 'flex flex-col items-center justify-center w-full h-full space-y-1',
-                isActive ? 'text-[var(--primary)]' : 'text-gray-500 hover:text-gray-900'
+                isActive ? 'text-[var(--tomato)]' : 'text-[var(--ink-50)] hover:text-[var(--ink)]'
               )}
             >
               <Icon className={cn('w-6 h-6', isActive && 'fill-current')} />

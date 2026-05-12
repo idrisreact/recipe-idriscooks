@@ -16,8 +16,8 @@ export const RecipeWelcomeHeader = memo(function RecipeWelcomeHeader({
   if (session) {
     return (
       <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="mb-12">
-        <span className="kicker mb-2 block">Welcome back</span>
-        <h2 className="headline-lg text-white">{session.user.name}</h2>
+        <span className="eyebrow mb-2 block">Welcome back</span>
+        <h2 className="display-s">{session.user.name}</h2>
       </motion.div>
     );
   }
@@ -26,12 +26,12 @@ export const RecipeWelcomeHeader = memo(function RecipeWelcomeHeader({
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      className="mb-12 p-8 bg-[var(--card)] border border-white/[0.04]"
+      className="mb-12 border-t border-[var(--ink)] bg-[var(--parchment)] p-8"
     >
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-6">
         <div>
-          <span className="kicker mb-2 block">Guest</span>
-          <h2 className="headline-sm text-white mb-2">Welcome to Idris Cooks</h2>
+          <span className="eyebrow mb-2 block">Guest</span>
+          <h2 className="subhead mb-2">Welcome to Idris Cooks</h2>
           <p className="body-md">Sign in to access all recipes and save your favorites.</p>
         </div>
         <button

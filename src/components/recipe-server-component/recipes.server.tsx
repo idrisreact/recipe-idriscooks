@@ -76,10 +76,10 @@ export const Recipes = ({ session }: Props) => {
   if (isError) {
     return (
       <div className="text-center py-16">
-        <span className="kicker text-destructive mb-4 block">Error</span>
-        <h2 className="headline-md text-white mb-4">Failed to load recipes</h2>
+        <span className="eyebrow text-destructive mb-4 block">Error</span>
+        <h2 className="subhead mb-4">Failed to load recipes</h2>
         <p className="body-md mb-8">{error?.message || 'Something went wrong'}</p>
-        <button onClick={() => window.location.reload()} className="btn-primary">
+        <button onClick={() => window.location.reload()} className="btn-ink">
           Try Again
         </button>
       </div>
@@ -153,13 +153,13 @@ export const Recipes = ({ session }: Props) => {
           viewport={{ once: true }}
           className="mt-24 text-center"
         >
-          <div className="max-w-2xl mx-auto p-12 bg-[var(--card)] border border-white/[0.04]">
-            <span className="kicker mb-4 block">Unlock More</span>
-            <h3 className="headline-md text-white mb-4">{recipes.length - 3} More Recipes Await</h3>
+          <div className="max-w-2xl mx-auto border-t border-[var(--ink)] bg-[var(--parchment)] p-12">
+            <span className="eyebrow mb-4 block">Unlock More</span>
+            <h3 className="subhead mb-4">{recipes.length - 3} More Recipes Await</h3>
             <p className="body-lg mb-8">
               Sign in to access our complete collection of {recipes.length} curated recipes.
             </p>
-            <button onClick={signIn} className="btn-primary group">
+            <button onClick={signIn} className="btn-ink group">
               Sign In to Explore
               <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
             </button>
