@@ -37,11 +37,7 @@ const formatTime = (mins: number): string => {
 
 const fetchRotationRecipes = async (): Promise<Recipe[]> => {
   try {
-    const rows = await db
-      .select()
-      .from(recipesTable)
-      .orderBy(desc(recipesTable.id))
-      .limit(12);
+    const rows = await db.select().from(recipesTable).orderBy(desc(recipesTable.id)).limit(12);
     return rows as Recipe[];
   } catch (error) {
     console.error('[home] failed to load rotation recipes', error);
@@ -88,7 +84,9 @@ export default async function Home() {
             <div className="absolute inset-0 overflow-hidden">
               <Image
                 src={featured?.imageUrl ?? '/images/food background.png'}
-                alt={featured?.title ?? 'Overhead table with a finished dish, herbs, and citrus zest'}
+                alt={
+                  featured?.title ?? 'Overhead table with a finished dish, herbs, and citrus zest'
+                }
                 fill
                 className="object-cover"
                 priority
@@ -100,7 +98,7 @@ export default async function Home() {
                 href={`/recipes/category/${encodeURIComponent(featured.title)}`}
                 className="absolute bottom-8 left-6 right-6 z-10 border-t-2 border-[var(--tomato)] bg-[var(--cream)] p-5 sm:left-auto sm:right-auto sm:w-[280px] lg:-left-12 lg:bottom-14"
               >
-                <p className="eyebrow">This week's pick</p>
+                <p className="eyebrow">This week&apos;s pick</p>
                 <h2 className="subhead mt-2">{featured.title}</h2>
                 <p className="mono-label mt-3 text-[var(--ink-60)]">
                   {formatTime(featured.cookTime)} / serves {featured.servings}

@@ -58,7 +58,7 @@ export const HomeRotation = ({ recipes }: Props) => {
           <div>
             <p className="eyebrow">What I am cooking / May</p>
             <h2 className="display-s mt-3">
-              This month's <span className="italic">rotation</span>
+              This month&apos;s <span className="italic">rotation</span>
             </h2>
           </div>
           <div className="flex flex-wrap gap-2">
@@ -122,7 +122,9 @@ const RotationCard = ({ recipe, big, tag, accent }: CardProps) => (
         sizes={big ? '(max-width: 1024px) 100vw, 45vw' : '(max-width: 1024px) 100vw, 28vw'}
       />
     </div>
-    <h3 className={`${big ? 'heading' : 'subhead'} mt-4 transition-colors group-hover:text-[var(--tomato)]`}>
+    <h3
+      className={`${big ? 'heading' : 'subhead'} mt-4 transition-colors group-hover:text-[var(--tomato)]`}
+    >
       {recipe.title}
     </h3>
     <p className="body-sm mt-2 line-clamp-2">{recipe.description}</p>

@@ -123,7 +123,10 @@ export function useUpdateMealPlan() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async ({ id, ...data }: { id: string } & Partial<{
+    mutationFn: async ({
+      id,
+      ...data
+    }: { id: string } & Partial<{
       name: string;
       description: string | null;
       weekStartDate: string;
@@ -210,15 +213,18 @@ export function useUpdateMealPlanItem() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async ({ itemId, planId: _planId, ...data }: { itemId: string; planId: string } & Partial<{
-      isCompleted: boolean;
-      servings: number;
-      notes: string | null;
-    }>) => {
+    mutationFn: async (
+      variables: { itemId: string; planId: string } & Partial<{
+        isCompleted: boolean;
+        servings: number;
+        notes: string | null;
+      }>
+    ) => {
+      const { itemId, isCompleted, servings, notes } = variables;
       const response = await fetch(`/api/meal-plans/items/${itemId}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(data),
+        body: JSON.stringify({ isCompleted, servings, notes }),
       });
       if (!response.ok) {
         const error = await response.json();
@@ -237,8 +243,8 @@ export function useRemoveMealPlanItem() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async ({ itemId, planId }: { itemId: string; planId: string }) => {
-      const response = await fetch(`/api/meal-plans/items/${itemId}`, {
+    mutationFn: async (variables: { itemId: string; planId: string }) => {
+      const response = await fetch(`/api/meal-plans/items/${variables.itemId}`, {
         method: 'DELETE',
       });
       if (!response.ok) {
