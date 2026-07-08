@@ -1,192 +1,180 @@
 import { auth } from '@/src/utils/auth';
 import { headers } from 'next/headers';
-import { redirect } from 'next/navigation';
-import { db } from '@/src/db';
-import { premiumFeatures } from '@/src/db/schemas/premium-features.schema';
-import { eq, and } from 'drizzle-orm';
-import { Check } from 'lucide-react';
 import Link from 'next/link';
+import { getEntitlements } from '@/src/lib/entitlements';
+import { PRICING, getRecipeAccessPrice, getSavingsDisplay } from '@/src/config/pricing';
+import { LifetimeCheckoutButton } from '@/src/components/payment/lifetime-checkout-button';
 
 export const metadata = {
-  title: 'Pricing - Recipe Platform',
-  description: 'Choose the perfect plan for your cooking journey',
+  title: 'Pricing',
+  description:
+    'One payment, every recipe, forever. No subscription, no recurring fees — just tested recipes.',
 };
+
+const FAQS = [
+  {
+    question: 'Is this a subscription?',
+    answer:
+      'No. Lifetime access is a single one-time payment. No recurring charges, no renewal emails, nothing to cancel.',
+  },
+  {
+    question: 'What payment methods do you accept?',
+    answer:
+      'All major cards (Visa, Mastercard, American Express) through Stripe, our payment processor.',
+  },
+  {
+    question: 'What happens after I purchase?',
+    answer:
+      'Access is granted instantly — every recipe unlocks the moment payment completes, and a receipt lands in your inbox.',
+  },
+  {
+    question: 'Do you offer refunds?',
+    answer:
+      'Yes — within 7 days for technical issues, duplicate purchases, or billing errors. See the refund policy for details.',
+  },
+];
 
 export default async function PricingPage() {
   const session = await auth.api.getSession({ headers: await headers() });
+  const entitlements = session?.user?.id ? await getEntitlements(session.user.id) : null;
+  const hasAccess = entitlements?.hasRecipeAccess ?? false;
 
-  if (!session?.user) {
-    redirect('/sign-in?redirect_url=/pricing');
-  }
-
-  const userId = session.user.id;
-
-  // Check if user already has recipe access
-  const [recipeAccess] = await db
-    .select()
-    .from(premiumFeatures)
-    .where(
-      and(
-        eq(premiumFeatures.userId, userId),
-        eq(premiumFeatures.feature, 'recipe_access')
-      )
-    )
-    .limit(1);
-
-  const hasAccess = !!recipeAccess;
+  const pricing = getRecipeAccessPrice();
+  const isLaunchSpecial = PRICING.recipeAccess.isLaunchSpecial;
+  const { freeTier } = PRICING;
 
   return (
     <div className="wrapper page">
-      <div className="max-w-7xl mx-auto px-4 py-16">
-        {/* Header */}
-        <div className="text-center mb-16">
-          <h1 className="text-4xl md:text-5xl font-bold mb-4 text-foreground">
-            Choose Your Plan
-          </h1>
-          <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-            Unlock premium features and take your cooking to the next level
+      {/* Header */}
+      <header className="flex flex-col gap-6 max-w-3xl">
+        <span className="eyebrow-rule">Pricing</span>
+        <h1 className="display-l">
+          Pay once. Cook <span className="italic text-[var(--tomato)]">forever</span>.
+        </h1>
+        <p className="body-lg text-[var(--ink-65)]">
+          No subscription. No recurring fees. One payment unlocks every recipe in the archive — and
+          every recipe still to come.
+        </p>
+      </header>
+
+      {/* Plans */}
+      <section className="grid grid-cols-1 md:grid-cols-5 gap-10 items-stretch">
+        {/* Free */}
+        <div className="md:col-span-2 flex flex-col gap-8 border-t border-[var(--ink)] pt-8">
+          <div className="flex flex-col gap-2">
+            <span className="eyebrow">The free shelf</span>
+            <h2 className="heading">Free</h2>
+            <p className="font-serif text-4xl">
+              £0 <span className="text-lg text-[var(--ink-50)]">forever</span>
+            </p>
+          </div>
+          <ul className="flex flex-col divide-y divide-[var(--ink-line)] text-sm text-[var(--ink-75)]">
+            <li className="py-3">{freeTier.recipeViewsPerMonth} full recipes each month</li>
+            <li className="py-3">Save up to {freeTier.favoritesLimit} favorites</li>
+            <li className="py-3">Collections, meal plans and shopping lists</li>
+          </ul>
+          <p className="mono-label mt-auto">
+            {hasAccess ? 'Included with your access' : 'Your current plan'}
           </p>
         </div>
 
-        {/* Pricing Plans */}
-        <div className="max-w-4xl mx-auto">
-          <div className="grid md:grid-cols-2 gap-8">
-            {/* Free Plan */}
-            <div className="murakamicity-card rounded-2xl shadow-lg p-8 border-2 border-border">
-              <h3 className="text-2xl font-bold mb-2 text-foreground">Free</h3>
-              <div className="mb-6">
-                <span className="text-4xl font-bold text-foreground">£0</span>
-                <span className="text-muted-foreground ml-2">forever</span>
-              </div>
-              <ul className="space-y-3 mb-8">
-                <li className="flex items-start gap-2">
-                  <Check className="w-5 h-5 text-green-500 mt-0.5" />
-                  <span className="text-foreground">Browse all recipes</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <Check className="w-5 h-5 text-green-500 mt-0.5" />
-                  <span className="text-foreground">Save favorites</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <Check className="w-5 h-5 text-green-500 mt-0.5" />
-                  <span className="text-foreground">Basic search</span>
-                </li>
-              </ul>
-              {!hasAccess ? (
-                <button
-                  disabled
-                  className="w-full py-3 px-6 rounded-lg bg-muted text-muted-foreground cursor-not-allowed font-medium"
-                >
-                  Current Plan
-                </button>
-              ) : (
-                <div className="w-full py-3 px-6 text-center text-muted-foreground font-medium">
-                  Basic features
-                </div>
-              )}
+        {/* Lifetime */}
+        <div className="md:col-span-3 flex flex-col gap-8 border-t-2 border-[var(--tomato)] bg-[var(--parchment)] p-8 md:p-10 -mt-px">
+          <div className="flex flex-col gap-2">
+            <div className="flex items-center justify-between gap-4 flex-wrap">
+              <span className="eyebrow" style={{ color: 'var(--tomato)' }}>
+                Lifetime access
+              </span>
+              {isLaunchSpecial && <span className="chip text-xs">{pricing.label}</span>}
             </div>
-
-            {/* Premium Plan */}
-            <div className="murakamicity-card rounded-2xl shadow-lg p-8 border-2 border-primary relative">
-              <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-primary text-primary-foreground px-4 py-1 rounded-full text-sm font-medium">
-                Most Popular
-              </div>
-              <h3 className="text-2xl font-bold mb-2 text-foreground">Lifetime Access</h3>
-              <div className="mb-6">
-                <span className="text-4xl font-bold text-foreground">£10</span>
-                <span className="text-muted-foreground ml-2">one-time</span>
-              </div>
-              <ul className="space-y-3 mb-8">
-                <li className="flex items-start gap-2">
-                  <Check className="w-5 h-5 text-green-500 mt-0.5" />
-                  <span className="font-medium text-foreground">Everything in Free, plus:</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <Check className="w-5 h-5 text-green-500 mt-0.5" />
-                  <span className="text-foreground">Unlimited recipe access</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <Check className="w-5 h-5 text-green-500 mt-0.5" />
-                  <span className="text-foreground">PDF downloads</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <Check className="w-5 h-5 text-green-500 mt-0.5" />
-                  <span className="text-foreground">Advanced filtering</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <Check className="w-5 h-5 text-green-500 mt-0.5" />
-                  <span className="text-foreground">Priority support</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <Check className="w-5 h-5 text-green-500 mt-0.5" />
-                  <span className="text-foreground">Lifetime updates</span>
-                </li>
-              </ul>
-              {hasAccess ? (
-                <div className="w-full py-3 px-6 rounded-lg bg-green-500/20 text-green-500 text-center font-medium">
-                  ✓ You have access
-                </div>
-              ) : (
-                <Link
-                  href="/api/stripe/checkout/recipe-access"
-                  className="block w-full py-3 px-6 rounded-lg bg-primary text-primary-foreground text-center hover:opacity-90 transition-opacity font-medium"
-                >
-                  Get Lifetime Access
-                </Link>
+            <h2 className="heading">The whole cookbook</h2>
+            <p className="font-serif text-5xl">
+              {pricing.display} <span className="text-lg text-[var(--ink-50)]">one-time</span>
+              {isLaunchSpecial && (
+                <span className="ml-3 text-xl text-[var(--ink-50)] line-through">
+                  {PRICING.recipeAccess.regular.display}
+                </span>
               )}
-            </div>
+            </p>
+            {isLaunchSpecial && (
+              <p className="text-sm text-[var(--tomato)] font-medium">
+                Save {getSavingsDisplay()} at the launch price.
+              </p>
+            )}
+          </div>
+          <ul className="flex flex-col divide-y divide-[var(--ink-line)] text-sm text-[var(--ink-75)]">
+            <li className="py-3">Unlimited recipe views — every recipe, in full</li>
+            <li className="py-3">Unlimited favorites</li>
+            <li className="py-3">Cooking mode for hands-free kitchens</li>
+            <li className="py-3">Every future recipe included, no extra cost</li>
+          </ul>
+          <div className="mt-auto">
+            {hasAccess ? (
+              <p className="btn-ink w-full pointer-events-none opacity-90">
+                You have lifetime access ✓
+              </p>
+            ) : (
+              <LifetimeCheckoutButton />
+            )}
           </div>
         </div>
+      </section>
 
-        {/* FAQ Section */}
-        <div className="mt-20 max-w-3xl mx-auto">
-          <h2 className="text-3xl font-bold text-center mb-8 text-foreground">
-            Frequently Asked Questions
-          </h2>
-          <div className="space-y-6">
-            <div className="border-b border-border pb-6">
-              <h3 className="text-lg font-semibold mb-2 text-foreground">
-                Is this a subscription or one-time payment?
-              </h3>
-              <p className="text-muted-foreground">
-                Lifetime Access is a one-time payment of £10. No recurring charges, no subscription
-                fees. Pay once and get lifetime access to all premium features.
-              </p>
-            </div>
-            <div className="border-b border-border pb-6">
-              <h3 className="text-lg font-semibold mb-2 text-foreground">
-                What payment methods do you accept?
-              </h3>
-              <p className="text-muted-foreground">
-                We accept all major credit cards (Visa, Mastercard, American Express) through
-                our secure payment processor, Stripe.
-              </p>
-            </div>
-            <div className="border-b border-border pb-6">
-              <h3 className="text-lg font-semibold mb-2 text-foreground">
-                What happens after I purchase?
-              </h3>
-              <p className="text-muted-foreground">
-                After completing your payment, you&apos;ll be instantly granted access to all premium
-                features. You&apos;ll also receive an email confirmation with your invoice.
-              </p>
-            </div>
-            <div className="pb-6">
-              <h3 className="text-lg font-semibold mb-2 text-foreground">
-                Do you offer refunds?
-              </h3>
-              <p className="text-muted-foreground">
-                Yes! We offer refunds within 7 days for technical issues, duplicate purchases,
-                or billing errors. See our{' '}
-                <Link href="/refund-policy" className="text-primary hover:underline">
-                  refund policy
-                </Link>{' '}
-                for full details.
-              </p>
-            </div>
-          </div>
+      {/* PDF bundles */}
+      <section className="flex flex-col gap-8">
+        <div className="flex flex-col gap-4">
+          <span className="eyebrow-rule">Add-on</span>
+          <h2 className="display-s">Recipes on paper</h2>
+          <p className="body-lg text-[var(--ink-65)] max-w-2xl">
+            Take your favorites off-screen. PDF bundles are typeset like the site — buy a bundle
+            once and export beautifully formatted recipe PDFs from your favorites.
+          </p>
         </div>
-      </div>
+        <div className="grid grid-cols-2 lg:grid-cols-4 border border-[var(--ink-line)] divide-x divide-[var(--ink-line)] max-lg:divide-y">
+          {Object.entries(PRICING.pdfDownloads).map(([tier, bundle], index) => (
+            <div key={tier} className="flex flex-col gap-3 p-6">
+              <span className="mono-label">{String(index + 1).padStart(2, '0')}</span>
+              <p className="font-serif text-3xl">{bundle.display}</p>
+              <p className="text-sm text-[var(--ink-65)]">{bundle.recipes} recipes per export</p>
+            </div>
+          ))}
+        </div>
+        <Link href="/favorites" className="btn-link self-start">
+          Choose a bundle from your favorites →
+        </Link>
+      </section>
+
+      {/* FAQ */}
+      <section className="flex flex-col gap-10 max-w-3xl">
+        <div className="flex flex-col gap-4">
+          <span className="eyebrow-rule">Questions</span>
+          <h2 className="display-s">Asked and answered</h2>
+        </div>
+        <div className="flex flex-col">
+          {FAQS.map((faq, index) => (
+            <div
+              key={faq.question}
+              className="grid grid-cols-[auto_1fr] gap-6 border-t border-[var(--ink-line)] py-8"
+            >
+              <span className="mono-label pt-1">{String(index + 1).padStart(2, '0')}</span>
+              <div className="flex flex-col gap-3">
+                <h3 className="font-serif text-2xl text-[var(--ink)]">{faq.question}</h3>
+                <p className="text-sm leading-relaxed text-[var(--ink-65)]">
+                  {faq.answer}
+                  {faq.question.includes('refunds') && (
+                    <>
+                      {' '}
+                      <Link href="/refund-policy" className="btn-link text-sm">
+                        Read the refund policy
+                      </Link>
+                    </>
+                  )}
+                </p>
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
     </div>
   );
 }

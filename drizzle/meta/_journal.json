@@ -57,6 +57,13 @@
       "when": 1754000000002,
       "tag": "0007_add_user_id_to_recipes",
       "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1754000000003,
+      "tag": "0008_add_catering_inquiries",
+      "breakpoints": true
     }
   ]
 }

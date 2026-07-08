@@ -4,14 +4,18 @@ import { useFavorites } from '@/src/hooks/use-favorites';
 import { Card } from '@/src/components/ui/Card';
 import { ActionButton } from '@/src/components/ui/ActionButton';
 import { RecipeMetadata } from '@/src/components/ui/RecipeMetadata';
-import { Text } from '@/src/components/ui/Text';
-import { Heading } from '@/src/components/common/heading/heading';
-import { VerticalSpace } from '@/src/components/ui/VerticalSpace';
+import { PageHeader } from '@/src/components/ui/page-header';
+import { EmptyState } from '@/src/components/ui/empty-state';
+import { SkeletonGrid, SkeletonPage } from '@/src/components/ui/skeleton';
 import { useRouter } from 'next/navigation';
-import { Heart, Share2, Eye, LogIn } from 'lucide-react';
+import { Heart, Share2, Eye } from 'lucide-react';
 import { RecipePreviewModal } from '@/src/components/recipe-server-component/recipe-preview-modal';
 import dynamic from 'next/dynamic';
-import { Suspense } from 'react';
+import { Suspense, useState, useEffect } from 'react';
+import { Recipe } from '@/src/types/recipes.types';
+import { authClient } from '@/src/utils/auth-client';
+import { SignInModal } from '@/src/components/auth/sign-in-modal/SignInModal';
+import { useSearchParams } from 'next/navigation';
 
 const PDFGenerator = dynamic(
   () =>
@@ -20,14 +24,9 @@ const PDFGenerator = dynamic(
     })),
   {
     ssr: false,
-    loading: () => <div className="animate-pulse w-24 h-10 bg-muted rounded"></div>,
+    loading: () => <div className="animate-pulse w-24 h-10 bg-[var(--parchment)]" />,
   }
 );
-import { useState, useEffect } from 'react';
-import { Recipe } from '@/src/types/recipes.types';
-import { authClient } from '@/src/utils/auth-client';
-import { SignInModal } from '@/src/components/auth/sign-in-modal/SignInModal';
-import { useSearchParams } from 'next/navigation';
 
 function FavoritesContent() {
   const { data: session, isPending } = authClient.useSession();
@@ -67,46 +66,36 @@ function FavoritesContent() {
   }, [searchParams, loading, favorites.length]);
 
   if (isPending) {
-    return (
-      <div className="wrapper page">
-        <div className="flex items-center justify-center min-h-[50vh]">
-          <div className="animate-pulse text-center">
-            <div className="w-8 h-8 bg-muted rounded-full mx-auto mb-4"></div>
-            <Text>Loading...</Text>
-          </div>
-        </div>
-      </div>
-    );
+    return <SkeletonPage />;
   }
 
   if (!session) {
     return (
       <div className="wrapper page">
-        <div className="text-center py-16">
-          <LogIn className="w-16 h-16 text-muted-foreground mx-auto mb-6" />
-          <Text as="h1" variant="heading" className="mb-4">
-            Sign in to view your favorites
-          </Text>
-          <Text variant="large" className="text-muted-foreground mb-8 max-w-md mx-auto">
-            Create an account or sign in to save your favorite recipes and access them anytime.
-          </Text>
-          <div className="flex gap-4 justify-center">
-            <button
-              onClick={() => setShowSignInModal(true)}
-              className="murakamicity-button flex items-center gap-2"
-            >
-              <LogIn className="w-4 h-4" />
-              Sign In
-            </button>
-            <button
-              onClick={() => router.push('/recipes')}
-              className="murakamicity-button-outline flex items-center gap-2"
-            >
-              Browse Recipes
-            </button>
-          </div>
-        </div>
-
+        <PageHeader
+          eyebrow="Dog-eared pages"
+          title="Favorites"
+          description="The recipes you come back to, saved in one place."
+        />
+        <EmptyState
+          eyebrow="Sign in required"
+          title={
+            <>
+              Save the ones worth <span className="italic text-[var(--tomato)]">repeating</span>.
+            </>
+          }
+          description="Sign in to keep your favorite recipes together and export them as a PDF."
+          action={
+            <div className="flex flex-wrap gap-4">
+              <button type="button" onClick={() => setShowSignInModal(true)} className="btn-ink">
+                Sign in
+              </button>
+              <button type="button" onClick={() => router.push('/recipes')} className="btn-link">
+                Browse recipes instead
+              </button>
+            </div>
+          }
+        />
         {showSignInModal && <SignInModal onClose={() => setShowSignInModal(false)} />}
       </div>
     );
@@ -129,77 +118,71 @@ function FavoritesContent() {
   if (loading) {
     return (
       <div className="wrapper page">
-        <Heading title="My Favorites" subTitle="Your saved recipes" />
-        <VerticalSpace space="16" />
-        <div className="recipe-grid">
-          {[...Array(6)].map((_, i) => (
-            <div key={i} className="w-full h-80 bg-muted rounded-sm animate-pulse" />
-          ))}
-        </div>
+        <PageHeader
+          eyebrow="Dog-eared pages"
+          title="Favorites"
+          description="The recipes you come back to, saved in one place."
+        />
+        <SkeletonGrid count={6} />
       </div>
     );
   }
 
   if (error) {
     return (
-      <div className="wrapper page text-center">
-        <Heading title="My Favorites" subTitle="Your saved recipes" />
-        <VerticalSpace space="16" />
-        <Text as="h2" className="text-destructive mb-4" variant="subheading">
-          Failed to load favorites
-        </Text>
-        <Text variant="large" className="text-muted-foreground mb-8 max-w-md mx-auto">
-          {error}
-        </Text>
-        <button onClick={() => window.location.reload()} className="murakamicity-button mx-auto">
-          Try Again
-        </button>
+      <div className="wrapper page">
+        <PageHeader eyebrow="Dog-eared pages" title="Favorites" />
+        <EmptyState
+          eyebrow="Something went wrong"
+          title="Your favorites wouldn't load."
+          description={error}
+          action={
+            <button type="button" onClick={() => window.location.reload()} className="btn-ink">
+              Try again
+            </button>
+          }
+        />
       </div>
     );
   }
 
   return (
     <div className="wrapper page">
-      <Heading title="My Favorites" subTitle="Your saved recipes" />
-      <VerticalSpace space="16" />
+      <PageHeader
+        eyebrow="Dog-eared pages"
+        title="Favorites"
+        description="The recipes you come back to, saved in one place."
+        aside={
+          favorites.length > 0 ? (
+            <div className="flex items-center gap-6">
+              <span className="mono-label">
+                {total} recipe{total !== 1 ? 's' : ''}
+              </span>
+              <PDFGenerator
+                recipes={favorites.map((fav) => fav.recipe)}
+                title="My Favorite Recipes"
+                autoDownload={shouldAutoDownload}
+                onAutoDownloadComplete={() => setShouldAutoDownload(false)}
+              />
+            </div>
+          ) : undefined
+        }
+      />
 
       {favorites.length === 0 ? (
-        <div className="text-center py-16">
-          <Heart className="w-16 h-16 text-muted-foreground mx-auto mb-6" />
-          <Text as="h2" variant="subheading" className="mb-4">
-            No favorites yet
-          </Text>
-          <Text variant="large" className="text-muted-foreground mb-8 max-w-md mx-auto">
-            Start exploring recipes and add them to your favorites!
-          </Text>
-          <button
-            onClick={() => router.push('/recipes')}
-            className="murakamicity-button flex items-center gap-2 mx-auto"
-          >
-            <Heart className="w-4 h-4" />
-            Browse Recipes
-          </button>
-        </div>
+        <EmptyState
+          eyebrow="Empty shelf"
+          title={
+            <>
+              Nothing dog-eared <span className="italic text-[var(--tomato)]">yet</span>.
+            </>
+          }
+          description="Browse the archive and save the recipes worth repeating."
+          actionLabel="Browse recipes"
+          actionHref="/recipes"
+        />
       ) : (
         <>
-          <div className="mb-6 flex justify-between items-center flex-wrap gap-4">
-            <Text variant="large" className="text-muted-foreground font-medium">
-              {total} favorite recipe
-              {total !== 1 ? 's' : ''}
-            </Text>
-
-            {favorites.length > 0 && (
-              <div className="flex items-center gap-3">
-                <PDFGenerator
-                  recipes={favorites.map((fav) => fav.recipe)}
-                  title="My Favorite Recipes"
-                  autoDownload={shouldAutoDownload}
-                  onAutoDownloadComplete={() => setShouldAutoDownload(false)}
-                />
-              </div>
-            )}
-          </div>
-
           <div className="recipe-grid">
             {favorites.map((favorite) => {
               const actions = (
@@ -207,7 +190,7 @@ function FavoritesContent() {
                   <ActionButton
                     icon={Heart}
                     isActive={true}
-                    activeColor="text-red-500"
+                    activeColor="text-[var(--tomato)]"
                     ariaLabel={`Remove ${favorite.recipe.title} from favorites`}
                     onClick={async (e) => {
                       e.stopPropagation();
@@ -259,26 +242,30 @@ function FavoritesContent() {
           </div>
 
           {total > favorites.length && (
-            <div className="flex justify-center items-center gap-4 mt-8">
+            <nav
+              className="flex items-center justify-between border-t border-[var(--ink-line)] pt-8"
+              aria-label="Favorites pagination"
+            >
               <button
+                type="button"
                 onClick={() => setPage((p) => Math.max(0, p - 1))}
                 disabled={page === 0}
-                className="murakamicity-button-outline disabled:opacity-50 disabled:cursor-not-allowed"
+                className="btn-link disabled:opacity-40 disabled:pointer-events-none"
               >
-                Previous
+                ← Previous
               </button>
-              <Text className="text-muted-foreground">Page {page + 1}</Text>
+              <span className="mono-label">Page {page + 1}</span>
               <button
+                type="button"
                 onClick={() => setPage((p) => p + 1)}
                 disabled={!hasMore}
-                className="murakamicity-button-outline disabled:opacity-50 disabled:cursor-not-allowed"
+                className="btn-link disabled:opacity-40 disabled:pointer-events-none"
               >
-                Next
+                Next →
               </button>
-            </div>
+            </nav>
           )}
 
-          {}
           <RecipePreviewModal
             recipe={previewRecipe}
             isOpen={isPreviewOpen}
@@ -298,13 +285,7 @@ function FavoritesContent() {
 
 export default function FavoritesPage() {
   return (
-    <Suspense
-      fallback={
-        <div className="wrapper page">
-          <div className="animate-pulse">Loading...</div>
-        </div>
-      }
-    >
+    <Suspense fallback={<SkeletonPage />}>
       <FavoritesContent />
     </Suspense>
   );

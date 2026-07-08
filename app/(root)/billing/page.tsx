@@ -3,20 +3,22 @@ import { headers } from 'next/headers';
 import { redirect } from 'next/navigation';
 import { db } from '@/src/db';
 import { userSubscriptions, billingHistory } from '@/src/db/schemas';
-import { getPlanById } from '@/src/lib/subscription';
+import { getEntitlements } from '@/src/lib/entitlements';
+import { getRecipeAccessPrice } from '@/src/config/pricing';
 import { eq, desc } from 'drizzle-orm';
-import { CreditCard, Calendar, Download, Settings } from 'lucide-react';
 import Link from 'next/link';
+import { PageHeader } from '@/src/components/ui/page-header';
+import { EmptyState } from '@/src/components/ui/empty-state';
 
 export const metadata = {
-  title: 'Billing - Recipe Platform',
-  description: 'Manage your subscription and billing',
+  title: 'Billing',
+  description: 'Your purchases, receipts and access.',
 };
 
 function formatPrice(price: number) {
-  return new Intl.NumberFormat('en-US', {
+  return new Intl.NumberFormat('en-GB', {
     style: 'currency',
-    currency: 'USD',
+    currency: 'GBP',
   }).format(price);
 }
 
@@ -28,18 +30,41 @@ export default async function BillingPage() {
     redirect('/sign-in?redirect_url=/billing');
   }
 
-  // Get user's subscription from database
   const [subscription] = await db
     .select()
     .from(userSubscriptions)
     .where(eq(userSubscriptions.userId, userId))
     .limit(1);
 
-  // Simple plan info - TODO: Integrate with Stripe
-  const planId = subscription?.planId || 'free';
-  const plan = getPlanById(planId);
+  const entitlements = await getEntitlements(userId);
 
-  // Get billing history
+  const plan = entitlements.hasRecipeAccess
+    ? {
+        name: 'Lifetime Access',
+        description: 'Unlimited recipe views and favorites, forever.',
+        price: getRecipeAccessPrice().amount / 100,
+        priceNote: 'one-time',
+        features: [
+          'Unlimited recipe views',
+          'Unlimited favorites',
+          'All future recipes included',
+          ...(entitlements.hasPdfAccess
+            ? [`PDF downloads (${entitlements.pdfRecipeLimit} recipes per export)`]
+            : []),
+        ],
+      }
+    : {
+        name: 'Free',
+        description: 'Perfect for getting started.',
+        price: 0,
+        priceNote: 'forever',
+        features: [
+          `${entitlements.limits.recipeViewsPerMonth} recipe views per month`,
+          `Save up to ${entitlements.limits.favoritesLimit} favorites`,
+          'Collections and meal plans',
+        ],
+      };
+
   const history = await db
     .select()
     .from(billingHistory)
@@ -49,164 +74,169 @@ export default async function BillingPage() {
 
   return (
     <div className="wrapper page">
-      <div className="max-w-5xl mx-auto px-4 py-16">
-        <h1 className="text-4xl font-bold text-gray-900 mb-8">Billing & Subscription</h1>
+      <PageHeader
+        eyebrow="Account"
+        title="Billing"
+        description="Your access, purchases and receipts — all in one place."
+      />
 
-        {/* Current Plan */}
-        <div className="bg-white rounded-lg shadow-md p-6 mb-8">
-          <div className="flex items-start justify-between mb-4">
-            <div>
-              <h2 className="text-2xl font-bold text-gray-900 mb-2">{plan?.name || 'Free'} Plan</h2>
-              <p className="text-gray-700">{plan?.description}</p>
+      {/* Current access */}
+      <section className="grid grid-cols-1 md:grid-cols-5 gap-10">
+        <div className="md:col-span-3 flex flex-col gap-6 bg-[var(--parchment)] p-8 md:p-10">
+          <div className="flex items-start justify-between gap-6 flex-wrap">
+            <div className="flex flex-col gap-2">
+              <span className="eyebrow">Your access</span>
+              <h2 className="heading">{plan.name}</h2>
+              <p className="text-sm text-[var(--ink-65)]">{plan.description}</p>
             </div>
-            <Link
-              href="/pricing"
-              className="bg-[#6c47ff] text-white px-4 py-2 rounded-lg hover:bg-[#5a3dd4] transition-colors"
-            >
-              Change Plan
-            </Link>
+            <p className="font-serif text-4xl">
+              {formatPrice(plan.price)}{' '}
+              <span className="text-base text-[var(--ink-50)]">{plan.priceNote}</span>
+            </p>
           </div>
+          <ul className="flex flex-col divide-y divide-[var(--ink-line)] text-sm text-[var(--ink-75)]">
+            {plan.features.map((feature) => (
+              <li key={feature} className="py-3">
+                {feature}
+              </li>
+            ))}
+          </ul>
+          {!entitlements.hasRecipeAccess && (
+            <Link href="/pricing" className="btn-tomato self-start">
+              Get lifetime access
+            </Link>
+          )}
+        </div>
+
+        <div className="md:col-span-2 flex flex-col gap-6 border-t border-[var(--ink)] pt-8">
+          <span className="eyebrow">This month</span>
+          <dl className="flex flex-col divide-y divide-[var(--ink-line)]">
+            <div className="flex items-baseline justify-between py-3">
+              <dt className="text-sm text-[var(--ink-65)]">Recipe views</dt>
+              <dd className="font-serif text-2xl">
+                {entitlements.hasRecipeAccess
+                  ? '∞'
+                  : `${entitlements.usage.recipeViews} / ${entitlements.limits.recipeViewsPerMonth}`}
+              </dd>
+            </div>
+            <div className="flex items-baseline justify-between py-3">
+              <dt className="text-sm text-[var(--ink-65)]">PDF exports</dt>
+              <dd className="font-serif text-2xl">{entitlements.usage.pdfExports}</dd>
+            </div>
+            <div className="flex items-baseline justify-between py-3">
+              <dt className="text-sm text-[var(--ink-65)]">Collections created</dt>
+              <dd className="font-serif text-2xl">{entitlements.usage.collectionsCount}</dd>
+            </div>
+          </dl>
 
           {subscription && (
-            <div className="grid md:grid-cols-2 gap-4 mt-6 pt-6 border-t">
-              <div className="flex items-center gap-3">
-                <CreditCard className="w-5 h-5 text-gray-500" />
-                <div>
-                  <p className="text-sm text-gray-700">Amount</p>
-                  <p className="font-semibold text-gray-900">
-                    {formatPrice(plan?.price || 0)}/month
-                  </p>
-                </div>
-              </div>
-              <div className="flex items-center gap-3">
-                <Calendar className="w-5 h-5 text-gray-500" />
-                <div>
-                  <p className="text-sm text-gray-700">Next Billing Date</p>
-                  <p className="font-semibold text-gray-900">
-                    {subscription.currentPeriodEnd
-                      ? new Date(subscription.currentPeriodEnd).toLocaleDateString()
-                      : 'N/A'}
-                  </p>
-                </div>
-              </div>
-              <div className="flex items-center gap-3">
-                <Settings className="w-5 h-5 text-gray-500" />
-                <div>
-                  <p className="text-sm text-gray-700">Status</p>
-                  <p className="font-semibold text-gray-900 capitalize">{subscription.status}</p>
-                </div>
-              </div>
-            </div>
-          )}
-
-          {subscription?.cancelAtPeriodEnd && (
-            <div className="mt-4 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
-              <p className="text-yellow-800">
-                Your subscription will be canceled at the end of the current billing period (
-                {subscription.currentPeriodEnd
-                  ? new Date(subscription.currentPeriodEnd).toLocaleDateString()
-                  : 'N/A'}
-                ).
+            <div className="flex flex-col gap-3 border-t border-[var(--ink-line)] pt-6">
+              <span className="eyebrow">Legacy subscription</span>
+              <p className="text-sm text-[var(--ink-65)]">
+                Status: <span className="capitalize text-[var(--ink)]">{subscription.status}</span>
+                {subscription.currentPeriodEnd && (
+                  <>
+                    {' '}
+                    · renews {new Date(subscription.currentPeriodEnd).toLocaleDateString('en-GB')}
+                  </>
+                )}
               </p>
+              {subscription.cancelAtPeriodEnd && (
+                <p className="text-sm text-[var(--tomato)]">
+                  Cancels at the end of the current period.
+                </p>
+              )}
+              {subscription.stripeCustomerId && (
+                <form action="/api/billing/portal" method="POST">
+                  <button type="submit" className="btn-outline">
+                    Manage billing in Stripe
+                  </button>
+                </form>
+              )}
             </div>
           )}
         </div>
+      </section>
 
-        {/* Plan Features */}
-        {plan && (
-          <div className="bg-white rounded-lg shadow-md p-6 mb-8">
-            <h2 className="text-xl font-bold text-gray-900 mb-4">Your Plan Includes</h2>
-            <ul className="grid md:grid-cols-2 gap-3">
-              {plan.features.map((feature, index) => (
-                <li key={index} className="flex items-center gap-2">
-                  <div className="w-2 h-2 bg-[#6c47ff] rounded-full" />
-                  <span className="text-gray-800">{feature}</span>
-                </li>
-              ))}
-            </ul>
-          </div>
-        )}
+      {/* History */}
+      <section className="flex flex-col gap-8">
+        <div className="flex flex-col gap-4">
+          <span className="eyebrow-rule">Receipts</span>
+          <h2 className="display-s">Billing history</h2>
+        </div>
 
-        {/* Billing History */}
-        <div className="bg-white rounded-lg shadow-md p-6">
-          <h2 className="text-xl font-bold text-gray-900 mb-4">Billing History</h2>
-
-          {history.length === 0 ? (
-            <p className="text-gray-700 text-center py-8">No billing history yet</p>
-          ) : (
-            <div className="overflow-x-auto">
-              <table className="w-full">
-                <thead className="border-b">
-                  <tr className="text-left">
-                    <th className="pb-3 font-semibold text-gray-900">Date</th>
-                    <th className="pb-3 font-semibold text-gray-900">Description</th>
-                    <th className="pb-3 font-semibold text-gray-900">Amount</th>
-                    <th className="pb-3 font-semibold text-gray-900">Status</th>
-                    <th className="pb-3 font-semibold text-gray-900">Invoice</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {history.map((item) => (
-                    <tr key={item.id} className="border-b last:border-b-0">
-                      <td className="py-4 text-gray-800">
-                        {new Date(item.billingDate).toLocaleDateString()}
-                      </td>
-                      <td className="py-4 text-gray-800">
-                        {item.description || 'Subscription payment'}
-                      </td>
-                      <td className="py-4 text-gray-900 font-medium">
-                        {formatPrice(parseFloat(item.amount))}
-                      </td>
-                      <td className="py-4">
-                        <span
-                          className={`px-2 py-1 rounded text-sm font-medium ${
+        {history.length === 0 ? (
+          <EmptyState
+            eyebrow="No receipts yet"
+            title={
+              <>
+                A clean <span className="italic text-[var(--tomato)]">ledger</span>.
+              </>
+            }
+            description="Purchases and payments will appear here once you make one."
+            actionLabel="See pricing"
+            actionHref="/pricing"
+          />
+        ) : (
+          <div className="overflow-x-auto">
+            <table className="w-full border-collapse">
+              <thead>
+                <tr className="border-b border-[var(--ink)] text-left">
+                  <th className="eyebrow py-4 font-medium">Date</th>
+                  <th className="eyebrow py-4 font-medium">Description</th>
+                  <th className="eyebrow py-4 font-medium">Amount</th>
+                  <th className="eyebrow py-4 font-medium">Status</th>
+                  <th className="eyebrow py-4 font-medium">Invoice</th>
+                </tr>
+              </thead>
+              <tbody>
+                {history.map((item) => (
+                  <tr key={item.id} className="border-b border-[var(--ink-line)]">
+                    <td className="py-4 text-sm text-[var(--ink-75)]">
+                      {new Date(item.billingDate).toLocaleDateString('en-GB')}
+                    </td>
+                    <td className="py-4 text-sm text-[var(--ink)]">
+                      {item.description || 'Payment'}
+                    </td>
+                    <td className="py-4 font-serif text-lg">
+                      {formatPrice(parseFloat(item.amount))}
+                    </td>
+                    <td className="py-4">
+                      <span
+                        className="mono-label"
+                        style={{
+                          color:
                             item.status === 'succeeded'
-                              ? 'bg-green-100 text-green-800'
+                              ? 'var(--olive)'
                               : item.status === 'failed'
-                                ? 'bg-red-100 text-red-800'
-                                : 'bg-gray-100 text-gray-800'
-                          }`}
+                                ? 'var(--tomato)'
+                                : 'var(--ink-60)',
+                        }}
+                      >
+                        {item.status}
+                      </span>
+                    </td>
+                    <td className="py-4">
+                      {item.invoiceUrl ? (
+                        <a
+                          href={item.invoiceUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="btn-link text-sm"
                         >
-                          {item.status}
-                        </span>
-                      </td>
-                      <td className="py-4">
-                        {item.invoiceUrl ? (
-                          <a
-                            href={item.invoiceUrl}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="text-[#6c47ff] hover:text-[#5a3dd4] hover:underline flex items-center gap-1 font-medium"
-                          >
-                            <Download className="w-4 h-4" />
-                            Download
-                          </a>
-                        ) : (
-                          <span className="text-gray-500">N/A</span>
-                        )}
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          )}
-        </div>
-
-        {/* Manage Subscription */}
-        {subscription && subscription.stripeCustomerId && (
-          <div className="mt-8 text-center">
-            <form action="/api/billing/portal" method="POST">
-              <button
-                type="submit"
-                className="text-gray-700 hover:text-gray-900 underline font-medium"
-              >
-                Manage subscription in Stripe
-              </button>
-            </form>
+                          Download
+                        </a>
+                      ) : (
+                        <span className="text-sm text-[var(--ink-50)]">—</span>
+                      )}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
           </div>
         )}
-      </div>
+      </section>
     </div>
   );
 }

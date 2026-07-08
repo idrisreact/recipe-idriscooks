@@ -250,14 +250,14 @@ export default function MealPlanDetailPage() {
           <div className="flex gap-4 justify-center">
             <button
               onClick={() => setShowSignInModal(true)}
-              className="murakamicity-button flex items-center gap-2"
+              className="btn-ink flex items-center gap-2"
             >
               <LogIn className="w-4 h-4" />
               Sign In
             </button>
             <button
               onClick={() => router.push('/meal-plans')}
-              className="murakamicity-button-outline flex items-center gap-2"
+              className="btn-outline flex items-center gap-2"
             >
               Back to Plans
             </button>
@@ -272,7 +272,7 @@ export default function MealPlanDetailPage() {
   if (isLoading) {
     return (
       <div className="wrapper page">
-        <div className="murakamicity-card p-6 animate-pulse h-40" />
+        <div className="card-editorial p-6 animate-pulse h-40" />
       </div>
     );
   }
@@ -286,7 +286,7 @@ export default function MealPlanDetailPage() {
         <Text variant="large" className="text-muted-foreground mb-8 max-w-md mx-auto">
           {error.message}
         </Text>
-        <button onClick={() => router.push('/meal-plans')} className="murakamicity-button">
+        <button onClick={() => router.push('/meal-plans')} className="btn-ink">
           Back to Plans
         </button>
       </div>
@@ -299,7 +299,7 @@ export default function MealPlanDetailPage() {
         <Text as="h2" className="text-muted-foreground mb-4" variant="subheading">
           Meal plan not found
         </Text>
-        <button onClick={() => router.push('/meal-plans')} className="murakamicity-button">
+        <button onClick={() => router.push('/meal-plans')} className="btn-ink">
           Back to Plans
         </button>
       </div>
@@ -317,22 +317,19 @@ export default function MealPlanDetailPage() {
       <div className="flex items-center justify-between flex-wrap gap-4">
         <button
           onClick={() => router.push('/meal-plans')}
-          className="murakamicity-button-outline flex items-center gap-2"
+          className="btn-outline flex items-center gap-2"
         >
           <ArrowLeft className="w-4 h-4" />
           Back to Plans
         </button>
         <div className="flex items-center gap-3 flex-wrap">
-          <button
-            onClick={handleArchive}
-            className="murakamicity-button-outline flex items-center gap-2"
-          >
+          <button onClick={handleArchive} className="btn-outline flex items-center gap-2">
             <Archive className="w-4 h-4" />
             {plan.status === 'archived' ? 'Restore Plan' : 'Archive Plan'}
           </button>
           <button
             onClick={handleDeletePlan}
-            className="murakamicity-button-outline flex items-center gap-2 text-destructive border-destructive"
+            className="btn-outline flex items-center gap-2 text-destructive border-destructive"
           >
             <Trash2 className="w-4 h-4" />
             Delete
@@ -352,7 +349,7 @@ export default function MealPlanDetailPage() {
 
       <VerticalSpace space="8" />
 
-      <div className="murakamicity-card p-6">
+      <div className="card-editorial p-6">
         <div className="flex items-center justify-between flex-wrap gap-4">
           <div>
             <Text as="h3" variant="subheading">
@@ -375,7 +372,7 @@ export default function MealPlanDetailPage() {
       <VerticalSpace space="12" />
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div className="murakamicity-card p-6 md:col-span-2">
+        <div className="card-editorial p-6 md:col-span-2">
           <Text as="h3" variant="subheading" className="mb-4">
             Plan Details
           </Text>
@@ -400,7 +397,7 @@ export default function MealPlanDetailPage() {
             </Text>
           )}
         </div>
-        <div className="murakamicity-card p-6">
+        <div className="card-editorial p-6">
           <Text as="h3" variant="subheading" className="mb-4">
             Quick Tips
           </Text>
@@ -422,7 +419,7 @@ export default function MealPlanDetailPage() {
           return (
             <div
               key={day}
-              className={`murakamicity-card p-4 flex flex-col gap-4 ${
+              className={`card-editorial p-4 flex flex-col gap-4 ${
                 highlight ? 'border border-primary' : ''
               }`}
             >
@@ -443,7 +440,10 @@ export default function MealPlanDetailPage() {
                   return (
                     <div key={meal.key} className="border border-border rounded-lg p-3">
                       <div className="flex items-center justify-between gap-2 mb-2">
-                        <Text variant="xs" className="text-muted-foreground uppercase tracking-wide">
+                        <Text
+                          variant="xs"
+                          className="text-muted-foreground uppercase tracking-wide"
+                        >
                           {meal.label}
                         </Text>
                         {item && (
@@ -511,10 +511,7 @@ export default function MealPlanDetailPage() {
               <Text as="h3" variant="subheading">
                 Add Recipe
               </Text>
-              <button
-                onClick={closePicker}
-                className="text-gray-500 hover:text-gray-700"
-              >
+              <button onClick={closePicker} className="text-gray-500 hover:text-gray-700">
                 Close
               </button>
             </div>
@@ -537,7 +534,10 @@ export default function MealPlanDetailPage() {
             ) : results.length === 0 ? (
               <div className="text-center py-6 text-muted-foreground">No recipes found.</div>
             ) : (
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 max-h-[50vh] overflow-y-auto">
+              <div
+                className="grid grid-cols-1 sm:grid-cols-2 gap-4 max-h-[50vh] overflow-y-auto"
+                data-lenis-prevent
+              >
                 {results.map((recipe) => (
                   <button
                     key={recipe.id}

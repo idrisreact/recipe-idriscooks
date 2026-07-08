@@ -17,7 +17,7 @@ export default function SubscriptionStatus() {
 
   if (isPending) {
     return (
-      <div className="murakamicity-card p-6 animate-pulse">
+      <div className="card-editorial p-6 animate-pulse">
         <div className="h-4 bg-muted rounded w-3/4 mb-3"></div>
         <div className="h-3 bg-muted rounded w-1/2"></div>
       </div>
@@ -26,7 +26,7 @@ export default function SubscriptionStatus() {
 
   if (!session) {
     return (
-      <div className="murakamicity-card p-6 border-dashed border-2">
+      <div className="card-editorial p-6 border-dashed border-2">
         <div className="text-center">
           <Text className="text-muted-foreground">Sign in to view your plan</Text>
         </div>
@@ -37,7 +37,7 @@ export default function SubscriptionStatus() {
   const isPdfPlan = currentPlan === 'pdf';
 
   return (
-    <div className="murakamicity-card p-6">
+    <div className="card-editorial p-6">
       <div className="flex items-center gap-4 mb-4">
         {isPdfPlan ? (
           <FileText className="w-8 h-8 text-primary" />

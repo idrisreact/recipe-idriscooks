@@ -152,7 +152,7 @@ export default function AddToShoppingListButton({
               </p>
             </div>
 
-            <div className="max-h-64 overflow-y-auto">
+            <div className="max-h-64 overflow-y-auto" data-lenis-prevent>
               {lists && lists.length > 0 ? (
                 <div className="p-2">
                   {lists.map((list) => (

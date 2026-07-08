@@ -28,9 +28,9 @@ export const Text = <T extends ElementTag = 'p'>({
     large: 'text-lg leading-relaxed',
     small: 'text-sm leading-normal',
     xs: 'text-xs leading-tight',
-    heading: 'text-3xl md:text-4xl lg:text-5xl font-bold leading-tight',
-    subheading: 'text-xl md:text-2xl font-semibold leading-snug',
-    caption: 'text-xs uppercase tracking-wide font-medium',
+    heading: 'font-serif text-4xl md:text-5xl lg:text-6xl font-normal leading-tight',
+    subheading: 'font-serif text-2xl md:text-3xl font-normal leading-snug',
+    caption: 'font-mono text-xs uppercase tracking-[0.2em] font-medium',
   };
 
   const weightClasses = {
@@ -43,7 +43,7 @@ export const Text = <T extends ElementTag = 'p'>({
   };
 
   const opacityClass = `opacity-${opacity}`;
-  const gradientClass = gradient ? 'murakamicity-text-gradient' : '';
+  const gradientClass = gradient ? 'italic-tomato' : '';
 
   return (
     <Component

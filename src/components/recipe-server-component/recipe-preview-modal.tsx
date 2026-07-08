@@ -72,7 +72,7 @@ export const RecipePreviewModal = ({
               size="sm"
               variant="secondary"
               onClick={async () => await onFavorite(recipe.id)}
-              className="murakamicity-button-outline bg-background/90 hover:bg-background"
+              className="btn-outline bg-background/90 hover:bg-background"
             >
               <Heart
                 className={`w-4 h-4 ${
@@ -84,7 +84,7 @@ export const RecipePreviewModal = ({
               size="sm"
               variant="secondary"
               onClick={shareRecipe}
-              className="murakamicity-button-outline bg-background/90 hover:bg-background"
+              className="btn-outline bg-background/90 hover:bg-background"
             >
               <Share2 className="w-4 h-4 text-foreground" />
             </Button>
@@ -92,7 +92,7 @@ export const RecipePreviewModal = ({
               size="sm"
               variant="secondary"
               onClick={onClose}
-              className="murakamicity-button-outline bg-background/90 hover:bg-background"
+              className="btn-outline bg-background/90 hover:bg-background"
             >
               <X className="w-4 h-4 text-foreground" />
             </Button>
@@ -115,7 +115,7 @@ export const RecipePreviewModal = ({
         </div>
 
         {}
-        <div className="p-6 overflow-y-auto max-h-[calc(90vh-12rem)]">
+        <div className="p-6 overflow-y-auto max-h-[calc(90vh-12rem)]" data-lenis-prevent>
           <Text className="text-muted-foreground mb-6">{recipe.description}</Text>
 
           {}
@@ -202,11 +202,11 @@ export const RecipePreviewModal = ({
         {}
         <div className="p-6 border-t border-border bg-muted">
           <div className="flex gap-3">
-            <Button onClick={() => onNavigate(recipe)} className="flex-1 murakamicity-button">
+            <Button onClick={() => onNavigate(recipe)} className="flex-1 btn-ink">
               <BookOpen className="w-4 h-4 mr-2" />
               View Full Recipe
             </Button>
-            <Button variant="outline" onClick={onClose} className="murakamicity-button-outline">
+            <Button variant="outline" onClick={onClose} className="btn-outline">
               Close
             </Button>
           </div>

@@ -48,7 +48,13 @@ export default function CookModePage() {
     queryFn: async () => {
       const res = await fetch(`/api/recipes/${params.id}`);
       if (!res.ok) throw new Error('Failed to fetch recipe');
-      return res.json();
+      const data = await res.json();
+      if (data.restricted) {
+        throw new Error(
+          'This recipe needs full access. Sign in or get lifetime access to use cooking mode.'
+        );
+      }
+      return data;
     },
   });
 
@@ -119,16 +125,19 @@ export default function CookModePage() {
   }
 
   if (error || !recipe) {
+    const isRestricted = error instanceof Error && error.message.includes('full access');
     return (
       <div className="min-h-screen bg-black flex items-center justify-center text-white">
         <div className="text-center max-w-md px-6">
-          <h2 className="text-2xl font-bold mb-4">Recipe Not Found</h2>
+          <h2 className="text-2xl font-bold mb-4">
+            {isRestricted ? 'Unlock Cooking Mode' : 'Recipe Not Found'}
+          </h2>
           <p className="text-white/60 mb-8">
-            We couldn&apos;t load the recipe you&apos;re looking for.
+            {isRestricted ? error.message : "We couldn't load the recipe you're looking for."}
           </p>
-          <Link href="/recipes">
+          <Link href={isRestricted ? '/pricing' : '/recipes'}>
             <button className="px-8 py-3 bg-white text-black font-bold uppercase tracking-wide hover:bg-[var(--primary)] hover:text-white transition-colors">
-              Back to Recipes
+              {isRestricted ? 'See Pricing' : 'Back to Recipes'}
             </button>
           </Link>
         </div>

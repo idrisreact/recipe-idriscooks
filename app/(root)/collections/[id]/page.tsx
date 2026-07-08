@@ -55,7 +55,7 @@ export default function CollectionDetailPage() {
   if (isLoading) {
     return (
       <div className="wrapper page">
-        <div className="murakamicity-card p-6 animate-pulse h-40" />
+        <div className="card-editorial p-6 animate-pulse h-40" />
       </div>
     );
   }
@@ -69,7 +69,7 @@ export default function CollectionDetailPage() {
         <Text variant="large" className="text-muted-foreground mb-8 max-w-md mx-auto">
           {errorMessage}
         </Text>
-        <button onClick={() => router.push('/collections')} className="murakamicity-button">
+        <button onClick={() => router.push('/collections')} className="btn-ink">
           Back to Collections
         </button>
       </div>
@@ -82,7 +82,7 @@ export default function CollectionDetailPage() {
         <Text as="h2" className="text-muted-foreground mb-4" variant="subheading">
           Collection not found
         </Text>
-        <button onClick={() => router.push('/collections')} className="murakamicity-button">
+        <button onClick={() => router.push('/collections')} className="btn-ink">
           Back to Collections
         </button>
       </div>
@@ -94,14 +94,14 @@ export default function CollectionDetailPage() {
       <div className="flex items-center justify-between flex-wrap gap-4">
         <button
           onClick={() => router.push('/collections')}
-          className="murakamicity-button-outline flex items-center gap-2"
+          className="btn-outline flex items-center gap-2"
         >
           <ArrowLeft className="w-4 h-4" />
           Back to Collections
         </button>
         <button
           onClick={handleDeleteCollection}
-          className="murakamicity-button-outline flex items-center gap-2 text-destructive border-destructive"
+          className="btn-outline flex items-center gap-2 text-destructive border-destructive"
         >
           <Trash2 className="w-4 h-4" />
           Delete Collection
@@ -111,7 +111,10 @@ export default function CollectionDetailPage() {
       <VerticalSpace space="12" />
 
       <div className="flex items-start justify-between flex-wrap gap-4">
-        <Heading title={collection.name} subTitle={collection.description || 'Your saved recipes'} />
+        <Heading
+          title={collection.name}
+          subTitle={collection.description || 'Your saved recipes'}
+        />
         <div className="text-sm text-muted-foreground">
           {collection.recipeCount} recipe{collection.recipeCount === 1 ? '' : 's'}
         </div>
@@ -128,7 +131,7 @@ export default function CollectionDetailPage() {
           <Text variant="large" className="text-muted-foreground mb-8 max-w-md mx-auto">
             Start adding recipes to build your collection.
           </Text>
-          <button onClick={() => router.push('/recipes')} className="murakamicity-button">
+          <button onClick={() => router.push('/recipes')} className="btn-ink">
             Browse Recipes
           </button>
         </div>

@@ -7,9 +7,8 @@ import { db } from '@/src/db';
 import { recipes as recipesTable, reviews } from '@/src/db/schemas';
 import { eq, sql } from 'drizzle-orm';
 import { Recipe } from '@/src/types/recipes.types';
-import { incrementUsage, getUserUsage } from '@/src/lib/subscription';
+import { getEntitlements, incrementUsage } from '@/src/lib/entitlements';
 import Link from 'next/link';
-import { checkRecipeAccess } from '@/src/utils/check-recipe-access';
 import { RecipeAccessButton } from '@/src/components/payment/recipe-access-button';
 import { getRecipeAccessPrice, PRICING } from '@/src/config/pricing';
 import { generateRecipeSchema, getCanonicalUrl, getOgImageUrl } from '@/src/utils/seo';
@@ -95,19 +94,12 @@ export default async function RecipePage({ params }: PageProps) {
   const session = await auth.api.getSession({ headers: await headers() });
   const userId = session?.user?.id;
 
-  // Check if user has paid for recipe access (only if logged in)
-  const hasUnlimitedViews = userId ? await checkRecipeAccess(userId) : false;
+  const entitlements = userId ? await getEntitlements(userId) : null;
+  const hasUnlimitedViews = entitlements?.hasRecipeAccess ?? false;
 
   // Get current pricing
   const pricing = getRecipeAccessPrice();
   const isLaunchSpecial = PRICING.recipeAccess.isLaunchSpecial;
-
-  // Debug logging
-  console.log('🔍 Debug - User access check:', {
-    userId,
-    hasUnlimitedViews,
-    checkingPlan: true,
-  });
 
   // Fetch the recipe first (we need it for the preview)
   const [recipe] = await db
@@ -121,28 +113,21 @@ export default async function RecipePage({ params }: PageProps) {
   }
 
   // For free users, check usage limits
-  let usage = null;
-  const FREE_PLAN_LIMIT = 3;
+  let usage = entitlements?.usage ?? null;
+  const FREE_PLAN_LIMIT = PRICING.freeTier.recipeViewsPerMonth;
   let showPaywall = false;
 
   // If user is not logged in, show sign-in paywall
   if (!userId) {
     showPaywall = true;
-  } else if (!hasUnlimitedViews) {
-    // For logged-in free users, check usage limits
-    usage = await getUserUsage();
-
-    // Check if free user has reached limit
-    if (usage && usage.recipeViews >= FREE_PLAN_LIMIT) {
-      showPaywall = true;
-    }
+  } else if (!hasUnlimitedViews && usage && usage.recipeViews >= FREE_PLAN_LIMIT) {
+    showPaywall = true;
   }
 
   // Increment view counter ONLY if logged in and not showing paywall (only for free users who haven't hit limit)
-  if (userId && !hasUnlimitedViews && !showPaywall) {
-    await incrementUsage('recipeViews');
-    // Get updated usage for display
-    usage = await getUserUsage();
+  if (userId && !hasUnlimitedViews && !showPaywall && usage) {
+    await incrementUsage(userId, 'recipeViews');
+    usage = { ...usage, recipeViews: usage.recipeViews + 1 };
   }
 
   // Fetch review stats for SEO schema

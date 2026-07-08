@@ -168,14 +168,14 @@ export default function MealPlansPage() {
           <div className="flex gap-4 justify-center">
             <button
               onClick={() => setShowSignInModal(true)}
-              className="murakamicity-button flex items-center gap-2"
+              className="btn-ink flex items-center gap-2"
             >
               <LogIn className="w-4 h-4" />
               Sign In
             </button>
             <button
               onClick={() => router.push('/recipes')}
-              className="murakamicity-button-outline flex items-center gap-2"
+              className="btn-outline flex items-center gap-2"
             >
               Browse Recipes
             </button>
@@ -219,7 +219,7 @@ export default function MealPlansPage() {
             );
 
             return (
-              <div key={plan.id} className="murakamicity-card p-6 flex flex-col gap-4">
+              <div key={plan.id} className="card-editorial p-6 flex flex-col gap-4">
                 <div className="flex items-start justify-between gap-4">
                   <div>
                     <h3 className="text-lg font-semibold text-foreground">{plan.name}</h3>
@@ -240,10 +240,7 @@ export default function MealPlansPage() {
                     <span>{progress}%</span>
                   </div>
                   <div className="h-2 bg-muted rounded-full overflow-hidden">
-                    <div
-                      className="h-full bg-[var(--primary)]"
-                      style={{ width: `${progress}%` }}
-                    />
+                    <div className="h-full bg-[var(--primary)]" style={{ width: `${progress}%` }} />
                   </div>
                 </div>
 
@@ -264,7 +261,7 @@ export default function MealPlansPage() {
                 <div className="mt-auto flex gap-3">
                   <button
                     onClick={() => router.push(`/meal-plans/${plan.id}`)}
-                    className="murakamicity-button-outline flex-1"
+                    className="btn-outline flex-1"
                   >
                     View Plan
                   </button>
@@ -272,7 +269,7 @@ export default function MealPlansPage() {
                     onClick={() =>
                       handleArchive(plan.id, plan.status === 'archived' ? 'active' : 'archived')
                     }
-                    className="murakamicity-button-outline flex items-center gap-2"
+                    className="btn-outline flex items-center gap-2"
                   >
                     <Archive className="w-4 h-4" />
                     {plan.status === 'archived' ? 'Restore' : 'Archive'}
@@ -293,7 +290,7 @@ export default function MealPlansPage() {
           <Heading title="Meal Plans" subTitle="Plan your week, keep momentum" />
           <button
             onClick={() => setShowCreate((prev) => !prev)}
-            className="murakamicity-button flex items-center gap-2"
+            className="btn-ink flex items-center gap-2"
           >
             <Plus className="w-4 h-4" />
             {showCreate ? 'Close' : 'New Plan'}
@@ -301,14 +298,12 @@ export default function MealPlansPage() {
         </div>
 
         {showCreate && (
-          <form onSubmit={handleCreate} className="murakamicity-card p-6 max-w-3xl">
+          <form onSubmit={handleCreate} className="card-editorial p-6 max-w-3xl">
             <h2 className="text-xl font-semibold text-primary mb-6">Create Meal Plan</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="space-y-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Plan Name
-                  </label>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Plan Name</label>
                   <input
                     type="text"
                     value={name}
@@ -349,13 +344,13 @@ export default function MealPlansPage() {
                   <label className="block text-sm font-medium text-gray-700 mb-2">
                     Default Servings
                   </label>
-                <input
-                  type="number"
-                  min={1}
-                  value={servings}
-                  onChange={(event) => setServings(Number(event.target.value) || 1)}
-                  className="w-full px-3 py-2 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
-                />
+                  <input
+                    type="number"
+                    min={1}
+                    value={servings}
+                    onChange={(event) => setServings(Number(event.target.value) || 1)}
+                    className="w-full px-3 py-2 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
+                  />
                 </div>
 
                 <div>
@@ -403,15 +398,11 @@ export default function MealPlansPage() {
               <button
                 type="submit"
                 disabled={createMealPlan.isPending}
-                className="murakamicity-button flex-1 disabled:opacity-60 disabled:cursor-not-allowed"
+                className="btn-ink flex-1 disabled:opacity-60 disabled:cursor-not-allowed"
               >
                 {createMealPlan.isPending ? 'Creating...' : 'Create Plan'}
               </button>
-              <button
-                type="button"
-                onClick={() => setShowCreate(false)}
-                className="murakamicity-button-outline"
-              >
+              <button type="button" onClick={() => setShowCreate(false)} className="btn-outline">
                 Cancel
               </button>
             </div>
@@ -424,7 +415,7 @@ export default function MealPlansPage() {
       {isLoading ? (
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
           {[...Array(6)].map((_, i) => (
-            <div key={i} className="murakamicity-card p-6 animate-pulse h-40" />
+            <div key={i} className="card-editorial p-6 animate-pulse h-40" />
           ))}
         </div>
       ) : errorMessage ? (
@@ -435,7 +426,7 @@ export default function MealPlansPage() {
           <Text variant="large" className="text-muted-foreground mb-8 max-w-md mx-auto">
             {errorMessage}
           </Text>
-          <button onClick={() => window.location.reload()} className="murakamicity-button">
+          <button onClick={() => window.location.reload()} className="btn-ink">
             Try Again
           </button>
         </div>
@@ -450,7 +441,7 @@ export default function MealPlansPage() {
           </Text>
           <button
             onClick={() => setShowCreate(true)}
-            className="murakamicity-button flex items-center gap-2 mx-auto"
+            className="btn-ink flex items-center gap-2 mx-auto"
           >
             <Plus className="w-4 h-4" />
             Create Plan
@@ -458,29 +449,17 @@ export default function MealPlansPage() {
         </div>
       ) : (
         <div className="space-y-12">
-          {renderPlanSection(
-            'This Week',
-            categorizedPlans.current,
-            'No plans for this week yet.'
-          )}
-          {renderPlanSection(
-            'Upcoming',
-            categorizedPlans.upcoming,
-            'No upcoming plans scheduled.'
-          )}
+          {renderPlanSection('This Week', categorizedPlans.current, 'No plans for this week yet.')}
+          {renderPlanSection('Upcoming', categorizedPlans.upcoming, 'No upcoming plans scheduled.')}
           {renderPlanSection('Past Weeks', categorizedPlans.past, 'No past plans saved.')}
           {categorizedPlans.archived.length > 0 &&
-            renderPlanSection(
-              'Archived',
-              categorizedPlans.archived,
-              'No archived plans yet.'
-            )}
+            renderPlanSection('Archived', categorizedPlans.archived, 'No archived plans yet.')}
         </div>
       )}
 
       <VerticalSpace space="16" />
 
-      <div className="murakamicity-card p-6">
+      <div className="card-editorial p-6">
         <div className="flex items-start gap-4">
           <CheckCircle2 className="w-6 h-6 text-primary" />
           <div>
@@ -488,8 +467,8 @@ export default function MealPlansPage() {
               Stay consistent
             </Text>
             <Text className="text-muted-foreground">
-              Check off meals as you cook them. The more you finish, the easier next week’s
-              planning becomes.
+              Check off meals as you cook them. The more you finish, the easier next week’s planning
+              becomes.
             </Text>
           </div>
         </div>

@@ -1,12 +1,20 @@
 'use client';
 
-import { useRef } from 'react';
+import { useEffect, useRef } from 'react';
 import { gsap } from 'gsap';
 import { useGsapTimeline } from '@/src/hooks/use-gsap-animation';
 import { useSessionStorage } from '@/src/hooks/use-session-storage';
+import { useMotionStore } from '@/src/store/motion-store';
 
 export default function IntroLoader() {
   const [hasSeenIntro, setHasSeenIntro] = useSessionStorage('hasSeenIntro', false);
+  const setIntroDone = useMotionStore((state) => state.setIntroDone);
+
+  useEffect(() => {
+    if (hasSeenIntro) {
+      setIntroDone(true);
+    }
+  }, [hasSeenIntro, setIntroDone]);
   const logoRef = useRef<HTMLDivElement>(null);
   const textRef = useRef<HTMLDivElement>(null);
   const taglineRef = useRef<HTMLDivElement>(null);
@@ -23,54 +31,57 @@ export default function IntroLoader() {
       gsap.set(taglineRef.current, { y: 30, opacity: 0 });
       gsap.set(lineRef.current, { scaleX: 0 });
 
+      // Kept tight: the curtain delays the page's first contentful paint,
+      // so the whole sequence must stay well under ~2.5s.
       tl.to(logoRef.current, {
         scale: 1,
         opacity: 1,
-        duration: 0.8,
+        duration: 0.45,
         ease: 'power3.out',
-        delay: 0.3,
+        delay: 0.1,
       })
         .to(
           lineRef.current,
           {
             scaleX: 1,
-            duration: 0.6,
+            duration: 0.35,
             ease: 'power2.out',
           },
-          '-=0.4'
+          '-=0.25'
         )
         .to(
           textRef.current,
           {
             y: 0,
             opacity: 1,
-            duration: 0.8,
+            duration: 0.45,
             ease: 'power3.out',
           },
-          '-=0.3'
+          '-=0.2'
         )
         .to(
           taglineRef.current,
           {
             y: 0,
             opacity: 1,
-            duration: 0.6,
+            duration: 0.35,
             ease: 'power3.out',
           },
-          '-=0.4'
+          '-=0.25'
         )
         .to([logoRef.current, textRef.current, taglineRef.current, lineRef.current], {
           opacity: 0,
           y: -40,
-          duration: 0.6,
+          duration: 0.4,
           ease: 'power3.in',
-          stagger: 0.05,
-          delay: 1.2,
+          stagger: 0.04,
+          delay: 0.4,
         })
         .to(curtainRef.current, {
           yPercent: -100,
-          duration: 1,
+          duration: 0.7,
           ease: 'power4.inOut',
+          onStart: () => setIntroDone(true),
         })
         .to(containerRef.current, {
           display: 'none',
@@ -105,9 +116,9 @@ export default function IntroLoader() {
         </div>
 
         <div ref={textRef} className="text-center mb-4">
-          <h1 className="font-serif text-3xl md:text-4xl font-normal tracking-tight text-[var(--ink)]">
+          <p className="font-serif text-3xl md:text-4xl font-normal tracking-tight text-[var(--ink)]">
             Idris <span className="italic text-[var(--tomato)]">cooks</span>
-          </h1>
+          </p>
         </div>
 
         <div ref={taglineRef}>

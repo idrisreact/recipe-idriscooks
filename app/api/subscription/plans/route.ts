@@ -1,15 +1,21 @@
 import { NextResponse } from 'next/server';
-import { getAvailablePlans } from '@/src/utils/subscription';
+import { PRICING, getRecipeAccessPrice } from '@/src/config/pricing';
 
 export async function GET() {
-  try {
-    const plans = await getAvailablePlans();
-    return NextResponse.json(plans);
-  } catch (error) {
-    console.error('Error fetching subscription plans:', error);
-    return NextResponse.json(
-      { error: 'Failed to fetch subscription plans' },
-      { status: 500 }
-    );
-  }
+  const recipeAccess = getRecipeAccessPrice();
+
+  return NextResponse.json({
+    freeTier: {
+      name: 'Free',
+      price: 0,
+      limits: PRICING.freeTier,
+    },
+    recipeAccess: {
+      name: 'Lifetime Access',
+      ...recipeAccess,
+      isLaunchSpecial: PRICING.recipeAccess.isLaunchSpecial,
+      regular: PRICING.recipeAccess.regular,
+    },
+    pdfDownloads: PRICING.pdfDownloads,
+  });
 }

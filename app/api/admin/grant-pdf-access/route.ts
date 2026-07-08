@@ -1,16 +1,25 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { z } from 'zod';
 import { db } from '@/src/db';
 import { premiumFeatures } from '@/src/db/schemas/premium-features.schema';
 import { user } from '@/src/db/schemas/user.schema';
 import { eq } from 'drizzle-orm';
+import { rateLimit } from '@/src/lib/rate-limit';
+import { requireAdmin } from '@/src/utils/api-guards';
+
+const GrantPdfAccessSchema = z.object({
+  userEmail: z.string().trim().email(),
+});
 
 export async function POST(request: NextRequest) {
-  try {
-    const { userEmail } = await request.json();
+  const rateLimited = await rateLimit(request, 'api');
+  if (rateLimited) return rateLimited;
 
-    if (!userEmail) {
-      return NextResponse.json({ error: 'User email is required' }, { status: 400 });
-    }
+  const forbidden = await requireAdmin();
+  if (forbidden) return forbidden;
+
+  try {
+    const { userEmail } = GrantPdfAccessSchema.parse(await request.json());
 
     // Find the user by email
     const userRecord = await db.select().from(user).where(eq(user.email, userEmail)).limit(1);
@@ -54,6 +63,13 @@ export async function POST(request: NextRequest) {
       feature: result[0],
     });
   } catch (error) {
+    if (error instanceof z.ZodError) {
+      return NextResponse.json(
+        { error: 'Invalid request', details: error.errors },
+        { status: 400 }
+      );
+    }
+
     console.error('Grant PDF access error:', error);
     return NextResponse.json(
       {

@@ -3,6 +3,7 @@ import { z } from 'zod';
 import { auth } from '@/src/utils/auth';
 import { headers } from 'next/headers';
 import { rateLimit } from '@/src/lib/rate-limit';
+import { getEntitlements, incrementUsage } from '@/src/lib/entitlements';
 import { buildRecipePDF } from '@/src/utils/pdf-builder';
 
 const IngredientSchema = z.object({
@@ -72,8 +73,35 @@ export async function POST(request: NextRequest) {
 
     const { recipes, title } = result.data;
 
+    // PDF downloads are a paid add-on: verify the feature and the purchased bundle size.
+    const entitlements = await getEntitlements(session.user.id);
+
+    if (!entitlements.hasPdfAccess) {
+      return NextResponse.json(
+        {
+          error: 'Upgrade required',
+          reason: 'PDF downloads are a paid add-on. Purchase a recipe bundle to export PDFs.',
+          upgradeUrl: '/pricing',
+        },
+        { status: 402 }
+      );
+    }
+
+    if (entitlements.pdfRecipeLimit > 0 && recipes.length > entitlements.pdfRecipeLimit) {
+      return NextResponse.json(
+        {
+          error: 'Bundle limit exceeded',
+          reason: `Your bundle covers ${entitlements.pdfRecipeLimit} recipes per export, but ${recipes.length} were requested.`,
+          upgradeUrl: '/pricing',
+        },
+        { status: 402 }
+      );
+    }
+
     // Generate PDF
     const pdfBytes = await buildRecipePDF(recipes, title);
+
+    await incrementUsage(session.user.id, 'pdfExports');
 
     return new NextResponse(pdfBytes, {
       status: 200,

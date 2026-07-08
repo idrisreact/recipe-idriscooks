@@ -2,8 +2,15 @@ import { NextResponse } from 'next/server';
 import { db } from '@/src/db';
 import { premiumFeatures } from '@/src/db/schemas/premium-features.schema';
 import { desc } from 'drizzle-orm';
+import { blockInProduction, requireAdmin } from '@/src/utils/api-guards';
 
 export async function GET() {
+  const blocked = blockInProduction();
+  if (blocked) return blocked;
+
+  const forbidden = await requireAdmin();
+  if (forbidden) return forbidden;
+
   try {
     // Get recent premium features grants to see webhook activity
     const recentGrants = await db

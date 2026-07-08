@@ -365,7 +365,7 @@ export default function RefundPolicyPage() {
                 If you have any questions about this Refund Policy or need assistance, please
                 contact us:
               </Text>
-              <div className="murakamicity-card p-4">
+              <div className="card-editorial p-4">
                 <ul className="space-y-2">
                   <li>
                     <Text>
@@ -397,7 +397,7 @@ export default function RefundPolicyPage() {
             </section>
 
             {/* Fair Use */}
-            <section className="murakamicity-card p-6 bg-muted/30">
+            <section className="card-editorial p-6 bg-muted/30">
               <Text as="h3" variant="large" className="font-semibold mb-3">
                 Our Fair Use Promise
               </Text>
