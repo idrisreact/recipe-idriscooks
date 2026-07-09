@@ -49,3 +49,7 @@ storybook-static
 ClAUDE.md
 # clerk configuration (can include secrets)
 /.clerk/
+
+# Playwright artifacts
+test-results/
+playwright-report/

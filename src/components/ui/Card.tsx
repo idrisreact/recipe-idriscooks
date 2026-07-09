@@ -62,10 +62,12 @@ export const Card = (props: CardProps) => {
           {metadata && <div aria-label="Recipe details">{metadata}</div>}
         </div>
 
-        <div
-          className="mt-4 h-[260px] w-full overflow-hidden bg-[var(--parchment)] bg-cover bg-center transition-transform duration-500 group-hover:scale-[1.01] sm:h-[300px]"
-          style={{ backgroundImage: `url(${backgroundImage})` }}
-        />
+        <div className="mt-4 h-[260px] w-full overflow-hidden bg-[var(--parchment)] sm:h-[300px]">
+          <div
+            className="h-full w-full bg-cover bg-center transition-transform duration-700 ease-out group-hover:scale-[1.04]"
+            style={{ backgroundImage: `url(${backgroundImage})` }}
+          />
+        </div>
 
         <div className="pt-5">
           {author && (

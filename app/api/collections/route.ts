@@ -5,7 +5,7 @@ import { z } from 'zod';
 import { db } from '@/src/db';
 import { recipeCollections, recipeCollectionItems } from '@/src/db/schemas';
 import { and, desc, eq, sql } from 'drizzle-orm';
-import { canPerformAction, incrementUsage } from '@/src/lib/subscription';
+import { canPerformAction, incrementUsage } from '@/src/lib/entitlements';
 
 const CreateCollectionSchema = z.object({
   name: z.string().trim().min(1).max(200),
@@ -44,10 +44,7 @@ export async function GET() {
         recipeCount: sql<number>`count(${recipeCollectionItems.id})`,
       })
       .from(recipeCollections)
-      .leftJoin(
-        recipeCollectionItems,
-        eq(recipeCollections.id, recipeCollectionItems.collectionId)
-      )
+      .leftJoin(recipeCollectionItems, eq(recipeCollections.id, recipeCollectionItems.collectionId))
       .where(eq(recipeCollections.userId, session.user.id))
       .groupBy(recipeCollections.id)
       .orderBy(desc(recipeCollections.createdAt));
@@ -75,7 +72,7 @@ export async function POST(request: Request) {
     const body = await request.json();
     const data = CreateCollectionSchema.parse(body);
 
-    const permission = await canPerformAction('createCollection');
+    const permission = await canPerformAction(session.user.id, 'createCollection');
     if (!permission.allowed) {
       return NextResponse.json(
         { error: permission.reason || 'Collection limit reached' },
@@ -123,7 +120,7 @@ export async function POST(request: Request) {
 
     const [collection] = await db.insert(recipeCollections).values(values).returning();
 
-    await incrementUsage('collectionsCount');
+    await incrementUsage(session.user.id, 'collectionsCount');
 
     return NextResponse.json(collection, { status: 201 });
   } catch (error) {

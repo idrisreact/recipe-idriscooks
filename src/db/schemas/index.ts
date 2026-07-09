@@ -4,3 +4,4 @@ export { favoriteRecipes, favoriteRecipesSchema } from './favorite-recipes.schem
 export * from './subscription.schema';
 export * from './premium-features.schema';
 export * from './review.schema';
+export * from './catering.schema';

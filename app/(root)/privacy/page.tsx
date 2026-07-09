@@ -319,7 +319,7 @@ export default function PrivacyPolicyPage() {
                 If you have any questions about this Privacy Policy or our data practices, please
                 contact us:
               </Text>
-              <div className="murakamicity-card p-4">
+              <div className="card-editorial p-4">
                 <ul className="space-y-2">
                   <li>
                     <Text>
@@ -339,7 +339,7 @@ export default function PrivacyPolicyPage() {
             </section>
 
             {/* Consent */}
-            <section className="murakamicity-card p-6 bg-muted/30">
+            <section className="card-editorial p-6 bg-muted/30">
               <Text as="h3" variant="large" className="font-semibold mb-3">
                 Your Consent
               </Text>

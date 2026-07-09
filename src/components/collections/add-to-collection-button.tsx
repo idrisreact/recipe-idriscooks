@@ -143,7 +143,7 @@ export default function AddToCollectionButton({
               </p>
             </div>
 
-            <div className="max-h-64 overflow-y-auto">
+            <div className="max-h-64 overflow-y-auto" data-lenis-prevent>
               {collections && collections.length > 0 ? (
                 <div className="p-2">
                   {collections.map((collection) => (

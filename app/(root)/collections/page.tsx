@@ -2,18 +2,19 @@
 
 import { useState, type FormEvent } from 'react';
 import { useRouter } from 'next/navigation';
-import { Folder, Plus, Trash2, LogIn, FolderOpen } from 'lucide-react';
 import { authClient } from '@/src/utils/auth-client';
 import { SignInModal } from '@/src/components/auth/sign-in-modal/SignInModal';
-import { Heading } from '@/src/components/common/heading/heading';
-import { Text } from '@/src/components/ui/Text';
-import { VerticalSpace } from '@/src/components/ui/VerticalSpace';
+import { PageHeader } from '@/src/components/ui/page-header';
+import { EmptyState } from '@/src/components/ui/empty-state';
+import { SkeletonGrid } from '@/src/components/ui/skeleton';
 import {
   useCollections,
   useCreateCollection,
   useDeleteCollection,
 } from '@/src/hooks/use-collections';
 import type { CollectionSummary } from '@/src/hooks/use-collections';
+
+const SWATCHES = ['#C8472D', '#6B7548', '#1C1A17', '#8B7355', '#F5B7A3'];
 
 function CollectionsContent() {
   const { data: session, isPending } = authClient.useSession();
@@ -25,7 +26,7 @@ function CollectionsContent() {
   const [showCreate, setShowCreate] = useState(false);
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
-  const [color, setColor] = useState('#3B82F6');
+  const [color, setColor] = useState(SWATCHES[0]);
   const [formError, setFormError] = useState<string | null>(null);
   const [showSignInModal, setShowSignInModal] = useState(false);
 
@@ -48,7 +49,7 @@ function CollectionsContent() {
       });
       setName('');
       setDescription('');
-      setColor('#3B82F6');
+      setColor(SWATCHES[0]);
       setShowCreate(false);
     } catch (err: unknown) {
       setFormError(err instanceof Error ? err.message : 'Failed to create collection');
@@ -56,7 +57,7 @@ function CollectionsContent() {
   };
 
   const handleDelete = async (collection: CollectionSummary) => {
-    const confirmed = window.confirm(`Delete "${collection.name}"? This can’t be undone.`);
+    const confirmed = window.confirm(`Delete "${collection.name}"? This can't be undone.`);
     if (!confirmed) return;
 
     try {
@@ -69,12 +70,7 @@ function CollectionsContent() {
   if (isPending) {
     return (
       <div className="wrapper page">
-        <div className="flex items-center justify-center min-h-[50vh]">
-          <div className="animate-pulse text-center">
-            <div className="w-8 h-8 bg-muted rounded-full mx-auto mb-4"></div>
-            <Text>Loading...</Text>
-          </div>
-        </div>
+        <SkeletonGrid count={4} itemClassName="h-24" className="flex flex-col gap-8" />
       </div>
     );
   }
@@ -82,31 +78,31 @@ function CollectionsContent() {
   if (!session) {
     return (
       <div className="wrapper page">
-        <div className="text-center py-16">
-          <LogIn className="w-16 h-16 text-muted-foreground mx-auto mb-6" />
-          <Text as="h1" variant="heading" className="mb-4">
-            Sign in to manage collections
-          </Text>
-          <Text variant="large" className="text-muted-foreground mb-8 max-w-md mx-auto">
-            Create recipe collections to organize your favorites and plan your meals.
-          </Text>
-          <div className="flex gap-4 justify-center">
-            <button
-              onClick={() => setShowSignInModal(true)}
-              className="murakamicity-button flex items-center gap-2"
-            >
-              <LogIn className="w-4 h-4" />
-              Sign In
-            </button>
-            <button
-              onClick={() => router.push('/recipes')}
-              className="murakamicity-button-outline flex items-center gap-2"
-            >
-              Browse Recipes
-            </button>
-          </div>
-        </div>
-
+        <PageHeader
+          eyebrow="The archive"
+          title="Collections"
+          description="Group recipes by theme, occasion, or mood — your own chapters of the cookbook."
+        />
+        <EmptyState
+          eyebrow="Sign in required"
+          title={
+            <>
+              Your chapters are waiting to be{' '}
+              <span className="italic text-[var(--tomato)]">written</span>.
+            </>
+          }
+          description="Sign in to create collections and organize the recipes you cook most."
+          action={
+            <div className="flex flex-wrap gap-4">
+              <button type="button" onClick={() => setShowSignInModal(true)} className="btn-ink">
+                Sign in
+              </button>
+              <button type="button" onClick={() => router.push('/recipes')} className="btn-link">
+                Browse recipes instead
+              </button>
+            </div>
+          }
+        />
         {showSignInModal && <SignInModal onClose={() => setShowSignInModal(false)} />}
       </div>
     );
@@ -114,160 +110,168 @@ function CollectionsContent() {
 
   return (
     <div className="wrapper page">
-      <div className="flex flex-col gap-6">
-        <div className="flex items-start justify-between flex-wrap gap-4">
-          <Heading title="My Collections" subTitle="Organize recipes your way" />
-          <button
-            onClick={() => setShowCreate((prev) => !prev)}
-            className="murakamicity-button flex items-center gap-2"
-          >
-            <Plus className="w-4 h-4" />
-            {showCreate ? 'Close' : 'New Collection'}
+      <PageHeader
+        eyebrow="The archive"
+        title="Collections"
+        description="Group recipes by theme, occasion, or mood — your own chapters of the cookbook."
+        aside={
+          <button type="button" onClick={() => setShowCreate((prev) => !prev)} className="btn-ink">
+            {showCreate ? 'Close' : 'New collection'}
           </button>
-        </div>
+        }
+      />
 
-        {showCreate && (
-          <form onSubmit={handleCreate} className="murakamicity-card p-6 max-w-2xl">
-            <h2 className="text-xl font-semibold text-primary mb-6">Create Collection</h2>
-            <div className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Collection Name
-                </label>
-                <input
-                  type="text"
-                  value={name}
-                  onChange={(event) => setName(event.target.value)}
-                  className="w-full px-3 py-2 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
-                  placeholder="Weekend Favorites"
+      {showCreate && (
+        <form
+          onSubmit={handleCreate}
+          className="flex flex-col gap-8 bg-[var(--parchment)] p-8 md:p-10 max-w-2xl"
+        >
+          <span className="eyebrow-rule">New collection</span>
+
+          <div className="flex flex-col gap-3">
+            <label htmlFor="collection-name" className="field-label">
+              Name
+            </label>
+            <input
+              id="collection-name"
+              type="text"
+              value={name}
+              onChange={(event) => setName(event.target.value)}
+              className="field-input"
+              placeholder="Weekend favorites"
+            />
+          </div>
+
+          <div className="flex flex-col gap-3">
+            <label htmlFor="collection-description" className="field-label">
+              Description <span className="normal-case tracking-normal">(optional)</span>
+            </label>
+            <textarea
+              id="collection-description"
+              rows={2}
+              value={description}
+              onChange={(event) => setDescription(event.target.value)}
+              className="field-input resize-none"
+              placeholder="Recipes I cook on repeat."
+            />
+          </div>
+
+          <div className="flex flex-col gap-3">
+            <span className="field-label">Marker</span>
+            <div className="flex gap-3">
+              {SWATCHES.map((swatch) => (
+                <button
+                  key={swatch}
+                  type="button"
+                  onClick={() => setColor(swatch)}
+                  aria-label={`Use color ${swatch}`}
+                  aria-pressed={color === swatch}
+                  className="h-8 w-8 border transition-transform"
+                  style={{
+                    backgroundColor: swatch,
+                    borderColor: color === swatch ? 'var(--ink)' : 'transparent',
+                    transform: color === swatch ? 'scale(1.15)' : 'scale(1)',
+                  }}
                 />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Description (optional)
-                </label>
-                <textarea
-                  rows={3}
-                  value={description}
-                  onChange={(event) => setDescription(event.target.value)}
-                  className="w-full px-3 py-2 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent resize-none"
-                  placeholder="Recipes I cook on repeat."
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Color</label>
-                <input
-                  type="color"
-                  value={color}
-                  onChange={(event) => setColor(event.target.value)}
-                  className="h-10 w-16 border border-border rounded"
-                />
-              </div>
+              ))}
             </div>
+          </div>
 
-            {formError && <p className="text-sm text-destructive mt-4">{formError}</p>}
+          {formError && <p className="field-error">{formError}</p>}
 
-            <div className="flex gap-3 mt-6">
-              <button
-                type="submit"
-                disabled={createCollection.isPending}
-                className="murakamicity-button flex-1 disabled:opacity-60 disabled:cursor-not-allowed"
-              >
-                {createCollection.isPending ? 'Creating...' : 'Create Collection'}
-              </button>
-              <button
-                type="button"
-                onClick={() => setShowCreate(false)}
-                className="murakamicity-button-outline"
-              >
-                Cancel
-              </button>
-            </div>
-          </form>
-        )}
-      </div>
-
-      <VerticalSpace space="16" />
+          <div className="flex gap-4">
+            <button
+              type="submit"
+              disabled={createCollection.isPending}
+              className="btn-ink disabled:opacity-60 disabled:cursor-not-allowed"
+            >
+              {createCollection.isPending ? 'Creating…' : 'Create collection'}
+            </button>
+            <button type="button" onClick={() => setShowCreate(false)} className="btn-link">
+              Cancel
+            </button>
+          </div>
+        </form>
+      )}
 
       {isLoading ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-          {[...Array(6)].map((_, i) => (
-            <div key={i} className="murakamicity-card p-6 animate-pulse h-40" />
-          ))}
-        </div>
+        <SkeletonGrid count={4} itemClassName="h-24" className="flex flex-col gap-8" />
       ) : errorMessage ? (
-        <div className="text-center">
-          <Text as="h2" className="text-destructive mb-4" variant="subheading">
-            Failed to load collections
-          </Text>
-          <Text variant="large" className="text-muted-foreground mb-8 max-w-md mx-auto">
-            {errorMessage}
-          </Text>
-          <button onClick={() => window.location.reload()} className="murakamicity-button">
-            Try Again
-          </button>
-        </div>
+        <EmptyState
+          eyebrow="Something went wrong"
+          title="The archive wouldn't open."
+          description={errorMessage}
+          action={
+            <button type="button" onClick={() => window.location.reload()} className="btn-ink">
+              Try again
+            </button>
+          }
+        />
       ) : collections.length === 0 ? (
-        <div className="text-center py-16">
-          <FolderOpen className="w-16 h-16 text-muted-foreground mx-auto mb-6" />
-          <Text as="h2" variant="subheading" className="mb-4">
-            No collections yet
-          </Text>
-          <Text variant="large" className="text-muted-foreground mb-8 max-w-md mx-auto">
-            Create a collection to group recipes by theme, occasion, or mood.
-          </Text>
-          <button
-            onClick={() => setShowCreate(true)}
-            className="murakamicity-button flex items-center gap-2 mx-auto"
-          >
-            <Plus className="w-4 h-4" />
-            Create Collection
-          </button>
-        </div>
+        <EmptyState
+          eyebrow="Empty shelf"
+          title={
+            <>
+              No collections <span className="italic text-[var(--tomato)]">yet</span>.
+            </>
+          }
+          description="Create a collection to group recipes by theme, occasion, or mood."
+          action={
+            <button type="button" onClick={() => setShowCreate(true)} className="btn-ink">
+              Create your first collection
+            </button>
+          }
+        />
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-          {collections.map((collection) => (
-            <div key={collection.id} className="murakamicity-card p-6 flex flex-col gap-4">
-              <div className="flex items-start justify-between gap-4">
-                <div>
-                  <div className="flex items-center gap-2">
-                    <span
-                      className="inline-flex h-3 w-3 rounded-full"
-                      style={{ backgroundColor: collection.color || '#3B82F6' }}
-                    />
-                    <h3 className="text-lg font-semibold text-foreground">{collection.name}</h3>
-                  </div>
-                  {collection.description && (
-                    <p className="text-sm text-muted-foreground mt-2">
-                      {collection.description}
-                    </p>
-                  )}
-                </div>
+        <ol className="flex flex-col">
+          {collections.map((collection, index) => (
+            <li
+              key={collection.id}
+              className="group grid grid-cols-[auto_1fr_auto] items-baseline gap-6 border-t border-[var(--ink-line)] py-8 last:border-b"
+            >
+              <span className="mono-label flex items-center gap-4">
+                {String(index + 1).padStart(2, '0')}
+                <span
+                  className="inline-block h-2.5 w-2.5"
+                  style={{ backgroundColor: collection.color || SWATCHES[0] }}
+                  aria-hidden="true"
+                />
+              </span>
+              <div className="flex flex-col gap-2 min-w-0">
                 <button
+                  type="button"
+                  onClick={() => router.push(`/collections/${collection.id}`)}
+                  className="text-left font-serif text-3xl md:text-4xl leading-tight text-[var(--ink)] transition-colors group-hover:text-[var(--tomato)]"
+                >
+                  {collection.name}
+                </button>
+                {collection.description && (
+                  <p className="text-sm text-[var(--ink-65)] max-w-xl">{collection.description}</p>
+                )}
+                <p className="mono-label">
+                  {collection.recipeCount} recipe{collection.recipeCount === 1 ? '' : 's'}
+                </p>
+              </div>
+              <div className="flex items-center gap-6">
+                <button
+                  type="button"
+                  onClick={() => router.push(`/collections/${collection.id}`)}
+                  className="btn-link"
+                >
+                  Open →
+                </button>
+                <button
+                  type="button"
                   onClick={() => handleDelete(collection)}
-                  className="p-2 text-muted-foreground hover:text-destructive transition-colors"
+                  className="text-sm text-[var(--ink-50)] transition-colors hover:text-[var(--tomato)]"
                   aria-label={`Delete ${collection.name}`}
                 >
-                  <Trash2 className="w-4 h-4" />
+                  Delete
                 </button>
               </div>
-
-              <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                <Folder className="w-4 h-4" />
-                {collection.recipeCount} recipe{collection.recipeCount === 1 ? '' : 's'}
-              </div>
-
-              <div className="mt-auto flex gap-3">
-                <button
-                  onClick={() => router.push(`/collections/${collection.id}`)}
-                  className="murakamicity-button-outline flex-1"
-                >
-                  View Collection
-                </button>
-              </div>
-            </div>
+            </li>
           ))}
-        </div>
+        </ol>
       )}
     </div>
   );

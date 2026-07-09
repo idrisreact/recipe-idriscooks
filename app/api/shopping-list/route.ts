@@ -1,9 +1,15 @@
 import { NextResponse } from 'next/server';
 import { auth } from '@/src/utils/auth';
 import { headers } from 'next/headers';
+import { z } from 'zod';
 import { db } from '@/src/db';
 import { shoppingLists, shoppingListItems } from '@/src/db/schemas/premium-features.schema';
-import { eq, and, desc } from 'drizzle-orm';
+import { eq, and, desc, inArray } from 'drizzle-orm';
+
+const CreateShoppingListSchema = z.object({
+  name: z.string().trim().min(1).max(200).default('My Shopping List'),
+  mealPlanId: z.string().trim().min(1).optional().nullable(),
+});
 
 // GET - Fetch all shopping lists for the current user
 export async function GET() {
@@ -20,21 +26,30 @@ export async function GET() {
       .where(eq(shoppingLists.userId, session.user.id))
       .orderBy(desc(shoppingLists.createdAt));
 
-    // For each list, get its items
-    const listsWithItems = await Promise.all(
-      lists.map(async (list) => {
-        const items = await db
-          .select()
-          .from(shoppingListItems)
-          .where(eq(shoppingListItems.shoppingListId, list.id))
-          .orderBy(shoppingListItems.sortOrder);
+    const listIds = lists.map((list) => list.id);
+    const items =
+      listIds.length > 0
+        ? await db
+            .select()
+            .from(shoppingListItems)
+            .where(inArray(shoppingListItems.shoppingListId, listIds))
+            .orderBy(shoppingListItems.sortOrder)
+        : [];
 
-        return {
-          ...list,
-          items,
-        };
-      })
-    );
+    const itemsByList = new Map<string, typeof items>();
+    for (const item of items) {
+      const group = itemsByList.get(item.shoppingListId);
+      if (group) {
+        group.push(item);
+      } else {
+        itemsByList.set(item.shoppingListId, [item]);
+      }
+    }
+
+    const listsWithItems = lists.map((list) => ({
+      ...list,
+      items: itemsByList.get(list.id) ?? [],
+    }));
 
     return NextResponse.json(listsWithItems);
   } catch (error) {
@@ -53,7 +68,7 @@ export async function POST(request: Request) {
     }
 
     const body = await request.json();
-    const { name = 'My Shopping List', mealPlanId } = body;
+    const { name, mealPlanId } = CreateShoppingListSchema.parse(body);
 
     // Check for duplicate list names
     const existingLists = await db
@@ -82,6 +97,13 @@ export async function POST(request: Request) {
 
     return NextResponse.json(newList, { status: 201 });
   } catch (error) {
+    if (error instanceof z.ZodError) {
+      return NextResponse.json(
+        { error: 'Invalid request', details: error.errors },
+        { status: 400 }
+      );
+    }
+
     console.error('Error creating shopping list:', error);
     return NextResponse.json({ error: 'Failed to create shopping list' }, { status: 500 });
   }

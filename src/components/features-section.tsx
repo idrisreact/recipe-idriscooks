@@ -14,7 +14,7 @@ function MostPopularRecipes() {
     id: number;
     title: string;
     description: string;
-    image_url: string;
+    imageUrl: string;
     tags?: string[];
     favoriteCount: number;
   }
@@ -110,7 +110,7 @@ function MostPopularRecipes() {
 
       {/* Horizontal Scroll */}
       <div className="wrapper-wide">
-        <div className="horizontal-scroll gap-4 lg:gap-6 pb-6">
+        <div className="horizontal-scroll gap-4 lg:gap-6 pb-6" data-lenis-prevent>
           {recipes.map((recipe, index) => (
             <motion.div
               key={recipe.id}
@@ -125,7 +125,7 @@ function MostPopularRecipes() {
                 {/* Image */}
                 <div
                   className="absolute inset-0 bg-cover bg-center transition-transform duration-700 group-hover:scale-105"
-                  style={{ backgroundImage: `url(${recipe.image_url})` }}
+                  style={{ backgroundImage: `url(${recipe.imageUrl})` }}
                 />
                 <div className="img-overlay" />
 

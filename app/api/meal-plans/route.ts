@@ -5,7 +5,7 @@ import { headers } from 'next/headers';
 import { db } from '@/src/db';
 import { mealPlans, mealPlanItems } from '@/src/db/schemas';
 import { and, desc, eq, sql } from 'drizzle-orm';
-import { incrementUsage as incrementUsageWithUser } from '@/src/utils/subscription';
+import { incrementUsage as incrementUsageWithUser } from '@/src/lib/entitlements';
 
 const MealPlanStatusSchema = z.enum(['active', 'archived', 'template']);
 
@@ -34,7 +34,9 @@ const CreateMealPlanSchema = z.object({
 });
 
 function normalizeWeekStart(date: Date) {
-  const normalized = new Date(Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate()));
+  const normalized = new Date(
+    Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate())
+  );
   const day = normalized.getUTCDay();
   normalized.setUTCDate(normalized.getUTCDate() - day);
   return normalized;
@@ -92,7 +94,10 @@ export async function GET(request: Request) {
     return NextResponse.json(normalized);
   } catch (error) {
     if (error instanceof z.ZodError) {
-      return NextResponse.json({ error: 'Invalid parameters', details: error.errors }, { status: 400 });
+      return NextResponse.json(
+        { error: 'Invalid parameters', details: error.errors },
+        { status: 400 }
+      );
     }
 
     console.error('Error fetching meal plans:', error);
@@ -143,7 +148,10 @@ export async function POST(request: Request) {
     return NextResponse.json(plan, { status: 201 });
   } catch (error) {
     if (error instanceof z.ZodError) {
-      return NextResponse.json({ error: 'Invalid request', details: error.errors }, { status: 400 });
+      return NextResponse.json(
+        { error: 'Invalid request', details: error.errors },
+        { status: 400 }
+      );
     }
 
     console.error('Error creating meal plan:', error);

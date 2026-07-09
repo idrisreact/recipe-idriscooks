@@ -8,14 +8,14 @@
   ═══════════════════════════════════════════════════════════════ */
 
   /* Surfaces */
-  --cream: #F5EFE6;        /* page surface */
-  --parchment: #E8DFD0;    /* card / alt section bg */
-  --ink: #1C1A17;          /* type, lines */
+  --cream: #f5efe6; /* page surface */
+  --parchment: #e8dfd0; /* card / alt section bg */
+  --ink: #1c1a17; /* type, lines */
 
   /* Accents (used sparingly) */
-  --tomato: #C8472D;       /* single accent */
-  --peach: #F5B7A3;        /* tomato-on-dark */
-  --olive: #6B7548;        /* eyebrows, tags */
+  --tomato: #c8472d; /* single accent */
+  --peach: #f5b7a3; /* tomato-on-dark */
+  --olive: #6b7548; /* eyebrows, tags */
 
   /* Ink alphas */
   --ink-85: rgba(28, 26, 23, 0.85);
@@ -176,8 +176,8 @@ body {
 }
 
 ::selection {
-  background: rgba(200, 71, 45, 0.2);
-  color: var(--ink);
+  background: var(--tomato);
+  color: var(--cream);
 }
 
 @layer base {
@@ -367,7 +367,7 @@ body {
   }
 
   .btn-ink:hover {
-    background: #0F0E0C;
+    background: #0f0e0c;
   }
 
   .btn-cream {
@@ -399,7 +399,7 @@ body {
   }
 
   .btn-tomato:hover {
-    background: #B33E26;
+    background: #b33e26;
   }
 
   .btn-link {
@@ -445,7 +445,7 @@ body {
   }
 
   .chip-active:hover {
-    background: #0F0E0C;
+    background: #0f0e0c;
   }
 
   /* ═══════════════════════════════════════════════════════════════
@@ -634,7 +634,7 @@ body {
   }
 
   .btn-primary:hover {
-    background: #0F0E0C;
+    background: #0f0e0c;
   }
 
   .btn-outline {
@@ -670,7 +670,9 @@ body {
     background: var(--parchment);
     border: 1px solid var(--ink-line);
     border-radius: 0;
-    transition: border-color 0.2s, transform 0.2s;
+    transition:
+      border-color 0.2s,
+      transform 0.2s;
   }
 
   .card-editorial:hover,
@@ -808,5 +810,166 @@ body {
   }
   100% {
     height: 100%;
+  }
+}
+
+/* ---------------------------------------------------------------------------
+   Motion infrastructure (Lenis smooth scroll, marquee, link underline)
+   --------------------------------------------------------------------------- */
+
+/* Lenis housekeeping: CSS smooth scrolling fights Lenis' programmatic scroll */
+html.lenis,
+html.lenis body {
+  height: auto;
+}
+
+.lenis.lenis-smooth {
+  scroll-behavior: auto !important;
+}
+
+.lenis.lenis-smooth [data-lenis-prevent] {
+  overscroll-behavior: contain;
+}
+
+.lenis.lenis-stopped {
+  overflow: hidden;
+}
+
+/* Infinite marquee (used by src/components/motion/marquee.tsx) */
+.marquee {
+  display: flex;
+  overflow: hidden;
+  user-select: none;
+}
+
+.marquee-track {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  min-width: 100%;
+  justify-content: space-around;
+  animation: marquee-scroll 30s linear infinite;
+}
+
+@keyframes marquee-scroll {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-100%);
+  }
+}
+
+/* Animated underline for nav / inline links */
+.link-underline {
+  position: relative;
+}
+
+.link-underline::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  bottom: -3px;
+  width: 100%;
+  height: 1px;
+  background: currentColor;
+  transform: scaleX(0);
+  transform-origin: right center;
+  transition: transform 0.35s cubic-bezier(0.65, 0, 0.35, 1);
+}
+
+.link-underline:hover::after,
+.link-underline.active::after {
+  transform: scaleX(1);
+  transform-origin: left center;
+}
+
+/* Respect prefers-reduced-motion for CSS-driven animation */
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  body {
+    scroll-behavior: auto;
+  }
+
+  .marquee-track {
+    animation: none;
+  }
+
+  .animate-fade-in-up,
+  .animate-fade-in,
+  .animate-scale-in,
+  .animate-slide-in-left {
+    animation-duration: 0.01ms;
+    animation-iteration-count: 1;
+  }
+
+  .link-underline::after {
+    transition: none;
+  }
+}
+
+/* Editorial form fields (contact, catering) */
+@layer components {
+  .field-label {
+    font-family: var(--font-mono), ui-monospace, monospace;
+    font-size: 0.6875rem;
+    font-weight: 500;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--ink-60);
+  }
+
+  .field-input {
+    width: 100%;
+    background: transparent;
+    border: 0;
+    border-bottom: 1px solid var(--ink-line);
+    border-radius: 0;
+    padding: 12px 0;
+    font-family: var(--font-sans), system-ui, sans-serif;
+    font-size: 0.9375rem;
+    color: var(--ink);
+    transition: border-color 0.25s;
+  }
+
+  .field-input::placeholder {
+    color: var(--ink-50);
+  }
+
+  .field-input:focus {
+    outline: none;
+    border-bottom-color: var(--ink);
+  }
+
+  .field-input[aria-invalid='true'] {
+    border-bottom-color: var(--tomato);
+  }
+
+  .field-error {
+    font-size: 0.8125rem;
+    color: var(--tomato);
+  }
+}
+
+/* Outlined flat button (counterpart to .btn-ink) */
+@layer components {
+  .btn-outline {
+    @apply inline-flex items-center justify-center gap-2
+           px-7 py-4 text-sm font-semibold
+           transition-colors duration-200;
+    background: transparent;
+    color: var(--ink);
+    border: 1px solid var(--ink);
+    border-radius: 0;
+    font-family: var(--font-sans), system-ui, sans-serif;
+    letter-spacing: 0.02em;
+  }
+
+  .btn-outline:hover {
+    background: var(--ink);
+    color: var(--cream);
   }
 }

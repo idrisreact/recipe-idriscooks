@@ -1,35 +1,36 @@
 import { NextRequest, NextResponse } from 'next/server';
-import nodemailer from 'nodemailer';
+import { z } from 'zod';
+import { rateLimit } from '@/src/lib/rate-limit';
+import { sendEmail, escapeHtml } from '@/src/lib/email';
+import { contactSchema } from '@/src/lib/validations/contact';
 
 export async function POST(request: NextRequest) {
-  const { name, email, message } = await request.json();
-  if (!name || !email || !message) {
-    return NextResponse.json({ error: 'All fields are required.' }, { status: 400 });
-  }
-
-  const transporter = nodemailer.createTransport({
-    service: 'gmail',
-    auth: {
-      user: process.env.EMAIL_USER,
-      pass: process.env.EMAIL_PASS,
-    },
-  });
+  const rateLimited = await rateLimit(request, 'api');
+  if (rateLimited) return rateLimited;
 
   try {
-    await transporter.sendMail({
-      from: `Contact Form <${process.env.EMAIL_USER}>`,
-      to: process.env.EMAIL_USER,
-      subject: `Contact Form Submission from ${name}`,
-      html: `<p><b>Name:</b> ${name}</p><p><b>Email:</b> ${email}</p><p><b>Message:</b><br/>${message}</p>`,
+    const { name, email, message } = contactSchema.parse(await request.json());
+
+    await sendEmail({
+      subject: `Contact form: ${escapeHtml(name)}`,
+      replyTo: email,
+      html: [
+        `<p><b>Name:</b> ${escapeHtml(name)}</p>`,
+        `<p><b>Email:</b> ${escapeHtml(email)}</p>`,
+        `<p><b>Message:</b><br/>${escapeHtml(message).replace(/\n/g, '<br/>')}</p>`,
+      ].join(''),
     });
+
     return NextResponse.json({ success: true });
-  } catch (error: unknown) {
-    if (error instanceof Error) {
+  } catch (error) {
+    if (error instanceof z.ZodError) {
       return NextResponse.json(
-        { error: error.message || 'Failed to send message.' },
-        { status: 500 }
+        { error: 'Invalid request', details: error.errors },
+        { status: 400 }
       );
     }
+
+    console.error('Contact form error:', error);
     return NextResponse.json({ error: 'Failed to send message.' }, { status: 500 });
   }
 }

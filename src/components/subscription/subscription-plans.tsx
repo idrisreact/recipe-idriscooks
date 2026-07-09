@@ -74,7 +74,7 @@ export default function SubscriptionPlans() {
       {plans.map((plan) => (
         <div
           key={plan.id}
-          className={`murakamicity-card p-8 relative transition-all duration-200 ${
+          className={`card-editorial p-8 relative transition-all duration-200 ${
             plan.popular
               ? 'ring-2 ring-primary shadow-lg transform scale-105'
               : 'hover:shadow-lg hover:scale-102'
@@ -141,8 +141,8 @@ export default function SubscriptionPlans() {
               plan.current
                 ? 'bg-green-500/20 text-green-600 cursor-not-allowed'
                 : plan.popular
-                  ? 'murakamicity-button hover:scale-105'
-                  : 'murakamicity-button-outline hover:bg-primary hover:text-primary-foreground'
+                  ? 'btn-ink hover:scale-105'
+                  : 'btn-outline hover:bg-primary hover:text-primary-foreground'
             }`}
           >
             {loading && plan.id === 'pdf' ? (

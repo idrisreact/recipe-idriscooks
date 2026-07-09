@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import { DM_Sans, Instrument_Serif, JetBrains_Mono } from 'next/font/google';
 import './globals.css';
 import { ReactQueryProvider } from '@/src/components/react-query-provider/react-query-provider';
+import { SmoothScrollProvider, TransitionProvider } from '@/src/components/motion';
 import { Toaster } from 'react-hot-toast';
 import LogRocket from 'logrocket';
 import { Analytics } from '@vercel/analytics/next';
@@ -116,7 +117,9 @@ export default function RootLayout({
       <body className="font-sans antialiased">
         <IntroLoader />
         <ReactQueryProvider>
-          {children}
+          <SmoothScrollProvider>
+            <TransitionProvider>{children}</TransitionProvider>
+          </SmoothScrollProvider>
           <Toaster
             position="top-right"
             toastOptions={{

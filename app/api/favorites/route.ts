@@ -6,6 +6,7 @@ import {
   getUserFavorites,
 } from '@/src/utils/favorite-recipes';
 import { auth } from '@/src/utils/auth';
+import { enforceLimit } from '@/src/lib/entitlements';
 
 const FavoritesQuerySchema = z
   .object({
@@ -70,6 +71,9 @@ export async function POST(request: NextRequest) {
     if (!recipeId) {
       return NextResponse.json({ error: 'Recipe ID is required' }, { status: 400 });
     }
+
+    const blocked = await enforceLimit(session.user.id, 'addFavorite');
+    if (blocked) return blocked;
 
     const favorite = await addToFavorites(session.user.id, recipeId);
 

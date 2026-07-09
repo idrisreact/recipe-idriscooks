@@ -1,21 +1,15 @@
-import { Text } from "@/src/components/ui/Text";
-
 type HeadingProps = {
   title: string;
   subTitle?: string;
 };
 
+/** Editorial page heading: serif display title, muted standfirst, ink rule. */
 export const Heading = ({ title, subTitle }: HeadingProps) => {
   return (
-    <div className="flex flex-col gap-2">
-      <Text as="h1" className="text-4xl">
-        {title}
-      </Text>
-      {subTitle && (
-        <Text as="p" opacity="50">
-          {subTitle}
-        </Text>
-      )}
+    <div className="flex flex-col gap-4">
+      <h1 className="display-s">{title}</h1>
+      {subTitle && <p className="body-lg text-[var(--ink-65)] max-w-2xl">{subTitle}</p>}
+      <div className="divider" />
     </div>
   );
 };

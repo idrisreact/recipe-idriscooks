@@ -13,6 +13,8 @@ const publicRoutes = [
   '/api/webhooks',
   '/api/recipes',
   '/api/contact',
+  '/catering',
+  '/api/catering',
 ];
 
 function isPublicRoute(pathname: string): boolean {

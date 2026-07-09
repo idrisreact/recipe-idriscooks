@@ -23,11 +23,10 @@ export function WelcomeToast() {
         (t) => (
           <div className="flex items-start gap-3 max-w-md">
             <div className="flex-1">
-              <p className="font-semibold text-white mb-1">
-                Welcome to Idris Cooks! 👋
-              </p>
+              <p className="font-semibold text-white mb-1">Welcome to Idris Cooks! 👋</p>
               <p className="text-sm text-gray-300 mb-3">
-                Sign in with Google to access premium recipes, save favorites, and unlock exclusive features.
+                Sign in with Google to access premium recipes, save favorites, and unlock exclusive
+                features.
               </p>
               <div className="flex gap-2">
                 <button
@@ -53,14 +52,10 @@ export function WelcomeToast() {
             </div>
             <button
               onClick={() => toast.dismiss(t.id)}
+              aria-label="Dismiss"
               className="text-gray-400 hover:text-white transition-colors"
             >
-              <svg
-                className="w-5 h-5"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path
                   strokeLinecap="round"
                   strokeLinejoin="round"

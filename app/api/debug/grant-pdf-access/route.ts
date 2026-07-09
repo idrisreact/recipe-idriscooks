@@ -2,8 +2,12 @@ import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@/src/utils/auth';
 import { db } from '@/src/db';
 import { premiumFeatures } from '@/src/db/schemas/premium-features.schema';
+import { blockInProduction } from '@/src/utils/api-guards';
 
 export async function POST(request: NextRequest) {
+  const blocked = blockInProduction();
+  if (blocked) return blocked;
+
   try {
     const session = await auth.api.getSession({
       headers: request.headers,
