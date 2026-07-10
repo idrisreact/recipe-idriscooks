@@ -17,7 +17,7 @@ import toast from 'react-hot-toast';
 type Props = {
   recipe: Recipe;
   canView: boolean;
-  hasPro?: boolean;
+  hasPdfAccess?: boolean;
 };
 
 function formatMinutes(total: number): string {
@@ -48,7 +48,7 @@ function splitStep(step: string, index: number) {
   };
 }
 
-export function RecipeDetailedView({ recipe, canView, hasPro = false }: Props) {
+export function RecipeDetailedView({ recipe, canView, hasPdfAccess = false }: Props) {
   const router = useRouter();
   const { addToFavorites, removeFromFavorites, isFavorited } = useFavorites();
   const [isDownloading, setIsDownloading] = useState(false);
@@ -76,8 +76,8 @@ export function RecipeDetailedView({ recipe, canView, hasPro = false }: Props) {
   };
 
   const handleDownloadPDF = async () => {
-    if (!hasPro) {
-      toast.error('Upgrade to Pro to download recipes!');
+    if (!hasPdfAccess) {
+      toast.error('Upgrade to download recipe PDFs!');
       router.push('/pricing');
       return;
     }
@@ -120,23 +120,23 @@ export function RecipeDetailedView({ recipe, canView, hasPro = false }: Props) {
 
   return (
     <article className="relative w-full">
-      <div className="mb-8 flex items-center justify-between gap-4">
+      <div className="mb-8 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
         <Button
           variant="outline"
           onClick={() => router.push('/recipes')}
-          className="rounded-none border-[var(--ink)] bg-transparent text-[var(--ink)] shadow-none hover:bg-[var(--parchment)]"
+          className="w-fit rounded-none border-[var(--ink)] bg-transparent text-[var(--ink)] shadow-none hover:bg-[var(--parchment)]"
         >
           <ArrowLeft className="h-4 w-4" /> Recipes
         </Button>
 
-        <div className="hidden flex-wrap items-center justify-end gap-2 md:flex">
+        <div className="flex flex-wrap items-center gap-2 md:justify-end">
           <Button
             variant="outline"
             onClick={handleDownloadPDF}
             disabled={isDownloading}
             className="rounded-none border-[var(--ink)] bg-transparent text-[var(--ink)] shadow-none hover:bg-[var(--ink)] hover:text-[var(--cream)]"
           >
-            {hasPro ? <Download className="h-4 w-4" /> : <Lock className="h-4 w-4" />}
+            {hasPdfAccess ? <Download className="h-4 w-4" /> : <Lock className="h-4 w-4" />}
             {isDownloading ? 'Generating...' : 'PDF'}
           </Button>
           <Button
@@ -144,7 +144,9 @@ export function RecipeDetailedView({ recipe, canView, hasPro = false }: Props) {
             onClick={toggleFavorite}
             className="rounded-none border-[var(--ink)] bg-transparent text-[var(--ink)] shadow-none hover:bg-[var(--ink)] hover:text-[var(--cream)]"
           >
-            <Heart className={`h-4 w-4 ${favorited ? 'fill-[var(--tomato)] text-[var(--tomato)]' : ''}`} />
+            <Heart
+              className={`h-4 w-4 ${favorited ? 'fill-[var(--tomato)] text-[var(--tomato)]' : ''}`}
+            />
             {favorited ? 'Saved' : 'Save'}
           </Button>
           <Button
@@ -166,9 +168,7 @@ export function RecipeDetailedView({ recipe, canView, hasPro = false }: Props) {
           <span>{formatMinutes(totalTime)} total</span>
           <span>{formatMinutes(recipe.prepTime)} prep</span>
           <span>Serves {recipe.servings}</span>
-          <span className="text-[var(--tomato)]">
-            {canView ? 'Ready to cook' : 'Preview only'}
-          </span>
+          <span className="text-[var(--tomato)]">{canView ? 'Ready to cook' : 'Preview only'}</span>
         </div>
       </div>
 
@@ -268,9 +268,7 @@ export function RecipeDetailedView({ recipe, canView, hasPro = false }: Props) {
                   </span>
                   <div>
                     <h2 className="font-serif text-[22px] leading-tight">{parsedStep.heading}</h2>
-                    <p className="mt-2 text-sm leading-6 text-[var(--ink-85)]">
-                      {parsedStep.body}
-                    </p>
+                    <p className="mt-2 text-sm leading-6 text-[var(--ink-85)]">{parsedStep.body}</p>
                   </div>
                 </div>
               );
@@ -286,33 +284,6 @@ export function RecipeDetailedView({ recipe, canView, hasPro = false }: Props) {
           and crunchy toppings right before serving.
         </p>
       </section>
-
-      <div className="mt-8 grid gap-2 md:hidden">
-        <Button
-          variant="outline"
-          onClick={handleDownloadPDF}
-          disabled={isDownloading}
-          className="rounded-none border-[var(--ink)] bg-transparent text-[var(--ink)] shadow-none"
-        >
-          {hasPro ? <Download className="h-4 w-4" /> : <Lock className="h-4 w-4" />}
-          {isDownloading ? 'Generating...' : 'Download PDF'}
-        </Button>
-        <Button
-          variant="outline"
-          onClick={toggleFavorite}
-          className="rounded-none border-[var(--ink)] bg-transparent text-[var(--ink)] shadow-none"
-        >
-          <Heart className={`h-4 w-4 ${favorited ? 'fill-[var(--tomato)] text-[var(--tomato)]' : ''}`} />
-          {favorited ? 'Favorited' : 'Favorite'}
-        </Button>
-        <Button
-          variant="outline"
-          onClick={share}
-          className="rounded-none border-[var(--ink)] bg-transparent text-[var(--ink)] shadow-none"
-        >
-          <Share2 className="h-4 w-4" /> Share
-        </Button>
-      </div>
 
       {!canView && <SignInOverlay position="top" />}
     </article>
