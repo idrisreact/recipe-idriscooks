@@ -26,6 +26,7 @@ export const cateringInquiries = pgTable(
     dietaryRequirements: text('dietary_requirements'),
     message: text('message'),
     status: varchar('status', { length: 20 }).default('new').notNull(), // new, contacted, quoted, confirmed, declined, archived
+    internalNotes: text('internal_notes'), // admin-only, never exposed to the inquirer
     metadata: jsonb('metadata').$type<{
       source?: string;
       utm?: Record<string, string>;
