@@ -2,12 +2,18 @@ import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { db } from '@/src/db';
 import { cateringInquiries } from '@/src/db/schemas';
-import { desc } from 'drizzle-orm';
+import { count, desc, eq } from 'drizzle-orm';
 import { auth } from '@/src/utils/auth';
 import { rateLimit } from '@/src/lib/rate-limit';
 import { requireAdmin } from '@/src/utils/api-guards';
 import { sendEmail, escapeHtml } from '@/src/lib/email';
-import { cateringInquirySchema } from '@/src/lib/validations/catering';
+import {
+  cateringInquirySchema,
+  INQUIRY_STATUSES,
+  type InquiryStatus,
+} from '@/src/lib/validations/catering';
+
+const PAGE_SIZE = 20;
 
 export async function POST(request: NextRequest) {
   const rateLimited = await rateLimit(request, 'api');
@@ -78,18 +84,40 @@ export async function POST(request: NextRequest) {
   }
 }
 
-export async function GET() {
+export async function GET(request: NextRequest) {
   const forbidden = await requireAdmin();
   if (forbidden) return forbidden;
 
   try {
-    const inquiries = await db
-      .select()
-      .from(cateringInquiries)
-      .orderBy(desc(cateringInquiries.createdAt))
-      .limit(100);
+    const { searchParams } = new URL(request.url);
+    const statusParam = searchParams.get('status');
+    const status = INQUIRY_STATUSES.some((s) => s.value === statusParam)
+      ? (statusParam as InquiryStatus)
+      : null;
+    const page = Math.max(1, Number(searchParams.get('page')) || 1);
 
-    return NextResponse.json(inquiries);
+    let query = db.select().from(cateringInquiries).$dynamic();
+    if (status) {
+      query = query.where(eq(cateringInquiries.status, status));
+    }
+
+    const [inquiries, countRows] = await Promise.all([
+      query
+        .orderBy(desc(cateringInquiries.createdAt))
+        .limit(PAGE_SIZE)
+        .offset((page - 1) * PAGE_SIZE),
+      db
+        .select({ status: cateringInquiries.status, count: count() })
+        .from(cateringInquiries)
+        .groupBy(cateringInquiries.status),
+    ]);
+
+    const counts = Object.fromEntries(countRows.map((row) => [row.status, row.count]));
+    const total = status
+      ? (counts[status] ?? 0)
+      : countRows.reduce((sum, row) => sum + row.count, 0);
+
+    return NextResponse.json({ inquiries, counts, total, page, pageSize: PAGE_SIZE });
   } catch (error) {
     console.error('Error fetching catering inquiries:', error);
     return NextResponse.json({ error: 'Failed to fetch inquiries' }, { status: 500 });

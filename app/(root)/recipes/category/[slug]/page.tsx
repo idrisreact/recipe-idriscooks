@@ -182,7 +182,7 @@ export default async function RecipePage({ params }: PageProps) {
         <RecipeDetailedView
           recipe={recipe as unknown as Recipe}
           canView={true}
-          hasPro={hasUnlimitedViews}
+          hasPdfAccess={entitlements?.hasPdfAccess ?? false}
         />
 
         {/* Reviews Section */}

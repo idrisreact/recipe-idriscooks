@@ -16,8 +16,23 @@ export const BUDGET_RANGES = [
   { value: 'not-sure', label: 'Not sure yet' },
 ] as const;
 
+export const INQUIRY_STATUSES = [
+  { value: 'new', label: 'New' },
+  { value: 'contacted', label: 'Contacted' },
+  { value: 'quoted', label: 'Quoted' },
+  { value: 'confirmed', label: 'Confirmed' },
+  { value: 'declined', label: 'Declined' },
+  { value: 'archived', label: 'Archived' },
+] as const;
+
+export type InquiryStatus = (typeof INQUIRY_STATUSES)[number]['value'];
+
 const eventTypeValues = EVENT_TYPES.map((type) => type.value) as [string, ...string[]];
 const budgetValues = BUDGET_RANGES.map((range) => range.value) as [string, ...string[]];
+const statusValues = INQUIRY_STATUSES.map((status) => status.value) as [
+  InquiryStatus,
+  ...InquiryStatus[],
+];
 
 /**
  * Shared between the inquiry form (client) and /api/catering (server),
@@ -43,3 +58,15 @@ export const cateringInquirySchema = z.object({
 });
 
 export type CateringInquiryInput = z.infer<typeof cateringInquirySchema>;
+
+/** Admin-only updates via PATCH /api/catering/[id]. */
+export const cateringInquiryUpdateSchema = z
+  .object({
+    status: z.enum(statusValues).optional(),
+    internalNotes: z.string().trim().max(4000, 'Keep notes under 4000 characters').optional(),
+  })
+  .refine((data) => data.status !== undefined || data.internalNotes !== undefined, {
+    message: 'Provide a status or internal notes to update',
+  });
+
+export type CateringInquiryUpdateInput = z.infer<typeof cateringInquiryUpdateSchema>;
